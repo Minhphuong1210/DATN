@@ -1,16 +1,15 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { Route, Routes } from "react-router-dom";
+import LayoutClient from "./layout/LayoutClient";
 
 function App() {
-
-
   return (
     <>
-      <h1 className='text-center text-3xl'>asd</h1>
+      <Routes>
+        <Route path="/" element={<LayoutClient />} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
