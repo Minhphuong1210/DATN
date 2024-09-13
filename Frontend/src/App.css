@@ -1,0 +1,11 @@
+.containerr {
+  margin-left: 150px;
+  margin-right: 150px;
+}
+
+body {
+  margin: auto;
+  padding: 0;
+  font-size: 16px;
+  font-family: "MyFont", sans-serif;
+}
