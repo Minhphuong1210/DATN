@@ -1,20 +1,22 @@
 import React from 'react';
 import CartItem from '../../components/client/CartItem';
-import CartSummary from '../../components/CartSummary';
 import Header from '../../components/client/Header';
+import CartSummary from '../../components/client/CartSummary';
+import { CartItemProps } from '../../interface/Product';
 
 
-type CartItem = {
-  id: number;
-  name: string;
-  color: string;
-  size: string;
-  quantity: number;
-  price: number;
-};
+// type CartItem = {
+//   id: number;
+//   name: string;
+//   color: string;
+//   size: string;
+//   quantity: number;
+//   price: number;
+//   images: string
+// };
 
 const CartPage: React.FC = () => {
-  const [cartItems, setCartItems] = React.useState<CartItem[]>([
+  const [cartItems, setCartItems] = React.useState<CartItemProps[]>([
     {
       id: 1,
       name: 'Áo sơ mi - AR240033DT',
@@ -22,6 +24,7 @@ const CartPage: React.FC = () => {
       size: '38',
       quantity: 1,
       price: 700000,
+      images: 'https://owen.cdn.vccloud.vn/media/catalog/product/cache/01755127bd64f5dde3182fd2f139143a/a/s/as240047d._3_1.jpg'
     },
   ]);
 
@@ -43,7 +46,7 @@ const CartPage: React.FC = () => {
     <div className="flex overflow-hidden flex-col pb-5 bg-white">
         <Header isMobile={false}/>
         <div className='container mx-auto px-[160px]'>
-      <main className="flex flex-col self-center mt-16 w-full text-2xl font-semibold max-w-[1535px] max-md:mt-10 max-md:max-w-full">
+      <main className="flex flex-col self-center mt-16 w-full text-2xl  max-w-[1535px] max-md:mt-10 max-md:max-w-full">
         <h1 className="self-start text-xl font-bold text-black max-md:ml-1.5">
           GIỎ HÀNG
         </h1>

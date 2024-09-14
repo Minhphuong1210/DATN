@@ -5,6 +5,7 @@ export type CartItemProps = {
     size: string;
     quantity: number;
     price: number;
+    images: string 
 }
 export type CartSummaryProps = {
     totalItems: number;
