@@ -34,37 +34,37 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
         {/* Menu cho màn hình desktop */}
         <div className="hidden flex-grow md:flex md:justify-center">
           <ul className="flex space-x-5">
-            <li className="menuNav">
+            <li className="hovermenuNav">
               <a href="#" className="hover:text-slate-600">
                 NEW ITEM
               </a>
             </li>
-            <li className="menuNav">
+            <li className="hovermenuNav">
               <a href="#" className="hover:text-slate-600">
                 ÁO NAM
               </a>
             </li>
-            <li className="menuNav">
+            <li className="hovermenuNav">
               <a href="#" className="hover:text-slate-600">
                 QUẦN
               </a>
             </li>
-            <li className="menuNav">
+            <li className="hovermenuNav">
               <a href="#" className="hover:text-slate-600">
                 BỘ VEST
               </a>
             </li>
-            <li className="menuNav">
+            <li className="hovermenuNav">
               <a href="#" className="hover:text-slate-600">
                 PHỤ KIỆN
               </a>
             </li>
-            <li className="menuNav">
+            <li className="hovermenuNav">
               <a href="#" className="hover:text-slate-600">
                 TIN TỨC
               </a>
             </li>
-            <li className="menuNav">
+            <li className="hovermenuNav">
               <a href="#" className="hover:text-slate-600">
                 LIÊN HỆ
               </a>
