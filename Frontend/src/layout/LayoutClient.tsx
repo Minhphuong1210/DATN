@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/client/Header";
 import Footer from "../components/client/Footer";
-import Main from "../components/client/Main";
+
 import ProductDetail from "../pages/client/ProductDetail";
 
 const LayoutClient: React.FC = () => {
