@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+// Route::get('/product',[CartController::class,'Product'])->name('product');
+// Route::get('/DetalProduct/{id}',[CartController::class,'DetalProduct'])->name('detalProduct');
+// Route::post('/cart_add', [CartController::class, 'store'])->name('cart_add');
