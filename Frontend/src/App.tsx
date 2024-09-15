@@ -10,6 +10,7 @@ import { Route, Routes } from "react-router-dom";
 import LayoutClient from "./layout/LayoutClient";
 import Register from "./pages/Register";
 import CartPage from './pages/client/CartPage'
+import Checkout from './pages/client/Checkout'
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LayoutClient />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<Checkout />} />
         
       </Routes>
     </>
