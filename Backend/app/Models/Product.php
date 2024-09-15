@@ -24,6 +24,7 @@ class Product extends Model
         'product_code',
         'sub_category_id'
     ];
+
     public function ProductDetail(){
         return $this->hasMany(ProductDetail::class);
     }
