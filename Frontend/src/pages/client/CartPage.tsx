@@ -66,7 +66,7 @@ const CartPage: React.FC = () => {
             Tiếp tục mua hàng
           </button>
           <button className="px-16 py-3 text-lg text-white bg-black rounded max-md:px-5">
-            Đặt hàng
+            <a href="/checkout">Đặt hàng</a>
           </button>
         </div>
       </main>
