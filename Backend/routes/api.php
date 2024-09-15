@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\ProductController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -36,3 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // API xóa sản phẩm khỏi giỏ hàng
     Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('api.cart.destroy');
 });
+
+Route::resource('/products', ProductController::class);
+Route::resource('/categorys', CategoryController::class);
+
