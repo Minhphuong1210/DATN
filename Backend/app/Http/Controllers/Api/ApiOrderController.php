@@ -7,7 +7,9 @@ use App\Models\Cart;
 use App\Models\CartDetail;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
 use App\Models\ProductDetail;
+use App\Models\SubCategory;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
@@ -97,29 +99,22 @@ class ApiOrderController extends Controller
         
             try {
                 $user_id = Auth::id();
-        
                 if (!$user_id) {
                     return response()->json([
                         'error' => 'Người dùng chưa đăng nhập'
                     ], 401); 
                 }
-        
                 $params = $request->except('_token');
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
                 $order = Order::create($params);
                 $order_id = $order->id;
-        
-                
                 $cart = Cart::where('user_id', $user_id)->first();
-        
                 if (!$cart) {
                     return response()->json([
                         'error' => 'Không có sản phẩm cần mua'
                     ], 404); 
                 }
-        
-               
                 $cartDetails = CartDetail::where('cart_id', $cart->id)->get();
                 if ($cartDetails->isEmpty()) {
                     return response()->json([
@@ -145,11 +140,7 @@ class ApiOrderController extends Controller
                         $detail->save();
                     }
                 }
-        
-                
                 CartDetail::where('cart_id', $cart->id)->delete();
-        
-               
                 DB::commit();
                 return response()->json([
                     'success' => 'Mua hàng thành công'
@@ -179,12 +170,35 @@ class ApiOrderController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+//    đây là trang sản phẩm khi người dùng click vào nút cập nhật đơn hàng
     public function update(Request $request, string $id)
     {
-        //
+        $donHang = Order::query()->findOrFail($id);
+        DB::beginTransaction();
+        try {
+            if ($request->has('huy_don_hang')) {
+                $donHang->update(['trang_thai_don_hang' => Order::HUY_HANG]);
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Đơn hàng đã được hủy thành công.'
+                ], 200);
+            } else if ($request->has('da_nhan_hang')) {
+                $donHang->update(['trang_thai_don_hang' => Order::DA_NHAN_HANG]);
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Đơn hàng đã được đánh dấu là đã nhận.'
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Đã xảy ra lỗi khi cập nhật đơn hàng.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
