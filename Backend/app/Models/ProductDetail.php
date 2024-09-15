@@ -10,8 +10,16 @@ class ProductDetail extends Model
     use HasFactory;
     protected $table = 'product_details';
     protected $fillable = ['size_id', 'color_id', 'product_id', 'quantity'];
+  
     public function product(){
-        return $this->belongsto(Product::class);
+        return $this->belongsTo(Product::class);
+    }
+    public function productColor(){
+        return $this->belongsTo(ProductColor::class);
+    }
+    public function productSize(){
+        return $this->belongsTo(ProductSize::class);
+
     }
 }
 

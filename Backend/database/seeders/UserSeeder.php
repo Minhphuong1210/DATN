@@ -2,11 +2,16 @@
 
 namespace Database\Seeders;
 
+
 use DB;
 use Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Str;
+use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
 
 class UserSeeder extends Seeder
 {
@@ -15,10 +20,12 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->insert([
-            'name' => Str::random(10),
-            'email' => Str::random(10).'@example.com',
-            'password' => Hash::make('password'),
+        User::create([
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'password' => Hash::make('password123'),
+            'address' => fake()->address(),
+            'phone' => fake()->phoneNumber()
         ]);
     }
 }

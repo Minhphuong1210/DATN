@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
 
@@ -16,6 +18,7 @@ use App\Http\Controllers\Api\CartController;
 
 Route::get('/', function () {
     return view('welcome');
+
 }); 
 Route::get('/product',[CartController::class,'Product'])->name('product');
 Route::get('/DetalProduct/{id}',[CartController::class,'DetalProduct'])->name('detalProduct');
@@ -26,6 +29,9 @@ Route::post('/login',[CartController::class,'login'])->name('login');
 Route::get('/cart_detail',[CartController::class,'cart_detail'])->name('cart_detail');
 Route::delete('/destroy/{id}',[CartController::class,'destroy'])->name('destroy');
 Route::put('/update/{id}',[CartController::class,'update'])->name('update');
+
+});
+
 
 
 
