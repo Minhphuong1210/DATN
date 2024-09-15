@@ -31,7 +31,7 @@ const Register = () => {
   };
   return (
     <div>
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
+      <form className="max-w-sm mx-auto" onSubmit={handleSubmit(onSubmit)}>
         <h1>Register</h1>
         <div className="form-group">
           <label htmlFor="title">email</label>
