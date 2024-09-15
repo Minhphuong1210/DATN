@@ -35,8 +35,35 @@ class CartController extends Controller
     }
     public function index()
     {
+        $cart = Cart::all();
+        $cartDetail = CartDetail::all();
 
+        $productDetail = ProductDetail::all();
+
+        $color = ProductColor::all();
+        $size = ProductSize::all();
+        return view('giohang', compact('cart', 'productDetail', 'color', 'size'));
     }
+    public function showFormLogin()
+    {
+        return view('login');
+    }
+
+
+    public function login(Request $request)
+    {
+        // dd($request->all());
+        $user = $request->only('email', 'password');
+
+
+        if (Auth::attempt($user)) {
+            $check_khoa = Auth::user();
+            return redirect()->route('product');
+        }
+        ;
+    }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -56,7 +83,7 @@ class CartController extends Controller
         $size_id = $request->sizes_id;
         $color_id = $request->color_id;
         $quantity = $request->quantity;
-
+        $price=$request->price;
         if ($request->isMethod('POST')) {
             $param = $request->except('_token');
 
@@ -84,20 +111,20 @@ class CartController extends Controller
                             'cart_id' => $cart_id,
                             'product_detail_id' => $productDetail_id,
                             'quantity' => $quantity,
-                            'price' => $request->price,
+                            'price' => $price,
                         ]);
                     }
                 }
             } else {
                 // Nếu người dùng chưa đăng nhập, xử lý giỏ hàng trong session
-                // $productDetail = ProductDetail::where('product_id', $product_id)
-                //     ->where('size_id', $size_id)
-                //     ->where('color_id', $color_id)
-                //     ->first();
+                $productDetail = ProductDetail::where('product_id', $product_id)
+                    ->where('size_id', $size_id)
+                    ->where('color_id', $color_id)
+                    ->first();
 
-                // if (!$productDetail) {
-                //     return redirect()->back()->with('error', 'Chưa có sản phẩm này');
-                // }
+                if (!$productDetail) {
+                    return redirect()->back()->with('error', 'Chưa có sản phẩm này');
+                }
 
                 $sub_category_id = $request->sub_category_id;
                 $ProductColor = ProductColor::query()->where('id', $color_id)->first();
@@ -129,7 +156,7 @@ class CartController extends Controller
                 }
 
                 // Lưu lại giỏ hàng vào session
-                dd($cart);
+
                 session()->put('cart', $cart);
             }
 
@@ -147,17 +174,53 @@ class CartController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function cart_detail()
     {
-        //
+        // Lấy tất cả các giỏ hàng
+
+        if (Auth::check()) {
+            $user_id = Auth::user()->id;
+            $carts = Cart::query()->where('user_id', $user_id)->first();
+        
+            if ($carts) {
+                $cart_id = $carts->id;
+                $cart_detail = CartDetail::query()->where('cart_id', $cart_id)->get();
+                $products_details = [];
+                
+                foreach ($cart_detail as $cart_details) {
+                    $product_detail_id = $cart_details->product_detail_id;
+                    $Product_detail = ProductDetail::query()->where('id', $product_detail_id)->first();
+        
+                    if ($Product_detail) {
+                        // Kết hợp dữ liệu từ cả CartDetail và ProductDetail
+                        $products_details[] = [
+                            'product_detail' => $Product_detail,   
+                            'quantity' => $cart_details->quantity, 
+                            'total_price' => $cart_details->price * $cart_details->quantity,
+                            'cart_id'=>$cart_details->id,
+                        ];
+                    }
+                }
+        // dd($products_details);
+                // Trả về view cùng với tất cả dữ liệu giỏ hàng
+                return view('giohang', compact('products_details'));
+            }
+        } else {
+            return redirect()->route('login'); // Chuyển hướng nếu chưa đăng nhập
+        }
+        
+        // Truyền dữ liệu đến view
+        return view('giohang', compact('cart_detail'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+
+        // $cart_detail = CartDetail::find($id);
     }
 
     /**
@@ -165,7 +228,13 @@ class CartController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $cart_delete = CartDetail::query()->findOrFail($id);
+        // dd($cart_delete['quantity']);
+       if($request->isMethod('PUT')){
+        $cart_delete['quantity']  = $request->quantity;
+        $cart_delete->save();
+        return redirect()->back();
+    }
     }
 
     /**
@@ -173,6 +242,7 @@ class CartController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $cart_delete = CartDetail::query()->where('id', $id)->delete();
+        return redirect()->back()->with('success','thành công');
     }
 }

@@ -32,6 +32,7 @@
                   </select>
             </div>
             <input type="text" name="quantity" id="">
+            giá
             <input type="text" name="price" value="{{ $productDetail->product->price }}">
         </div>
         <button type="submit">Thêm</button>
