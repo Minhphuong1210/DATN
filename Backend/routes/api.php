@@ -49,6 +49,7 @@ Route::resource('/categorys', CategoryController::class);
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
+Route::get('/product/detail/{id}', [ApiOrderController::class, 'chiTietSanPham']);
 
 Route::middleware('auth:sanctum')
     ->prefix('donhangs')
