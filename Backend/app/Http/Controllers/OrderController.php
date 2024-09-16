@@ -11,24 +11,6 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function showFormLogin()
-    {
-        return view('login');
-    }
-
-
-    public function login(Request $request)
-    {
-
-        $user = $request->only('email', 'password');
-
-
-        if (Auth::attempt($user)) {
-            $check_khoa = Auth::user();
-            return redirect()->intended('/');
-        }
-        return redirect()->back()->with('Email', 'sai địa chỉ email');
-    }
 
     public function index()
     {

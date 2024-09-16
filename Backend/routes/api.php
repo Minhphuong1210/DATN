@@ -1,6 +1,4 @@
 <?php
-
-
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiOrderController;
 
@@ -25,12 +23,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::middleware('auth:sanctum')->group(function () {
-    // API để lấy chi tiết sản phẩm
-    Route::get('/products/{id}', [CartController::class, 'DetalProduct'])->name('api.product.detail');
-
-    // API để lấy danh sách sản phẩm
-    Route::get('/products', [CartController::class, 'Product'])->name('api.products');
-
     // API để lấy giỏ hàng
     Route::get('/cart', [CartController::class, 'cart_detail'])->name('api.cart.detail');
 
@@ -49,7 +41,6 @@ Route::resource('/categorys', CategoryController::class);
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
-Route::get('/product/detail/{id}', [ApiOrderController::class, 'chiTietSanPham']);
 
 Route::middleware('auth:sanctum')
     ->prefix('donhangs')
