@@ -20,23 +20,28 @@ const Register = () => {
 
   const onSubmit = async (user: User) => {
     console.log(user);
-    
+
     try {
       const data = await instance.post("/register", user);
-      console.log(data)
-      navigate('/login')
+      console.log(data);
+      navigate("/login");
     } catch (error) {
       console.log(error);
     }
   };
   return (
-    <div >
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <h1>Register</h1>
-        <div className="form-group">
-          <label htmlFor="title">email</label>
+    <div>
+      <form className="max-w-sm mx-auto" onSubmit={handleSubmit(onSubmit)}>
+        <h1 className="text-center text-4xl mt-10 font-bold">Register</h1>
+        <div className="mb-5">
+          <label
+            className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white"
+            htmlFor="title"
+          >
+            email
+          </label>
           <input
-            className="form-control"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             type="email"
             placeholder="email..."
             id="title"
@@ -47,9 +52,14 @@ const Register = () => {
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="price">Password</label>
+          <label
+            className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white"
+            htmlFor="price"
+          >
+            Password
+          </label>
           <input
-            className="form-control"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             type="number"
             placeholder="password..."
             id="price"
@@ -60,7 +70,10 @@ const Register = () => {
           )}
         </div>
 
-        <button type="submit" className="btn btn-primary w-100">
+        <button
+          type="submit"
+          className="btn btn-primary w-100 mt-10 mb-10 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
           Submit
         </button>
       </form>
