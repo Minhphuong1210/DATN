@@ -1,5 +1,4 @@
 import React from 'react'
-import Header from '../../components/client/Header'
 import Footer from '../../components/client/Footer'
 
 type Props = {}
@@ -7,7 +6,6 @@ type Props = {}
 const Checkout = (props: Props) => {
     return (
         <>
-            <Header isMobile={false} />
             <main className='flex flex-col pl-40 self-center mt-10 w-full max-w-[1535px] max-md:mt-10 max-md:max-w-full'>
                 <div className='flex text-gray-500 '>
                     <a href='/cart' className='hover:text-black '>Giỏ Hàng</a>/
