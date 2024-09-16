@@ -21,7 +21,7 @@
                     </div>
                 @endif
                 @if (session('error'))
-                    <div class="alert alert-success">
+                    <div class="alert alert-danger">
                         {{ session('error') }}
                     </div>
                 @endif
@@ -42,23 +42,23 @@
                         <tbody>
                             @foreach ($listDonHang as $item)
                                 <tr>
-                                    <th scope="row">{{ $item->ma_don_hang }}</th>
+                                    <th scope="row">{{ $item->code_order }}</th>
 
 
                                     <td>{{ $item->created_at->format('d-m-y') }}</td>
-                                    <td>{{ $item->trang_thai_don_hang }}</td>
-                                    <td>{{ number_format($item->tong_tien) }}</td>
+                                    <td>{{ $item->order_status }}</td>
+                                    <td>{{ number_format($item->total_amount) }}</td>
                                     <td>
 
                                         <form action="{{ route('admins.orders.update', $item->id) }}" method="post">
                                             @csrf
                                             @method('PUT')
-                                            <select name="trang_thai_don_hang" class="form-select w-50"
+                                            <select name="order_status" class="form-select w-50"
                                                 onchange="confirmSubmit(this)"
-                                                data-default-value="{{ $item->trang_thai_don_hang }}">
+                                                data-default-value="{{ $item->order_status }}">
                                                 @foreach ($trangThaiDonHang as $key => $value)
                                                     <option value="{{ $key }}"
-                                                        {{ $item->trang_thai_don_hang == $key ? 'selected' : '' }}
+                                                        {{ $item->order_status == $key ? 'selected' : '' }}
                                                         {{ $key == 'huy_hang' ? 'disabled' : '' }}>
                                                         {{ $value }}
                                                     </option>
