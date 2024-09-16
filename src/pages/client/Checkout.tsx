@@ -8,6 +8,7 @@ const Checkout = (props: Props) => {
     return (
         <>
 
+            <Header isMobile={false} />
             <main className='flex flex-col pl-40 self-center mt-10 w-full max-w-[1535px] max-md:mt-10 max-md:max-w-full'>
                 <div className='flex text-gray-500 '>
                     <a href='/cart' className='hover:text-black '>Giỏ Hàng</a>/
@@ -22,6 +23,7 @@ const Checkout = (props: Props) => {
                     </div>
                     <div className='flex flex-col pt-2 '>
                         <label className='text-lg'>Số điện thoại</label>
+
                         <input type="text" className=' w-[550px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='012345678' />
                     </div>
                     <div className='flex flex-col pt-2 '>
@@ -39,6 +41,24 @@ const Checkout = (props: Props) => {
                     <div className='flex flex-col pt-2 '>
                         <label className='text-lg'>Địa chỉ đường</label>
                         <input type="text" className=' w-[550px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Xóm 4' />
+=======
+                        <input type="text" className=' w-[550px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='012345678'/>
+                    </div>
+                    <div className='flex flex-col pt-2 '>
+                        <label className='text-lg'>Tỉnh/Thành phố</label>
+                        <input type="text" className=' w-[550px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Ha Noi'/>
+                    </div>
+                    <div className='flex flex-col pt-2 '>
+                        <label className='text-lg'>Quận/Huyện</label>
+                        <input type="text" className=' w-[550px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Thanh Trì'/>
+                    </div>
+                    <div className='flex flex-col pt-2 '>
+                        <label className='text-lg'>Phường/Xã</label>
+                        <input type="text" className=' w-[550px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Vạn Phúc'/>
+                    </div>
+                    <div className='flex flex-col pt-2 '>
+                        <label className='text-lg'>Địa chỉ đường</label>
+                        <input type="text" className=' w-[550px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Xóm 4'/>
                     </div>
                     <div className='flex flex-col pt-2 '>
                         <label className='text-lg'>Ghi chú</label>
@@ -96,6 +116,7 @@ const Checkout = (props: Props) => {
                 </div>
             </main>
 
+            <Footer />
         </>
     )
 }
