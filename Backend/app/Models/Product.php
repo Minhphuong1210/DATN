@@ -28,4 +28,7 @@ class Product extends Model
     public function ProductDetail(){
         return $this->hasMany(ProductDetail::class);
     }
+    public function SubCate(){
+        return $this->belongsTo(SubCategory::class);
+    }
 }
