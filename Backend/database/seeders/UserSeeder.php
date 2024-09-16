@@ -19,8 +19,9 @@ class UserSeeder extends Seeder
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'password' => Hash::make('password123'),
-            'address' => fake()->address(),
+           'address' => fake()->address(),
             'phone' => fake()->phoneNumber()
         ]);
     }
 }
+

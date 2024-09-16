@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/client/Header";
 import Footer from "../components/client/Footer";
 
-import ProductDetail from "../pages/client/ProductDetail";
+
+import { Outlet } from "react-router-dom";
+import Loading from "../components/loading/Loading";
+import { useLoading } from "../context/Loading";
 
 const LayoutClient: React.FC = () => {
+  const { loading } = useLoading()
   const [windowSize, setWindowSize] = useState<{
     width?: number;
     height?: number;
@@ -37,11 +41,14 @@ const LayoutClient: React.FC = () => {
   }, [windowSize]);
 
   return (
-    <div className="h-screen overflow-y-auto overflow-x-hidden">
-      <Header isMobile={isMobile} />
-      <ProductDetail />
-      <Footer />
-    </div>
+    <>
+      <Loading isShow={loading} />
+      <div className="h-screen overflow-y-auto overflow-x-hidden">
+        <Header isMobile={isMobile} />
+        <Outlet />
+        <Footer />
+      </div>
+    </>
   );
 };
 
