@@ -1,27 +1,22 @@
 import React, { ChangeEvent, useState } from "react";
 import yourImage from "../../public/images/AoPolo.png";
-import yourImage1 from "../../public/images/z5798016468804_8e0562bdb8cf6d307970a5c3643d142d.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
 import { Link } from "react-router-dom";
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-}
-const products: Product[] = [
-    { id: 1, name: 'Sản phẩm 1', price: 100 },
-    { id: 2, name: 'Sản phẩm 2', price: 200 },
-    { id: 3, name: 'Sản phẩm 3', price: 300 },
-    { id: 4, name: 'Sản phẩm 4', price: 400 },
-    { id: 5, name: 'Sản phẩm 5', price: 500 },
-    { id: 6, name: 'Sản phẩm 6', price: 600 },
-    { id: 7, name: 'Sản phẩm 7', price: 700 },
-    { id: 8, name: 'Sản phẩm 8', price: 800 },
-    { id: 9, name: 'Sản phẩm 9', price: 900 },
-    { id: 10, name: 'Sản phẩm 10', price: 1000 }
+
+const products = [
+    {
+        id: '1',
+        name: 'Áo Thun',
+        price: 200000,
+        variants: {
+            sizes: ['S', 'M', 'L'],
+            colors: ['Đỏ', 'Xanh', 'Đen'],
+        },
+    }
+
 ];
 type Size = "S" | "M" | "L" | "XL" | "2XL" | "Chọn size";
 type Color = "Đỏ" | "Trắng" | "Đen" | "Chọn màu";
