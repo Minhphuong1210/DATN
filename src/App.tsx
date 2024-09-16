@@ -1,15 +1,44 @@
+
+import { useState } from 'react'
+import './App.css'
+import { ToastContainer } from 'react-toastify'
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
+
 import LayoutClient from "./layout/LayoutClient";
-import Register from "./pages/Register";
+import CartPage from './pages/client/CartPage'
+import Checkout from './pages/client/Checkout'
+import Home from './pages/client/Home';
+import { Routes, Route } from 'react-router-dom';
+import ProductDetail from './pages/client/ProductDetail';
+import Register from './pages/Register';
+
+
 
 function App() {
   return (
     <>
-      <Routes>
-        <Route path="/" element={<LayoutClient />} />
-        <Route path="/register" element={<Register />} />
+
+      {/* <Routes>
+        <Route path='register' element={<Register />} />
+
       </Routes>
+      <Routes >
+        <Route path='ss' element={<LayoutClient />} >
+          <Route index element={<Home />} />
+          <Route path="cart" element={<CartPage />} />
+          <Route path="checkout" element={<Checkout />} />
+        </Route>
+      </Routes> */}
+      <Routes>
+        <Route path='register' element={<Register />} />
+        <Route path='/' element={<LayoutClient />} >
+          <Route index element={<Home />} />
+          <Route path='detail' element={<ProductDetail />} />
+          <Route path="cart" element={<CartPage />} />
+          <Route path="checkout" element={<Checkout />} />
+        </Route>
+      </Routes>
+      <ToastContainer />
     </>
   );
 }
