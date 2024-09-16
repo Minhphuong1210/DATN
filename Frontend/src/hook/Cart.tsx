@@ -1,6 +1,5 @@
 // import axios from 'axios';
 
-// // Giả lập API lưu trữ giỏ hàng
 // export const addToCartApi = async (product: any) => {
 //     try {
 //         const response = await axios.post('/api/cart', product, {
