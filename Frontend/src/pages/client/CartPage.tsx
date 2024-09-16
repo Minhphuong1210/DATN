@@ -35,7 +35,6 @@ const CartPage: React.FC = () => {
 
   return (
     <div className="flex overflow-hidden flex-col pb-5 bg-white">
-        <Header isMobile={false}/>
         <div className='container mx-auto px-[160px]'>
       <main className="flex flex-col self-center mt-16 w-full text-2xl  max-w-[1535px] max-md:mt-10 max-md:max-w-full">
         <h1 className="self-start text-xl font-bold text-black max-md:ml-1.5">

@@ -19,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
         {/* Logo */}
         <div>
           <a
-            href="#"
+            href="/"
             className="flex items-center justify-center md:justify-start"
           >
             <div className="w-10 md:w-16">
@@ -118,14 +118,18 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
         {/* Biểu tượng menu */}
         <div className="mr-1 flex space-x-2">
+          <a href="/login">
           <User
             size={25}
             className="cursor-pointer text-slate-500 hover:text-black"
           />
-          <ShoppingCart
-            size={25}
-            className="cursor-pointer text-slate-500 hover:text-black"
-          />
+          </a>
+          <a href="/cart">
+            <ShoppingCart
+              size={25}
+              className="cursor-pointer text-slate-500 hover:text-black"
+            />
+          </a>
           <Search
             size={25}
             className="hidden cursor-pointer text-slate-500 hover:text-black md:block lg:block"

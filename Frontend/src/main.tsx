@@ -6,12 +6,15 @@ import { BrowserRouter } from "react-router-dom";
 
 import { LoadingProvider } from "./context/Loading.tsx";
 import { configAxios } from "./config/aixos.ts";
+import { CartProvider } from "./context/Cart.tsx";
 configAxios();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <LoadingProvider>
       <BrowserRouter>
+      <CartProvider>
         <App />
+      </CartProvider>
       </BrowserRouter>
     </LoadingProvider>
 

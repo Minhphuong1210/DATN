@@ -1,15 +1,17 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 
-import AuthForm from "../components/Form/RegiterForm";
+
+import AuthForm from "../components/Form/LoginForm";
 import { UseAuth } from "../hook/Auth";
 
-const Register = () => {
-    const { Register } = UseAuth()
+const Login = () => {
+    const { Login } = UseAuth()
     return (
         <div className="flex justify-center">
-            <AuthForm onSubmit={Register} />
+            <AuthForm onSubmit={Login} />
         </div>
+      
     );
 };
 
-export default Register;
+export default Login;
