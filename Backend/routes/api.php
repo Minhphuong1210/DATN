@@ -2,6 +2,7 @@
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiOrderController;
 
+use App\Http\Controllers\Api\ApiProductController;
 use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +42,6 @@ Route::resource('/categorys', CategoryController::class);
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
-
 Route::middleware('auth:sanctum')
     ->prefix('donhangs')
     ->as('donhangs.')

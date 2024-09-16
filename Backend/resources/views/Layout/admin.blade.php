@@ -52,7 +52,7 @@
         <div class="content-page">
          
             <!-- content -->
-            @yield('Layout.content')
+            @yield('content')
 
             <!-- Footer Start -->
         @include('Layout.footer')
