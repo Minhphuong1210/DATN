@@ -117,9 +117,18 @@ class CartController extends Controller
 
                 foreach ($cartDetails as $detail) {
                     $productDetail = ProductDetail::find($detail->product_detail_id);
-
+                    $colorName= $productDetail->productColor->name;
+                    $sizeName= $productDetail->productSize->name;
+                    $NameProduct=$productDetail->product->name;
+                    $ImageProduct=$productDetail->product->image;
+                    $PriceProduct=$productDetail->product->price;
                     if ($productDetail) {
                         $productsDetails[] = [
+                            'colorName'=>$colorName,
+                            'sizeName'=>$sizeName,
+                            'NameProduct'=>$NameProduct,
+                            'PriceProduct'=>$PriceProduct,
+                            'ImageProduct'=>$ImageProduct,
                             'product_detail' => $productDetail,
                             'quantity' => $detail->quantity,
                             'total_price' => $detail->price * $detail->quantity,
