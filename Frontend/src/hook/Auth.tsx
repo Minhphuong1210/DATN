@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserInput } from '../types/auth';
+import { UserInput } from '../interfaces/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -8,8 +8,8 @@ export const UseAuth = () => {
     const navigate = useNavigate();
     const Register = async (value: UserInput) => {
         try {
-            const {data} =
-            await axios.post('/api/register', value)
+            const { data } =
+                await axios.post('/api/register', value)
             console.log(data);
             toast.success("Đăng ký thành công");
             navigate('/login')
@@ -32,5 +32,5 @@ export const UseAuth = () => {
             toast.error("Lỗi đăng nhập");
         }
     };
-    return { Register ,Login};
+    return { Register, Login };
 };
