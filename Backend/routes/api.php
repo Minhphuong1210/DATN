@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\ApiProductController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -54,5 +54,4 @@ Route::middleware('auth:sanctum')
         Route::put('/{id}/update', [ApiOrderController::class, 'update'])->name('update');
         
 });
-Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
-
+// Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
