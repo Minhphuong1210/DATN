@@ -5,6 +5,7 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\DiscountController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -67,6 +68,21 @@ Route::prefix('admins')
             Route::delete('/{id}/destroy', [BannerController::class, 'destroy'])->name('destroy');
         });
 
+    });
+    Route::prefix('admins')
+    ->as('admins.')
+    ->group(function () {
+        Route::prefix('discounts')
+            ->as('discounts.')
+            ->group(function () {
+                Route::get('/', [DiscountController::class, 'index'])->name('index');
+                Route::get('/create', [DiscountController::class, 'create'])->name('create');
+                Route::post('/store', [DiscountController::class, 'store'])->name('store');
+                Route::get('/show/{id}', [DiscountController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [DiscountController::class, 'edit'])->name('edit');
+                Route::put('/{id}/update', [DiscountController::class, 'update'])->name('update');
+                Route::delete('/{id}/destroy', [DiscountController::class, 'destroy'])->name('destroy');
+            }); 
     });
 
 

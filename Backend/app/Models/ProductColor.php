@@ -11,7 +11,7 @@ class ProductColor extends Model
     protected $table = 'product_colors';
     protected $fillable = ['name', 'color_code'];
     public function productDetails()
-    {
-        return $this->hasMany(ProductDetail::class);
-    }
+        {
+            return $this->hasMany(ProductDetail::class);
+        }
 }

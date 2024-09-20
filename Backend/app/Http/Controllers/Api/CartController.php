@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cart;              
-use App\Models\CartDetail;        
-use App\Models\Product;           
-use App\Models\ProductColor;      
-use App\Models\ProductSize;       
-use App\Models\ProductDetail;     
-use Illuminate\Http\Request;      
-use Illuminate\Support\Facades\Auth; 
-use Illuminate\Support\Facades\Session; 
+use App\Models\Cart;
+use App\Models\CartDetail;
+use App\Models\Product;
+use App\Models\ProductColor;
+use App\Models\ProductSize;
+use App\Models\ProductDetail;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 
 class CartController extends Controller
@@ -149,7 +149,7 @@ class CartController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    //Cap nhat gio hang 
+    //Cap nhat gio hang
     public function update(Request $request, string $id)
     {
         $cartDetail = CartDetail::findOrFail($id);
