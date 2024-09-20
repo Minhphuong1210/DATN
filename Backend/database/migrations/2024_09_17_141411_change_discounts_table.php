@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('order_details', function (Blueprint $table) {
-            $table->dropColumn('total');
+        Schema::table('discounts', function (Blueprint $table) {
+            $table->boolean('is_active')->default(true); 
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('order_details', function (Blueprint $table) {
-            //
+        Schema::table('discounts', function (Blueprint $table) {
+            $table->dropColumn('is_active');
         });
     }
 };
