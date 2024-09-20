@@ -126,7 +126,7 @@ Route::prefix('admins')
                 Route::delete('/{id}/destroy', [CategoryController::class, 'destroy'])->name('destroy');
             });
 
-            }); 
+            
             Route::prefix('subcategory')
             ->as('subcategory.')
             ->group(function () {
