@@ -179,7 +179,7 @@
                         href="#" role="button" aria-haspopup="false" aria-expanded="false">
                         <img src="{{asset('assets/admin/assets/images/users/user-11.jpg')}}" alt="user-image" class="rounded-circle">
                         <span class="pro-user-name ms-1">
-                            {{Auth::user()->name}} <i class="mdi mdi-chevron-down"></i>
+                            <i class="mdi mdi-chevron-down"></i>
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
