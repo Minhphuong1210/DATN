@@ -3,6 +3,7 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SubCategoryController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -51,6 +52,17 @@ Route::prefix('admins')
                 Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('edit');
                 Route::put('/{id}/update', [OrderController::class, 'update'])->name('update');
                 Route::delete('/{id}/destroy', [OrderController::class, 'destroy'])->name('destroy');
+            }); 
+            Route::prefix('subcategory')
+            ->as('subcategory.')
+            ->group(function () {
+                Route::get('/', [SubCategoryController::class, 'index'])->name('index');
+                Route::get('/create', [SubCategoryController::class, 'create'])->name('create');
+                Route::post('/store', [SubCategoryController::class, 'store'])->name('store');
+                Route::get('/show/{id}', [SubCategoryController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [SubCategoryController::class, 'edit'])->name('edit');
+                Route::put('/{id}/update', [SubCategoryController::class, 'update'])->name('update');
+                Route::delete('/{id}/destroy', [SubCategoryController::class, 'destroy'])->name('destroy');
             }); 
     });
 
