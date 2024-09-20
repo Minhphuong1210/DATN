@@ -41,6 +41,13 @@
                         <span> Đơn hàng </span>
                     </a>
                 </li>
+                <li>
+                   
+                    <a href="{{ route('admins.discounts.index') }}">
+                        <i data-feather="shopping-cart"></i>
+                        <span> Discount </span>
+                    </a>
+                </li>
 
             </ul>
 

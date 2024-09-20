@@ -13,10 +13,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::query()->where('is_active','1')->limit('8')->get(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
-        $products_sale = Product::query()->where('is_active','1')->where('is_sale','1')->limit('8')->get(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
-        $products_hot = Product::query()->where('is_active','1')->where('is_hot','1')->limit('8')->get(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
-        $products_showhome = Product::query()->where('is_active','1')->where('is_show_home','1')->limit('8')->get(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
+        $products = Product::query()->where('is_active','1')
+        ->orderBy('created_at', 'desc')
+        ->limit('8')->get(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
+        $products_sale = Product::query()->where('is_active','1')->where('is_sale','1')->orderBy('created_at', 'desc')->limit('8')->get(); 
+        $products_hot = Product::query()->where('is_active','1')->where('is_hot','1')->orderBy('created_at', 'desc')->limit('8')->get(); 
+        $products_showhome = Product::query()->where('is_active','1')->where('is_show_home','1')->orderBy('created_at', 'desc')->limit('8')->get(); 
         $data = [
             'status' => 'success',
             'products' => $products,

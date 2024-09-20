@@ -87,4 +87,38 @@
 //   );
 // };
 
-// export const useCart = () => useContext(CartContext);
+// export const useCart = () => useContext(CartContext);import { createContext, useState } from 'react';
+
+import React, { createContext, useState, useContext, ReactNode } from "react";
+import { Cart_detail } from "../interfaces/Cart";
+
+interface CartContextType {
+  cart: Cart_detail | null;
+  setCart: React.Dispatch<React.SetStateAction<Cart_detail | null>>;
+}
+
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+export const useCart = (): CartContextType => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+};
+
+interface CartProviderProps {
+  children: ReactNode;
+}
+
+export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+  const [cart, setCart] = useState<Cart_detail | null>(null);
+
+  return (
+    <CartContext.Provider value={{ cart, setCart }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
+  
+  
