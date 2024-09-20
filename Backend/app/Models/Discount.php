@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Discount extends Model
 {
     use HasFactory;
+
     protected $table = 'discounts';
-    protected $fillable = ['category_id ', 'discount_percent'];
+    protected $fillable = ['category_id', 'discount_percent', 'is_active'];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
