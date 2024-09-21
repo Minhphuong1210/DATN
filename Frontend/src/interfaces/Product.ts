@@ -9,7 +9,10 @@ export interface Product {
     id: string;
     name: string;
     price: number
+    image: string;
     variants: ProductVariants;
+    description: string;
+    sub_category_id: string
 }
 export interface ApiResponse {
     status: string;

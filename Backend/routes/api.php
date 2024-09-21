@@ -55,7 +55,7 @@ Route::middleware('auth:sanctum')
         Route::post('/store', [ApiOrderController::class, 'store'])->name('store');
         Route::get('/show/{id}', [ApiOrderController::class, 'show'])->name('show');
         Route::put('/{id}/update', [ApiOrderController::class, 'update'])->name('update');
-        
+
 });
 
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);

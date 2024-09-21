@@ -1,6 +1,6 @@
 import React from 'react'
 import { useForm } from 'react-hook-form';
-import { UserInput } from '../types/auth';
+import { UserInput } from '../interfaces/auth';
 
 type AuthFormProps = {
     onSubmit: (data: UserInput) => void
