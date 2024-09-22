@@ -44,6 +44,13 @@
                         <span> Discount </span>
                     </a>
                 </li>
+                <li>
+                   
+                    <a href="{{ route('admins.product_sizes.index') }}">
+                        <i data-feather="shopping-cart"></i>
+                        <span> Product Size     </span>
+                    </a>
+                </li>
 
             </ul>
 
