@@ -6,6 +6,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SubCategoryController;
 
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\PromotionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -76,6 +77,17 @@ Route::prefix('admins')
                 Route::get('/{id}/edit', [DiscountController::class, 'edit'])->name('edit');
                 Route::put('/{id}/update', [DiscountController::class, 'update'])->name('update');
                 Route::delete('/{id}/destroy', [DiscountController::class, 'destroy'])->name('destroy');
+            }); 
+            Route::prefix('promotion')
+            ->as('promotion.')
+            ->group(function () {
+                Route::get('/', [PromotionController::class, 'index'])->name('index');
+                Route::get('/create', [PromotionController::class, 'create'])->name('create');
+                Route::post('/store', [PromotionController::class, 'store'])->name('store');
+                Route::get('/show/{id}', [PromotionController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [PromotionController::class, 'edit'])->name('edit');
+                Route::put('/{id}/update', [PromotionController::class, 'update'])->name('update');
+                Route::delete('/{id}/destroy', [PromotionController::class, 'destroy'])->name('destroy');
             }); 
     });
  

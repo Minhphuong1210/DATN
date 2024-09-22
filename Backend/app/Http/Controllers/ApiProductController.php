@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Promotion;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
 
@@ -19,5 +20,23 @@ class ApiProductController extends Controller
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
         ], 200);
+    }
+    public function promotion()
+    {
+        $promotion = Promotion::all(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
+        $data = [
+            'status' => 'success',
+            'data' => $promotion,
+        ];
+        return response()->json($data);
+    }
+    public function subcategory()
+    {
+        $category = SubCategory::all(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
+        $data = [
+            'status' => 'success',
+            'data' => $category,
+        ];
+        return response()->json($data);
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
-
+use App\Http\Controllers\ApiProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::resource('/products', ProductController::class);
 Route::resource('/categorys', CategoryController::class);
+Route::get('/promotion',[ ApiProductController::class,'promotion']);
+Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
