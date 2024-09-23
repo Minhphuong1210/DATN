@@ -16,8 +16,8 @@ class ApiProductController extends Controller
         $subCategory = SubCategory::findOrFail($sub_category_id);
         $productSize = ProductSize::all();
         $productColor=ProductColor::all();
-        $productSubCategory = $subCategory->product; 
-        $product->view = $product->view + 1; 
+        $productSubCategory = $subCategory->product;
+        $product->view = $product->view + 1;
         $product->save();
         return response()->json([
             'productSize'=>$productSize,
@@ -25,5 +25,17 @@ class ApiProductController extends Controller
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
         ], 200);
+    }
+    public function color(){
+        $productColor=ProductColor::all();
+        return response()->json([
+            'productColor'=>$productColor,
+        ]);
+    }
+    public function size(){
+        $productSize = ProductSize::all();
+        return response()->json([
+            'productSize'=>$productSize,
+        ]);
     }
 }

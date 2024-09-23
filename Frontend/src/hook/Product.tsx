@@ -11,7 +11,8 @@ export const useProduct = () => {
     const [productsSale, setProductsSale] = useState<Product[]>([]);
     const { loading, setLoading } = useLoading();
     const { id, idd } = useParams();
-    console.log(id, idd);
+  
+    // console.log(id, idd);
 
     //Lấy tất cả sản phẩm
     const getAllProducts = async () => {
@@ -73,7 +74,8 @@ export const useProduct = () => {
 
             // Combine the two IDs into the URL
             const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
-
+           
+            
             // Log the response data
             setProduct(response.data.Product
             );
@@ -84,6 +86,8 @@ export const useProduct = () => {
             setLoading(false);
         }
     }
+    
+
 
     useEffect(() => {
         if (!id || !idd) return;

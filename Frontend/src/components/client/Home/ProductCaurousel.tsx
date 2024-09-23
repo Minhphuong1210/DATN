@@ -1,10 +1,11 @@
 import React from 'react';
 import { useProductPagination, useProductSwipe } from '../../../hook/useProductCarousel';
 import { ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart } from 'lucide-react';
+import { Product } from '../../../interfaces/Product';
 
 // Thay thế bằng các import phù hợp
 
-const ProductCarousel = ({ products }) => {
+const ProductCarousel = ({ products }: { products: Product[] }) => {
     const { currentProducts, handleNext, handlePrev } = useProductPagination(products);
     const swipeHandlers = useProductSwipe(handleNext, handlePrev);
 
@@ -53,7 +54,7 @@ const ProductCarousel = ({ products }) => {
                                 </div>
                             </div>
                         </div>
-                        <a href="#" className="block overflow-hidden">
+                        <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="block overflow-hidden">
                             <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
                                 {product.name}
                             </div>
