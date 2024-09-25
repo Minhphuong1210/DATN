@@ -58,6 +58,7 @@ class CartController extends Controller
 
     //Them san pham vao gio hang
     public function store(Request $request)
+
 {
     $product_id = $request->id;
     $size_id = $request->size_id; 
@@ -78,6 +79,20 @@ class CartController extends Controller
             $productDetail_id = $productDetail->id;
             $cartDetail = CartDetail::where('cart_id', $cart->id)
                 ->where('product_detail_id', $productDetail_id)
+
+    {
+        $product_id = $request->id;
+        $size_id = $request->size_id;
+        $color_id = $request->color_id;
+        $quantity = $request->quantity;
+        $price = $request->price;
+
+        if (Auth::check()) {
+            $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+            $productDetail = ProductDetail::where('product_id', $product_id)
+                ->where('size_id', $size_id)
+                ->where('color_id', $color_id)
+
                 ->first();
 
             if ($cartDetail) {

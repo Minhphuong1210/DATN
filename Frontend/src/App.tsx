@@ -1,9 +1,8 @@
 
 import { useState } from 'react'
 import './App.css'
-import { ToastContainer } from 'react-toastify'
-import "./App.css";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import LayoutClient from "./layout/LayoutClient";
 import Checkout from './pages/client/Checkout'
 import Home from './pages/client/Home';
@@ -12,6 +11,9 @@ import ProductDetail from './pages/client/ProductDetail';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Cart from './pages/client/Cart';
+import Cart from './pages/client/Cart';
+import Login from './pages/Login';
+import Color from './pages/client/Color';
 
 function App() {
   return (
@@ -24,6 +26,7 @@ function App() {
           <Route path='productdetail/:id/subcate/:idd' element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
+          <Route path="color" element={<Color />} />
         </Route>
       </Routes>
       <ToastContainer />

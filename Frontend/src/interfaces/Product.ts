@@ -13,6 +13,8 @@ export interface Product {
     variants: ProductVariants;
     description: string;
     sub_category_id: string
+    // color: Colors[]
+    // size: Sizes[]
 }
 export interface ApiResponse {
     status: string;
@@ -20,4 +22,14 @@ export interface ApiResponse {
     products_hot: Product[];
     products_sale: Product[];
     products_showhome: Product[];
+}
+export interface Colors  {
+    id:string
+    name: string
+    color_code: string
+}
+
+export interface Sizes {
+    id: string
+    name: string
 }

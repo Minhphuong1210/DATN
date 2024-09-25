@@ -10,6 +10,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubCategoryController;
 
 use App\Http\Controllers\DiscountController;
+
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ProductSizeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -166,17 +169,30 @@ Route::prefix('admins')
                 Route::put('/{id}/update', [DiscountController::class, 'update'])->name('update');
                 Route::delete('/{id}/destroy', [DiscountController::class, 'destroy'])->name('destroy');
             }); 
-           Route::prefix('subcategory')
-            ->as('subcategory.')
+
+            Route::prefix('promotion')
+            ->as('promotion.')
             ->group(function () {
-                Route::get('/', [SubCategoryController::class, 'index'])->name('index');
-                Route::get('/create', [SubCategoryController::class, 'create'])->name('create');
-                Route::post('/store', [SubCategoryController::class, 'store'])->name('store');
-                Route::get('/show/{id}', [SubCategoryController::class, 'show'])->name('show');
-                Route::get('/{id}/edit', [SubCategoryController::class, 'edit'])->name('edit');
-                Route::put('/{id}/update', [SubCategoryController::class, 'update'])->name('update');
-                Route::delete('/{id}/destroy', [SubCategoryController::class, 'destroy'])->name('destroy');
+                Route::get('/', [PromotionController::class, 'index'])->name('index');
+                Route::get('/create', [PromotionController::class, 'create'])->name('create');
+                Route::post('/store', [PromotionController::class, 'store'])->name('store');
+                Route::get('/show/{id}', [PromotionController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [PromotionController::class, 'edit'])->name('edit');
+                Route::put('/{id}/update', [PromotionController::class, 'update'])->name('update');
+                Route::delete('/{id}/destroy', [PromotionController::class, 'destroy'])->name('destroy');
             }); 
+       Route::prefix('product_sizes')
+            ->as('product_sizes.')
+            ->group(function () {
+                Route::get('/', [ProductSizeController::class, 'index'])->name('index');
+                Route::get('/create', [ProductSizeController::class, 'create'])->name('create');
+                Route::post('/store', [ProductSizeController::class, 'store'])->name('store');
+                Route::get('/show/{id}', [ProductSizeController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ProductSizeController::class, 'edit'])->name('edit');
+                Route::put('/{id}/update', [ProductSizeController::class, 'update'])->name('update');
+                Route::delete('/{id}/destroy', [ProductSizeController::class, 'destroy'])->name('destroy');
+            }); 
+
 
             Route::prefix('product')
             ->as('product.')
@@ -191,5 +207,8 @@ Route::prefix('admins')
             }); 
 
     });
+ 
+
+
 
 

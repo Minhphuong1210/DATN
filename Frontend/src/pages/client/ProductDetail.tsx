@@ -4,33 +4,49 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useProduct } from "../../hook/Product";
+import { useCarts } from "../../hook/Cart";
+import { toast } from "react-toastify";
+import { Product_detail } from "../../interfaces/Cart";
+import { useCart } from "../../context/CartContext";
+import { Product } from "../../interfaces/Product";
+import { useColor } from "../../hook/Color";
+import axios from "axios";
 
-const products = [
-    {
-        id: '1',
-        name: 'Áo Thun',
-        price: 200000,
-        variants: {
-            sizes: ['S', 'M', 'L'],
-            colors: ['Đỏ', 'Xanh', 'Đen'],
-        },
-    }
 
-];
-type Size = "S" | "M" | "L" | "XL" | "2XL" | "Chọn size";
-type Color = "Đỏ" | "Trắng" | "Đen" | "Chọn màu";
-const ProductDetail: React.FC = () => {
+
+// const products = [
+//     {
+//         id: '1',
+//         name: 'Áo Thun',
+//         price: 200000,
+//         variants: {
+//             sizes: ['S', 'M', 'L'],
+//             colors: ['Đỏ', 'Xanh', 'Đen'],
+//         },
+//     }
+
+// ];
+
+const ProductDetail: React.FC = ({ }) => {
     const { product } = useProduct();
-    console.log(product);
-
-    const [selectedSize, setSelectedSize] = useState<Size>("Chọn size");
+    const [size_id, setsize_id] = useState<Size>("Chọn size");
     const [selectColor, setSelectColor] = useState<Color>("Chọn màu");
     const [quantity, setQuantity] = useState(1);
     const [showDescription, setShowDescription] = useState(true);
     const [showComment, setShowComment] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
+    // const { addToCart } = useCarts();
+    const { color, size } = useColor();
+
+    type AddtoCart = {
+        product_id: string
+        size: string
+        color: string
+        quantity: number
+        price: number
+      }
 
     // Tăng giảm sô lượng
     const incurement = () => {
@@ -41,8 +57,11 @@ const ProductDetail: React.FC = () => {
     };
 
     const handleChangeSize = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectedSize(event.target.value as Size);
+        setsize_id(event.target.value as Size);
     };
+    // const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
+    //     setSelectColor(event.target.value as Color);
+    // };
     const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
         setSelectColor(event.target.value as Color);
     };
@@ -56,7 +75,6 @@ const ProductDetail: React.FC = () => {
         setShowComment(true);
         setShowDescription(false);
     };
-
 
 
     const itemsPerPage = 4; // Số lượng sản phẩm hiển thị trên màn hình
@@ -79,6 +97,47 @@ const ProductDetail: React.FC = () => {
             setCurrentIndex(0); // Không quay lại quá đầu danh sách
         }
     };
+    
+    const nav = useNavigate()
+    // const addToCart = async ({product_id, size , quantity, color, price}: AddtoCart) => {
+    //     try {
+    //       await axios.post('/api/cart/add', { product_id, size , quantity, color, price })
+    //       toast.success('Thêm sản phẩm vào giỏ hàng thành công')
+    //       nav('/cart')
+    //     } catch (error) {
+    //       toast.error('Thêm sản phẩm vào giỏ hàng thất bại')
+    //     }
+    //   }
+
+    const handleAddToCart = async(
+        product: Product, 
+        color_id: string,  // Truyền trực tiếp giá trị đã chọn
+        size_id: string,    // Truyền trực tiếp giá trị đã chọn
+        quantity: number,
+        
+      ) => {
+        console.log('Product:', product.id);
+        console.log('Selected Color:', color_id);
+        console.log('Selected Size:', size_id);
+        console.log('Quantity:', quantity);
+        try {
+            // Only send the product ID instead of the full product object
+            await axios.post('/api/cart/add', { 
+              id: product.id, 
+              color_id, 
+              size_id, 
+              quantity,
+              price: product.price
+            });
+            toast.success('Thêm sản phẩm vào giỏ hàng thành công');
+            nav('/cart');
+          } catch (error) {
+            console.error('Error adding to cart:', error);
+          }
+      
+        // Thực hiện các thao tác thêm vào giỏ hàng tại đây
+      };
+
     return (
         <>
             {product && (
@@ -131,7 +190,7 @@ const ProductDetail: React.FC = () => {
                             <div className="text-lg font-bold">{product?.price} </div>
                             <form action="">
                                 <div className="mb-2 flex justify-between text-sm md:block">
-                                    <span className="md:mr-11">Kích thước: {selectedSize}</span>
+                                    <span className="md:mr-11">Kích thước: {size_id}</span>
                                     <span className="hover:text-yellow-400 md:mr-11">
                                         <a href="">Giúp bạn chọn size</a>
                                     </span>
@@ -140,131 +199,52 @@ const ProductDetail: React.FC = () => {
                                     </span>
                                 </div>
                                 <div>
+                                    <div className="inline-flex items-center">
+                                        <div className="flex space-x-2">
+                                            {size.map((size, index) => {
+                                                return (
+                                                    <label key={index} className="relative flex cursor-pointer items-center">
+                                                        <input
+                                                            type="radio"  // Thay đổi từ checkbox sang radio
+                                                            name="size"   // Tất cả radio button cần cùng một name để được nhóm lại
+                                                            value={size.id}
+                                                            checked={size_id === size.id}  // Kiểm tra nếu size đã được chọn
+                                                            onChange={() => setsize_id(size.id)}  // Khi người dùng chọn, cập nhật state
+                                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
+                                                        />
+                                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                            {size.name}
+                                                        </span>
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                     <div className="flex space-x-2">
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="example"
-                                                    value="S"
-                                                    checked={selectedSize === "S"}
-                                                    onChange={handleChangeSize}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    S
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    value="M"
-                                                    checked={selectedSize === "M"}
-                                                    onChange={handleChangeSize}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    M
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="example"
-                                                    value="L"
-                                                    checked={selectedSize === "L"}
-                                                    onChange={handleChangeSize}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    L
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="example"
-                                                    value="XL"
-                                                    checked={selectedSize === "XL"}
-                                                    onChange={handleChangeSize}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    XL
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="example"
-                                                    value="2XL"
-                                                    checked={selectedSize === "2XL"}
-                                                    onChange={handleChangeSize}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    2XL
-                                                </span>
-                                            </label>
-                                        </div>
+
                                     </div>
                                 </div>
                                 <div className="mb-2 mt-3 text-sm">
                                     <span>Màu Sắc:{selectColor} </span>
                                     <div className="mt-2 flex space-x-2">
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="example"
-                                                    value="Đỏ"
-                                                    checked={selectColor === "Đỏ"}
-                                                    onChange={handleChangeColor}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    Đỏ
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="example"
-                                                    value="Trắng"
-                                                    checked={selectColor === "Trắng"}
-                                                    onChange={handleChangeColor}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm font-thin text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    Trắng
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="example"
-                                                    value="Đen"
-                                                    checked={selectColor === "Đen"}
-                                                    onChange={handleChangeColor}
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    Đen
-                                                </span>
-                                            </label>
-                                        </div>
+                                        {color.map((color, index) => {
+                                            return (
+                                                <div key={index} className="inline-flex items-center">
+                                                    <label className="relative flex cursor-pointer items-center">
+                                                        <input
+                                                            type="radio"
+                                                            name="color"
+                                                            value={color.id}
+                                                            checked={selectColor === color.id}
+                                                            onChange={(event) => handleChangeColor(event)}
+                                                            className="peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
+                                                            style={{ backgroundColor: color.name }} // Apply color from db
+                                                        />
+                                                    </label>
+                                                    <div>{color.name}</div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </form>
@@ -295,9 +275,15 @@ const ProductDetail: React.FC = () => {
                                 >
                                     +
                                 </button>
-                                <button className="rounded-sm bg-yellow-400 px-10 py-3">
-                                    Thêm vào giỏ hàng
+                                <button onClick={() => handleAddToCart(product, selectColor, size_id, quantity)}>
+                                    Add to Cart
                                 </button>
+
+                                {/* <button className="rounded-sm bg-yellow-400 px-10 py-3" onClick={() => { handleAddToCart(product, setSelectColor, setsize_id
+
+                                ) }} >
+                                    Thêm vào giỏ hàng
+                                </button> */}
                             </div>
                         </div>
                     </div>

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
-
+use App\Http\Controllers\ApiProductController;
 
 
 use App\Http\Controllers\ApiProductController;
@@ -43,6 +43,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::resource('/products', ProductController::class);
 Route::resource('/categorys', CategoryController::class);
+Route::get('/promotion',[ ApiProductController::class,'promotion']);
+Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
@@ -57,6 +59,16 @@ Route::middleware('auth:sanctum')
         Route::put('/{id}/update', [ApiOrderController::class, 'update'])->name('update');
 
 });
+Route::prefix('productSizes')
+    ->as('productSizes.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\ApiProductController::class, 'indexProductSize'])->name('indexProductSize');
+        Route::get('/create', [\App\Http\Controllers\ApiProductController::class, 'createProductSize'])->name('createProductSize');
+        Route::post('/store', [\App\Http\Controllers\ApiProductController::class, 'storeProductSize'])->name('storeProductSize');
+        Route::put('/{id}/update', [\App\Http\Controllers\ApiProductController::class, 'updateProductSize'])->name('updateProductSize');
+        Route::delete('/{id}', [\App\Http\Controllers\ApiProductController::class, 'destroyProductSize'])->name('destroyProductSize'); 
+    });
+
 
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
 Route::get('color',[ApiProductController::class,'color']);

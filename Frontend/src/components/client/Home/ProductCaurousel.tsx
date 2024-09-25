@@ -1,10 +1,11 @@
 import React from 'react';
 import { useProductPagination, useProductSwipe } from '../../../hook/useProductCarousel';
 import { ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart } from 'lucide-react';
+import { Product } from '../../../interfaces/Product';
 
 // Thay thế bằng các import phù hợp
 
-const ProductCarousel = ({ products }) => {
+const ProductCarousel = ({ products }: { products: Product[] }) => {
     const { currentProducts, handleNext, handlePrev } = useProductPagination(products);
     const swipeHandlers = useProductSwipe(handleNext, handlePrev);
 
