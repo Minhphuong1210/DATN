@@ -118,10 +118,13 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
         {/* Biểu tượng menu */}
         <div className="mr-1 flex space-x-2">
-          <User
-            size={25}
-            className="cursor-pointer text-slate-500 hover:text-black"
-          />
+          <a href="/login">
+            <User
+              size={25}
+              className="cursor-pointer text-slate-500 hover:text-black"
+            />
+          </a>
+
           <ShoppingCart
             size={25}
             className="cursor-pointer text-slate-500 hover:text-black"

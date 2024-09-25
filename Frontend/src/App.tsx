@@ -7,10 +7,15 @@ import { ToastContainer } from 'react-toastify'
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import LayoutClient from "./layout/LayoutClient";
-import Register from "./pages/Register";
+
 import CartPage from './pages/client/CartPage'
 import Checkout from './pages/client/Checkout'
-import Login from './pages/client/Login'
+import Register from './pages/Register'
+import LoginForm from './components/Form/LoginForm'
+import Login from './pages/Login'
+
+
+
 
 
 function App() {
