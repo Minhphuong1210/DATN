@@ -1,0 +1,19 @@
+.product-carousel {
+    user-select: none;
+    /* Ngăn chặn chọn văn bản */
+    -webkit-user-select: none;
+    /* Ngăn chặn chọn văn bản trên Webkit */
+    -webkit-user-drag: none;
+    /* Ngăn chặn kéo chuột trên Webkit */
+}
+
+.product-carousel img,
+.product-carousel a {
+    -webkit-user-drag: none;
+    /* Ngăn chặn kéo chuột trên ảnh và thẻ a */
+}
+
+.product-item a {
+    pointer-events: auto;
+    /* Bật sự kiện chuột cho các thẻ a */
+}

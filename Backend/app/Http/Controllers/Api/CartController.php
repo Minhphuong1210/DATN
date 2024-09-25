@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cart;              
-use App\Models\CartDetail;        
-use App\Models\Product;           
-use App\Models\ProductColor;      
-use App\Models\ProductSize;       
-use App\Models\ProductDetail;     
-use Illuminate\Http\Request;      
-use Illuminate\Support\Facades\Auth; 
-use Illuminate\Support\Facades\Session; 
+use App\Models\Cart;
+use App\Models\CartDetail;
+use App\Models\Product;
+use App\Models\ProductColor;
+use App\Models\ProductSize;
+use App\Models\ProductDetail;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 
 class CartController extends Controller
@@ -60,7 +60,7 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $product_id = $request->id;
-        $size_id = $request->sizes_id;
+        $size_id = $request->size_id;
         $color_id = $request->color_id;
         $quantity = $request->quantity;
         $price = $request->price;
@@ -117,9 +117,18 @@ class CartController extends Controller
 
                 foreach ($cartDetails as $detail) {
                     $productDetail = ProductDetail::find($detail->product_detail_id);
-
+                    $colorName= $productDetail->productColor->name;
+                    $sizeName= $productDetail->productSize->name;
+                    $NameProduct=$productDetail->product->name;
+                    $ImageProduct=$productDetail->product->image;
+                    $PriceProduct=$productDetail->product->price;
                     if ($productDetail) {
                         $productsDetails[] = [
+                            'colorName'=>$colorName,
+                            'sizeName'=>$sizeName,
+                            'NameProduct'=>$NameProduct,
+                            'PriceProduct'=>$PriceProduct,
+                            'ImageProduct'=>$ImageProduct,
                             'product_detail' => $productDetail,
                             'quantity' => $detail->quantity,
                             'total_price' => $detail->price * $detail->quantity,
@@ -140,7 +149,7 @@ class CartController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    //Cap nhat gio hang 
+    //Cap nhat gio hang
     public function update(Request $request, string $id)
     {
         $cartDetail = CartDetail::findOrFail($id);
