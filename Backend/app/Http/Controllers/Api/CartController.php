@@ -58,6 +58,28 @@ class CartController extends Controller
 
     //Them san pham vao gio hang
     public function store(Request $request)
+
+{
+    $product_id = $request->id;
+    $size_id = $request->size_id; 
+    $color_id = $request->color_id; 
+    $quantity = $request->quantity;
+    $price = $request->price;
+
+    if (Auth::check()) {
+        $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+
+       
+        $productDetail = ProductDetail::where('product_id', $product_id)
+            ->where('size_id', $size_id)
+            ->where('color_id', $color_id)
+            ->first();
+
+        if ($productDetail) {
+            $productDetail_id = $productDetail->id;
+            $cartDetail = CartDetail::where('cart_id', $cart->id)
+                ->where('product_detail_id', $productDetail_id)
+
     {
         $product_id = $request->id;
         $size_id = $request->size_id;
@@ -70,35 +92,33 @@ class CartController extends Controller
             $productDetail = ProductDetail::where('product_id', $product_id)
                 ->where('size_id', $size_id)
                 ->where('color_id', $color_id)
+
                 ->first();
 
-            if ($productDetail) {
-                $productDetail_id = $productDetail->id;
-                $cartDetail = CartDetail::where('cart_id', $cart->id)
-                    ->where('product_detail_id', $productDetail_id)
-                    ->first();
-
-                if ($cartDetail) {
-                    $cartDetail->update([
-                        'quantity' => $cartDetail->quantity + $quantity,
-                    ]);
-                } else {
-                    CartDetail::create([
-                        'cart_id' => $cart->id,
-                        'product_detail_id' => $productDetail_id,
-                        'quantity' => $quantity,
-                        'price' => $price,
-                    ]);
-                }
-
-                return response()->json(['message' => 'Product added to cart successfully'], 200);
+            if ($cartDetail) {
+                $cartDetail->update([
+                    'quantity' => $cartDetail->quantity + $quantity,
+                ]);
             } else {
-                return response()->json(['error' => 'Product not found'], 404);
+                CartDetail::create([
+                    'cart_id' => $cart->id,
+                    'product_detail_id' => $productDetail_id,
+                    'quantity' => $quantity,
+                    'price' => $price,
+                ]);
             }
+
+            return response()->json(['message' => 'Product added to cart successfully'], 200);
         } else {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json(['error' => 'Product detail not found for the given size and color'], 404);
         }
+    } else {
+        return response()->json(['error' => 'User not logged in'], 401);
     }
+}
+
+    
+    
 
 
     /**
@@ -124,6 +144,7 @@ class CartController extends Controller
                     $PriceProduct=$productDetail->product->price;
                     if ($productDetail) {
                         $productsDetails[] = [
+
                             'colorName'=>$colorName,
                             'sizeName'=>$sizeName,
                             'NameProduct'=>$NameProduct,
