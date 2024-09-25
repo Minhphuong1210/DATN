@@ -16,14 +16,9 @@ class ApiProductController extends Controller
         $product = Product::findOrFail($id);
         $subCategory = SubCategory::findOrFail($sub_category_id);
 
+
         $productSubCategory = $subCategory->product; 
         $product->view = $product->view + 1; 
-
-        $productSize = ProductSize::all();
-        $productColor=ProductColor::all();
-        $productSubCategory = $subCategory->product;
-        $product->view = $product->view + 1;
-
         $product->save();
         return response()->json([
             
@@ -31,6 +26,7 @@ class ApiProductController extends Controller
             'ProductSubCategory' => $productSubCategory,
         ], 200);
     }
+
 
 
     public function promotion()
@@ -50,17 +46,13 @@ class ApiProductController extends Controller
             'data' => $category,
         ];
         return response()->json($data);
+    }
     public function indexProductSize()
     {
         $productSizes = ProductSize::all();
         return response()->json($productSizes);
     }
 
-    // Tạo kích thước sản phẩm (trả về form tạo)
-    public function createProductSize()
-    {
-    
-    }
 
     // Lưu kích thước sản phẩm
     public function storeProductSize(Request $request)
@@ -93,7 +85,7 @@ class ApiProductController extends Controller
         $productSize->delete();
 
         return response()->json(['message' => 'Kích thước sản phẩm đã được xóa thành công.'], 204);
-
+    }
     public function color(){
         $productColor=ProductColor::all();
         return response()->json([
@@ -105,11 +97,11 @@ class ApiProductController extends Controller
         return response()->json([
             'productSize'=>$productSize,
         ]);
-=
-    }
-
-=
 
     }
+
+
+   
+
 
 }

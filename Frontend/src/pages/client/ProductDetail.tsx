@@ -5,48 +5,24 @@ import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useProduct } from "../../hook/Product";
-import { useCarts } from "../../hook/Cart";
-import { toast } from "react-toastify";
-import { Product_detail } from "../../interfaces/Cart";
-import { useCart } from "../../context/CartContext";
+import { useProduct } from "../../hook/Product"; import { toast } from "react-toastify";
 import { Product } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
 import axios from "axios";
 
 
 
-// const products = [
-//     {
-//         id: '1',
-//         name: 'Áo Thun',
-//         price: 200000,
-//         variants: {
-//             sizes: ['S', 'M', 'L'],
-//             colors: ['Đỏ', 'Xanh', 'Đen'],
-//         },
-//     }
-
-// ];
 
 const ProductDetail: React.FC = ({ }) => {
     const { product } = useProduct();
-    const [size_id, setsize_id] = useState<Size>("Chọn size");
+    const [selectSize, setSelectSize] = useState<Size>("Chọn size");
     const [selectColor, setSelectColor] = useState<Color>("Chọn màu");
     const [quantity, setQuantity] = useState(1);
     const [showDescription, setShowDescription] = useState(true);
     const [showComment, setShowComment] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    // const { addToCart } = useCarts();
     const { color, size } = useColor();
 
-    type AddtoCart = {
-        product_id: string
-        size: string
-        color: string
-        quantity: number
-        price: number
-      }
+
 
     // Tăng giảm sô lượng
     const incurement = () => {
@@ -57,13 +33,11 @@ const ProductDetail: React.FC = ({ }) => {
     };
 
     const handleChangeSize = (event: ChangeEvent<HTMLInputElement>) => {
-        setsize_id(event.target.value as Size);
+        setSelectSize(event.target.value);
     };
-    // const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
-    //     setSelectColor(event.target.value as Color);
-    // };
+
     const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectColor(event.target.value as Color);
+        setSelectColor(event.target.value);
     };
 
     // Mô tả & Comment
@@ -75,68 +49,34 @@ const ProductDetail: React.FC = ({ }) => {
         setShowComment(true);
         setShowDescription(false);
     };
-
-
-    const itemsPerPage = 4; // Số lượng sản phẩm hiển thị trên màn hình
-    const productsPerPage = 4; // Số lượng sản phẩm chuyển qua mỗi lần bấm nút
-
-    const handleNext = () => {
-        // Chuyển sang 4 sản phẩm tiếp theo
-        if (currentIndex + productsPerPage < products.length) {
-            setCurrentIndex(currentIndex + productsPerPage);
-        } else {
-            setCurrentIndex(products.length - itemsPerPage); // Nếu vượt quá, chỉ hiển thị 2 sản phẩm cuối
-        }
-    };
-
-    const handlePrevious = () => {
-        // Quay lại 4 sản phẩm trước
-        if (currentIndex - productsPerPage >= 0) {
-            setCurrentIndex(currentIndex - productsPerPage);
-        } else {
-            setCurrentIndex(0); // Không quay lại quá đầu danh sách
-        }
-    };
-    
     const nav = useNavigate()
-    // const addToCart = async ({product_id, size , quantity, color, price}: AddtoCart) => {
-    //     try {
-    //       await axios.post('/api/cart/add', { product_id, size , quantity, color, price })
-    //       toast.success('Thêm sản phẩm vào giỏ hàng thành công')
-    //       nav('/cart')
-    //     } catch (error) {
-    //       toast.error('Thêm sản phẩm vào giỏ hàng thất bại')
-    //     }
-    //   }
-
-    const handleAddToCart = async(
-        product: Product, 
+    const handleAddToCart = async (
+        product: Product,
         color_id: string,  // Truyền trực tiếp giá trị đã chọn
         size_id: string,    // Truyền trực tiếp giá trị đã chọn
         quantity: number,
-        
-      ) => {
+
+    ) => {
         console.log('Product:', product.id);
         console.log('Selected Color:', color_id);
         console.log('Selected Size:', size_id);
         console.log('Quantity:', quantity);
         try {
             // Only send the product ID instead of the full product object
-            await axios.post('/api/cart/add', { 
-              id: product.id, 
-              color_id, 
-              size_id, 
-              quantity,
-              price: product.price
+            await axios.post('/api/cart/add', {
+                id: product.id,
+                color_id,
+                size_id,
+                quantity,
+                price: product.price
             });
             toast.success('Thêm sản phẩm vào giỏ hàng thành công');
             nav('/cart');
-          } catch (error) {
+        } catch (error) {
             console.error('Error adding to cart:', error);
-          }
-      
-        // Thực hiện các thao tác thêm vào giỏ hàng tại đây
-      };
+        }
+
+    };
 
     return (
         <>
@@ -190,7 +130,7 @@ const ProductDetail: React.FC = ({ }) => {
                             <div className="text-lg font-bold">{product?.price} </div>
                             <form action="">
                                 <div className="mb-2 flex justify-between text-sm md:block">
-                                    <span className="md:mr-11">Kích thước: {size_id}</span>
+                                    <span className="md:mr-11">Kích thước: {selectSize}</span>
                                     <span className="hover:text-yellow-400 md:mr-11">
                                         <a href="">Giúp bạn chọn size</a>
                                     </span>
@@ -208,8 +148,8 @@ const ProductDetail: React.FC = ({ }) => {
                                                             type="radio"  // Thay đổi từ checkbox sang radio
                                                             name="size"   // Tất cả radio button cần cùng một name để được nhóm lại
                                                             value={size.id}
-                                                            checked={size_id === size.id}  // Kiểm tra nếu size đã được chọn
-                                                            onChange={() => setsize_id(size.id)}  // Khi người dùng chọn, cập nhật state
+                                                            checked={selectSize === size.id}  // Kiểm tra nếu size đã được chọn
+                                                            onChange={(event) => handleChangeSize(event)}  // Khi người dùng chọn, cập nhật state
                                                             className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
                                                         />
                                                         <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
@@ -275,7 +215,7 @@ const ProductDetail: React.FC = ({ }) => {
                                 >
                                     +
                                 </button>
-                                <button onClick={() => handleAddToCart(product, selectColor, size_id, quantity)}>
+                                <button onClick={() => handleAddToCart(product, selectColor, selectSize, quantity)}>
                                     Add to Cart
                                 </button>
 

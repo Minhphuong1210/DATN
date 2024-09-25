@@ -9,11 +9,11 @@ import Home from './pages/client/Home';
 import { Routes, Route } from 'react-router-dom';
 import ProductDetail from './pages/client/ProductDetail';
 import Register from './pages/Register';
-import Login from './pages/Login';
-import Cart from './pages/client/Cart';
+
 import Cart from './pages/client/Cart';
 import Login from './pages/Login';
 import Color from './pages/client/Color';
+
 
 function App() {
   return (

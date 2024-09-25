@@ -12,9 +12,9 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <LoadingProvider>
       <BrowserRouter>
-      <CartProvider>
-        <App />
-      </CartProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
       </BrowserRouter>
     </LoadingProvider>
 

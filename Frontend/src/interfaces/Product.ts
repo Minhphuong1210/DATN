@@ -23,6 +23,7 @@ export interface ApiResponse {
     products_sale: Product[];
     products_showhome: Product[];
 }
+
 export interface Colors  {
     id:string
     name: string

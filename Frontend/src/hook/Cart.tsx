@@ -7,11 +7,13 @@ import { Product } from "../interfaces/Product";
 import { useNavigate } from "react-router-dom";
 
 type AddtoCart = {
-  product: Product, 
-        color_id: string,  // Truyền trực tiếp giá trị đã chọn
-        size_id: string,    // Truyền trực tiếp giá trị đã chọn
-        quantity: number,
-        price : number
+
+  product: Product,
+  color_id: string,  // Truyền trực tiếp giá trị đã chọn
+  size_id: string,    // Truyền trực tiếp giá trị đã chọn
+  quantity: number,
+  price: number
+
 }
 
 export const useCarts = () => {
@@ -29,6 +31,12 @@ export const useCarts = () => {
       }
     })();
   }, []);
+
+
+
+
+
+  return { productCart, setProductCart, cart, setCart };
 
   const addToCart = async ({product, size_id , quantity, color_id, price}: AddtoCart) => {
     try {
@@ -51,4 +59,5 @@ export const useCarts = () => {
   
 
   return { productCart, setProductCart, addToCart, cart , setCart };
+
 };
