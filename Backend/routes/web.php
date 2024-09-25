@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SubCategoryController;
 
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\ProductSizeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -177,6 +178,21 @@ Route::prefix('admins')
                 Route::delete('/{id}/destroy', [SubCategoryController::class, 'destroy'])->name('destroy');
             }); 
 
+    });
+    Route::prefix('admins')
+    ->as('admins.')
+    ->group(function () {
+        Route::prefix('product_sizes')
+            ->as('product_sizes.')
+            ->group(function () {
+                Route::get('/', [ProductSizeController::class, 'index'])->name('index');
+                Route::get('/create', [ProductSizeController::class, 'create'])->name('create');
+                Route::post('/store', [ProductSizeController::class, 'store'])->name('store');
+                Route::get('/show/{id}', [ProductSizeController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ProductSizeController::class, 'edit'])->name('edit');
+                Route::put('/{id}/update', [ProductSizeController::class, 'update'])->name('update');
+                Route::delete('/{id}/destroy', [ProductSizeController::class, 'destroy'])->name('destroy');
+            }); 
     });
 
 
