@@ -7,11 +7,13 @@ import { Product } from "../interfaces/Product";
 import { useNavigate } from "react-router-dom";
 
 type AddtoCart = {
+
   product: Product,
   color_id: string,  // Truyền trực tiếp giá trị đã chọn
   size_id: string,    // Truyền trực tiếp giá trị đã chọn
   quantity: number,
   price: number
+
 }
 
 export const useCarts = () => {
@@ -33,5 +35,29 @@ export const useCarts = () => {
 
 
 
+
   return { productCart, setProductCart, cart, setCart };
+
+  const addToCart = async ({product, size_id , quantity, color_id, price}: AddtoCart) => {
+    try {
+      // Only send the product ID instead of the full product object
+      await axios.post('/api/cart/add', { 
+        id: product.id, 
+        color_id, 
+        size_id, 
+        quantity ,
+        price: product.price
+      });
+      toast.success('Thêm sản phẩm vào giỏ hàng thành công');
+      nav('/cart');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+
+  // Thực hiện các thao tác thêm vào giỏ hàng tại đây
+  }
+  
+
+  return { productCart, setProductCart, addToCart, cart , setCart };
+
 };

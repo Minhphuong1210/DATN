@@ -2,12 +2,16 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Colors, Sizes } from "../interfaces/Product";
 
+
 export const useColor = () => {
     const [color, setColor] = useState<Colors[]>([])
+
+
     const [size, setSize] = useState<Sizes[]>([])
     const [selectedColor, setSelectedColors] = useState<string | null>(null);
     // const [selectColor, setSelectColor] = useState("")
     // const [selectedSize, setSelectedSize] = useState("")
+
     const getColor = async () => {
         try {
             const { data } = await axios.get(`/api/color`)
@@ -24,7 +28,9 @@ export const useColor = () => {
         } catch (error) {
             console.log(error);
 
-        }
+
+   
+    }
     }
     const handleChangeColors = (colorName: string) => {
         if (selectedColor === colorName) {
@@ -43,4 +49,4 @@ export const useColor = () => {
         color, getColor, size, getSize, selectedColor,
         handleChangeColors,
     }
-} 
+   

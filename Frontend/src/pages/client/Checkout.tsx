@@ -93,6 +93,7 @@ const Checkout = () => {
                         <a href="/" className="focus:outline-none hover:underline text-gray-500">Home</a> / <a href="cart" className="focus:outline-none hover:underline text-gray-500">Cart</a> / <span className="text-gray-600">Checkout</span>
                     </div>
                 </div>
+
                 <div className="w-full bg-white border-t border-b border-gray-200 px-5 py-10 text-gray-800">
                     <div className="w-full">
                         <div className="-mx-3 md:flex items-start">
@@ -130,6 +131,51 @@ const Checkout = () => {
                                             <button className=" w-full max-w-xs mx-auto border border-transparent bg-blue-600 hover:bg-gray-500 focus:bg-gray-500 text-white rounded-md px-5 py-[15px] font-semibold">Áp Dụng</button>
                                         </div>
                                     </div>
+
+                <div className='pt-10 text-xl font-bold'>Thanh Toán</div>
+                <div className='flex gap-20'>
+                    <div className='border border-separate w-[650px] flex justify-center'>
+                        <div className='pt-3 '>
+                            <div className='flex justify-between text-xl '>1.Địa chỉ nhận hàng</div>
+                            <div className='flex flex-col pt-2 '>
+                                <label className='text-lg'>Họ và tên</label>
+                                <input type="text" className=' w-[600px] h-[35px] bg-slate-50 border border-black border-solid rounded ' placeholder='Nguyen Van A' />
+                            </div>
+                            <div className='flex flex-col pt-2 '>
+                                <label className='text-lg'>Số điện thoại</label>
+                                <input type="text" className=' w-[600px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='012345678' />
+                            </div>
+                            <div className='flex flex-col pt-2 '>
+                                <label className='text-lg'>Tỉnh/Thành phố</label>
+                                <input type="text" className=' w-[600px] h-[35px] bg-slate-50 border border-black border-solid rounded ' placeholder='Ha Noi' />
+                            </div>
+                            <div className='flex flex-col pt-2 '>
+                                <label className='text-lg'>Quận/Huyện</label>
+                                <input type="text" className=' w-[600px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Thanh Trì' />
+                            </div>
+                            <div className='flex flex-col pt-2 '>
+                                <label className='text-lg'>Phường/Xã</label>
+                                <input type="text" className=' w-[600px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Vạn Phúc' />
+                            </div>
+                            <div className='flex flex-col pt-2 '>
+                                <label className='text-lg'>Địa chỉ đường</label>
+                                <input type="text" className=' w-[600px] h-[35px] bg-slate-50 border border-black border-solid rounded' placeholder='Xóm 4' />
+                            </div>
+                            <div className='flex flex-col pt-2 '>
+                                <label className='text-lg'>Ghi chú</label>
+                                <textarea name="" id="" className=' w-[600px] h-[135px] bg-slate-50 border border-black border-solid rounded' placeholder='Ghi chú'></textarea>
+                            </div>
+                            <hr className='shrink-0 mt-8 w-[600px]  border border-black border-solid' />
+                            <div className='flex justify-between text-xl pt-10'>2.Vận chuyển</div>
+                            <div className='pt-3 flex flex-col'>
+                                <div className='flex flex-row gap-5'>
+                                    <input type="radio" name='vanchuyen' className='ml-2 w-5' />
+                                    <label htmlFor="" className='text-lg'>Giao hàng nhanh</label>
+                                </div>
+                                <div className='flex flex-row gap-5'>
+                                    <input type="radio" name='vanchuyen' className='ml-2 w-5' />
+                                    <label htmlFor="" className='text-lg'>Giao tiết kiệm</label>
+
                                 </div>
                                 <div className="mb-6 pb-6 border-b border-gray-200 text-gray-800">
                                     <div className="w-full flex mb-3 items-center">

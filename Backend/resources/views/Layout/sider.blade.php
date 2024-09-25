@@ -35,7 +35,14 @@
                         <i data-feather="shopping-cart"></i>
                         <span> Danh mục cha </span>
                     </a>
-                   
+                    <a href="{{ route('admins.banner.index') }}">
+                        <i data-feather="shopping-cart"></i>
+                        <span> Banner </span>
+                    </a>
+                    <a href="{{ route('admins.subcategory.index') }}">
+                        <i data-feather="shopping-cart"></i>
+                        <span> danh mục con </span>
+                    </a>
                     <a href="{{ route('admins.orders.index') }}">
                         <i data-feather="shopping-cart"></i>
                         <span> Đơn hàng </span>
@@ -46,6 +53,13 @@
                     <a href="{{ route('admins.discounts.index') }}">
                         <i data-feather="shopping-cart"></i>
                         <span> Discount </span>
+                    </a>
+                </li>
+                <li>
+                   
+                    <a href="{{ route('admins.product_sizes.index') }}">
+                        <i data-feather="shopping-cart"></i>
+                        <span> Product Size     </span>
                     </a>
                 </li>
 

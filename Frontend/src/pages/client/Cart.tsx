@@ -1,5 +1,8 @@
-import React from "react";
 
+import React from "react";
+import React, { useEffect } from "react";
+import { useCarts } from "../../hook/Cart";
+import { Cart_detail } from "../../interfaces/Cart";
 import axios from "axios";
 import { useCarts } from "../../hook/Cart";
 
@@ -22,6 +25,7 @@ const Cart = () => {
         // Cập nhật giỏ hàng cục bộ nếu cần
     };
 
+
     const decreaseQuantity = (item: any) => {
         if (item.quantity > 1) {
             const newQuantity = item.quantity - 1;
@@ -34,6 +38,11 @@ const Cart = () => {
         (acc, item) => acc + item.PriceProduct * item.quantity,
         0
     );
+
+const Cart = (props: Props) => {
+    const { productCart } = useCarts();
+    console.log(productCart);
+
 
     return (
         <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
