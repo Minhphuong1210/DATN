@@ -49,4 +49,5 @@ export const useColor = () => {
         color, getColor, size, getSize, selectedColor,
         handleChangeColors,
     }
+}
    

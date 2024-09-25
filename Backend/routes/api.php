@@ -9,9 +9,6 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\ApiProductController;
 
-
-use App\Http\Controllers\ApiProductController;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
