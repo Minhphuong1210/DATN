@@ -53,7 +53,7 @@ const ProductCarousel = ({ products }) => {
                                 </div>
                             </div>
                         </div>
-                        <a href="#" className="block overflow-hidden">
+                        <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="block overflow-hidden">
                             <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
                                 {product.name}
                             </div>
