@@ -48,11 +48,11 @@ const Checkout = (props: Props) => {
                             <div className='flex justify-between text-xl pt-10'>2.Vận chuyển</div>
                             <div className='pt-3 flex flex-col'>
                                 <div className='flex flex-row gap-5'>
-                                    <input type="radio" className='ml-2 w-5' />
+                                    <input type="radio" name='vanchuyen' className='ml-2 w-5' />
                                     <label htmlFor="" className='text-lg'>Giao hàng nhanh</label>
                                 </div>
                                 <div className='flex flex-row gap-5'>
-                                    <input type="radio" className='ml-2 w-5' />
+                                    <input type="radio" name='vanchuyen' className='ml-2 w-5' />
                                     <label htmlFor="" className='text-lg'>Giao tiết kiệm</label>
                                 </div>
                             </div>

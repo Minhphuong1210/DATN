@@ -60,7 +60,7 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $product_id = $request->id;
-        $size_id = $request->sizes_id;
+        $size_id = $request->size_id;
         $color_id = $request->color_id;
         $quantity = $request->quantity;
         $price = $request->price;
