@@ -4,18 +4,20 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useCart } from "../context/Cart"; // Sử dụng đúng context
 import { Product } from "../interfaces/Product";
+import { useNavigate } from "react-router-dom";
 
 type AddtoCart = {
-  product_id: string
-  size: string
-  color: string
-  quantity: number
-  price: number
+  product: Product, 
+        color_id: string,  // Truyền trực tiếp giá trị đã chọn
+        size_id: string,    // Truyền trực tiếp giá trị đã chọn
+        quantity: number,
+        price : number
 }
 
 export const useCarts = () => {
   const [productCart, setProductCart] = useState<Cart_detail[]>([]); // Giỏ hàng local
   const { cart, setCart } = useCart(); // Sử dụng useCart từ context
+  const nav = useNavigate()
 
   useEffect(() => {
     (async () => {
@@ -28,13 +30,23 @@ export const useCarts = () => {
     })();
   }, []);
 
-  const addToCart = async ({product_id, size , quantity, color, price}: AddtoCart) => {
+  const addToCart = async ({product, size_id , quantity, color_id, price}: AddtoCart) => {
     try {
-      await axios.post('/api/cart/add', { product_id, size , quantity, color, price })
-      toast.success('Thêm sản phẩm vào giỏ hàng thành công')
+      // Only send the product ID instead of the full product object
+      await axios.post('/api/cart/add', { 
+        id: product.id, 
+        color_id, 
+        size_id, 
+        quantity ,
+        price: product.price
+      });
+      toast.success('Thêm sản phẩm vào giỏ hàng thành công');
+      nav('/cart');
     } catch (error) {
-      toast.error('Thêm sản phẩm vào giỏ hàng thất bại')
+      console.error('Error adding to cart:', error);
     }
+
+  // Thực hiện các thao tác thêm vào giỏ hàng tại đây
   }
   
 
