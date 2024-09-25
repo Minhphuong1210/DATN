@@ -11,16 +11,19 @@ import Home from './pages/client/Home';
 import { Routes, Route } from 'react-router-dom';
 import ProductDetail from './pages/client/ProductDetail';
 import Register from './pages/Register';
+import Cart from './pages/client/Cart';
+import Login from './pages/Login';
 
 function App() {
   return (
     <>
       <Routes>
         <Route path='register' element={<Register />} />
+        <Route path='login' element={<Login />} />
         <Route path='/' element={<LayoutClient />} >
           <Route index element={<Home />} />
           <Route path='productdetail/:id/subcate/:idd' element={<ProductDetail />} />
-          <Route path="cart" element={<CartPage />} />
+          <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
         </Route>
       </Routes>

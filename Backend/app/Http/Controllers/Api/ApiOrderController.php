@@ -36,7 +36,7 @@ class ApiOrderController extends Controller
             'type_dang_van_chuyen' => $type_dang_van_chuyen,
         ]);
     }
-    // đây là hiện gia trang mua hàng 
+    // đây là hiện gia trang mua hàng
     public function create()
     {
         $userId = Auth::id();
@@ -48,9 +48,9 @@ class ApiOrderController extends Controller
 
         if ($userId) {
             // Khi người dùng đã đăng nhập
-            $cart = Cart::where('user_id', $userId)->with('details')->first();
+            $cart = Cart::where('user_id', $userId)->with('cartDetails')->first();
             if ($cart) {
-                foreach ($cart->details as $detail) {
+                foreach ($cart->cartDetails as $detail) {
                     $itemSubtotal = $detail->price * $detail->quantity;
                     $subtotal += $itemSubtotal;
                     $cartDetails[] = [
@@ -77,7 +77,7 @@ class ApiOrderController extends Controller
                 ];
             }
         }
-        // kiểm tra tính đồng bộ khi người dùng đăng nhập vào 
+        // kiểm tra tính đồng bộ khi người dùng đăng nhập vào
         $total = $subtotal + $tax;
 
         return response()->json([
@@ -88,21 +88,21 @@ class ApiOrderController extends Controller
         ]);
     }
 
-    // đây là khi kích vào nút mua hàng 
+    // đây là khi kích vào nút mua hàng
     public function store(Request $request)
     {
 
 
         if ($request->isMethod('post')) {
-            
+
             DB::beginTransaction();
-        
+
             try {
                 $user_id = Auth::id();
                 if (!$user_id) {
                     return response()->json([
                         'error' => 'Người dùng chưa đăng nhập'
-                    ], 401); 
+                    ], 401);
                 }
                 $params = $request->except('_token');
                 $params['user_id'] = $user_id;
@@ -113,7 +113,7 @@ class ApiOrderController extends Controller
                 if (!$cart) {
                     return response()->json([
                         'error' => 'Không có sản phẩm cần mua'
-                    ], 404); 
+                    ], 404);
                 }
                 $cartDetails = CartDetail::where('cart_id', $cart->id)->get();
                 if ($cartDetails->isEmpty()) {
@@ -121,7 +121,7 @@ class ApiOrderController extends Controller
                         'error' => 'Giỏ hàng của bạn hiện đang trống'
                     ], 404);
                 }
-        
+
                 foreach ($cartDetails as $item) {
                     $total = $item->price * $item->quantity;
                     OrderDetail::create([
@@ -132,9 +132,9 @@ class ApiOrderController extends Controller
                         'quantity' => $item->quantity,
                         'price' => $item->price
                     ]);
-        
+
                     $detail = ProductDetail::query()->where('id', $item->product_detail_id)->first();
-        
+
                     if ($detail) {
                         $detail->quantity -= $item->quantity;
                         $detail->save();
@@ -145,21 +145,21 @@ class ApiOrderController extends Controller
                 return response()->json([
                     'success' => 'Mua hàng thành công'
                 ], 201); // Created
-        
+
             } catch (\Exception $exception) {
                 // Rollback giao dịch nếu có lỗi
                 DB::rollBack();
-        
+
                 // Ghi lỗi vào log (tuỳ chọn)
                 Log::error('Order creation failed: ' . $exception->getMessage());
-        
+
                 // Trả về phản hồi lỗi
                 return response()->json([
                     'error' => 'Có lỗi khi tạo đơn hàng, vui lòng thử lại sau: ' . $exception->getMessage()
                 ], 500); // Internal Server Error
             }
         }
-        
+
     }
 
     /**

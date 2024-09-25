@@ -29,16 +29,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::middleware('auth:sanctum')->group(function () {
     // API để lấy giỏ hàng
-    Route::get('/cart', [CartController::class, 'cart_detail'])->name('api.cart.detail');
+    Route::get('/cart', [CartController::class, 'cart_detail']);
 
     // API thêm sản phẩm vào giỏ hàng
-    Route::post('/cart', [CartController::class, 'store'])->name('api.cart.store');
+    Route::post('/cart/add', [CartController::class, 'store']);
 
     // API cập nhật số lượng sản phẩm trong giỏ hàng
-    Route::put('/cart/{id}', [CartController::class, 'update'])->name('api.cart.update');
+    Route::put('/cart/{id}/update', [CartController::class, 'update']);
 
     // API xóa sản phẩm khỏi giỏ hàng
-    Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('api.cart.destroy');
+    Route::delete('/cart/{id}/delete', [CartController::class, 'destroy']);
 });
 
 Route::resource('/products', ProductController::class);
@@ -59,3 +59,6 @@ Route::middleware('auth:sanctum')
 });
 
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
+
+Route::get('color',[ApiProductController::class,'color']);
+Route::get('size',[ApiProductController::class,'size']);

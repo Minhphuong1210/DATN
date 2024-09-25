@@ -1,73 +1,105 @@
-import React, { useEffect } from "react";
-import { useCart } from "../../hook/Cart";
-import { Cart_detail } from "../../interfaces/Cart";
+import React from "react";
+
 import axios from "axios";
+import { useCarts } from "../../hook/Cart";
 
-type Props = {};
 
-const Cart = (props: Props) => {
-    const { productCart } = useCart();
-    console.log(productCart);
+const Cart = () => {
+    const { productCart } = useCarts();
+
+    const updateQuantityInDB = async (id: number, quantity: number) => {
+        try {
+            await axios.put(`/api/cart/${id}`, { quantity });
+            // Xử lý thông báo thành công nếu cần
+        } catch (error) {
+            console.error("Failed to update quantity", error);
+        }
+    };
+
+    const increaseQuantity = (item: any) => {
+        const newQuantity = item.quantity + 1;
+        updateQuantityInDB(item.id, newQuantity); // Sử dụng item.id
+        // Cập nhật giỏ hàng cục bộ nếu cần
+    };
+
+    const decreaseQuantity = (item: any) => {
+        if (item.quantity > 1) {
+            const newQuantity = item.quantity - 1;
+            updateQuantityInDB(item.id, newQuantity); // Sử dụng item.id
+            // Cập nhật giỏ hàng cục bộ nếu cần
+        }
+    };
+
+    const totalCartPrice = productCart.reduce(
+        (acc, item) => acc + item.PriceProduct * item.quantity,
+        0
+    );
 
     return (
-        <>
-            <div className="mt-16 flex w-[90%] max-w-[1535px] flex-col self-center pl-40 text-2xl max-md:mt-10 max-md:max-w-full">
-                <h1 className="self-start text-xl font-bold text-black max-md:ml-1.5">
-                    GIỎ HÀNG
-                </h1>
-                <div className="mt-16 flex w-full max-w-[1413px] flex-wrap justify-between gap-10 text-lg text-black max-md:mt-10 max-md:max-w-full">
-                    <div className="text-lg font-bold">Sản phẩm</div>
-                    <div className="flex gap-24 pr-[70px] max-md:max-w-full">
-                        <div className="text-lg">Số lượng</div>
-                        <div className="px-8 text-lg">Giá gốc</div>
-                        <div className="text-lg">Tổng tiền</div>
-                    </div>
-                </div>
-                <hr className="mt-2.5 w-full shrink-0 border border-solid border-black max-md:mr-1.5" />
-                <div className="flex flex-col gap-5 pt-3">
-                    {productCart &&
-                        productCart.length > 0 &&
-                        productCart.map((item, index) => {
-                            return (
-                                <div key={index} className="pt-10 gap-5 block text-base">
-                                    <div className="flex gap-5">
-                                        <div className="pt-5 "><img src={item.ImageProduct} alt="Hình ảnh" /></div>
-                                        <div className="block ">
-                                            <div className="truncate w-[150px]">{item.NameProduct}</div>
-                                            <div>{item.colorName}</div>
-                                            <div>{item.sizeName}</div>
-                                        </div>
-                                        <div className="flex w-full gap-[160px] pl-[480px] pt-2">
-                                            <div>{item.quantity}</div>
-                                            <div>{item.PriceProduct}</div>
-                                            <div>{item.total_price}</div>
+        <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+            <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Shopping Cart</h2>
+                <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+                    <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
+                        <div className="space-y-6">
+                            {productCart && productCart.length > 0 && productCart.map((item, index) => {
+                                const totalPrice = item.PriceProduct * item.quantity;
+                                console.log(productCart);
+
+                                return (
+                                    <div key={index} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-6">
+                                        <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
+                                            <a href="#" className="shrink-0 md:order-1">
+                                                <img className="h-20 w-20 dark:hidden" src={item.ImageProduct} alt="product image" />
+                                                <img className="hidden h-20 w-20 dark:block" src={item.ImageProduct} alt="product image" />
+                                            </a>
+                                            <div className="flex items-center justify-between md:order-3 md:justify-end">
+                                                <div className="flex items-center">
+                                                    <button onClick={() => decreaseQuantity(item)} type="button" className="inline-flex h-5 w-5 items-center justify-center border rounded-md bg-gray-100 hover:bg-gray-200">
+                                                        <svg className="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
+                                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1h16" />
+                                                        </svg>
+                                                    </button>
+                                                    <input type="text" className="w-10 text-center" value={item.quantity} readOnly />
+                                                    <button onClick={() => increaseQuantity(item)} type="button" className="inline-flex h-5 w-5 items-center justify-center border rounded-md bg-gray-100 hover:bg-gray-200">
+                                                        <svg className="h-2.5 w-2.5 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+                                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 1v16M1 9h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <div className="text-end md:order-4 md:w-32">
+                                                    <p className="text-base font-bold text-gray-900 dark:text-white">{item.PriceProduct} đ</p>
+                                                    <p className="text-base font-bold text-gray-900 dark:text-white">{totalPrice} đ</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
+                                                <a href="#" className="text-base font-medium text-gray-900 hover:underline dark:text-white">{item.NameProduct}</a>
+                                                <div>Size: {item.sizeName}, Màu: {item.colorName}</div>
+                                            </div>
                                         </div>
                                     </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                    <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
+                        <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+                            <p className="text-xl font-semibold text-gray-900 dark:text-white">Order summary</p>
+                            <div className="space-y-4">
+                                <dl className="flex items-center justify-between gap-4">
+                                    <dt className="text-base font-bold text-gray-900 dark:text-white">Total</dt>
+                                    <dd className="text-base font-bold text-gray-900 dark:text-white">{totalCartPrice} đ</dd>
+
+                                </dl>
+                                <div className="flex justify-center">
+                                    <button className="py-3 px-5 bg-yellow-400 rounded-md">Đặt hàng</button>
                                 </div>
-                            );
-                        })}
-                </div>
-                <hr className="mt-8 w-full shrink-0 border border-solid border-black" />
-                <div className="flex gap-5 justify-between items-start self-end mt-11 mr-10 max-w-full w-[300px] max-md:mt-10 max-md:mr-2.5 text-lg">
-                    <div className="flex flex-col">
-                        <div className="text-black font-bold">Tổng sản phẩm</div>
-                        <div className="text-yellow-500 font-bold text-xl">Tổng tiền</div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <div>{productCart && productCart.length > 0 && productCart.reduce((sum, item) => sum + item.quantity, 0)}</div>
-                        <div>{productCart && productCart.length > 0 && productCart.reduce((sum, item) => sum + item.total_price, 0)}</div>
-                    </div>
-                </div>
-                <div className="flex flex-wrap gap-5 justify-between self-center mt-20 w-full font-semibold max-w-[1515px] max-md:mt-10 max-md:max-w-full">
-                    <button className="self-start px-16 py-3 text-lg text-black bg-white rounded border border-black border-solid max-md:px-5">
-                        Tiếp tục mua hàng
-                    </button>
-                    <button className="px-16 py-3 text-lg text-white bg-black rounded max-md:px-5">
-                        <a href="/checkout">Đặt hàng</a>
-                    </button>
                 </div>
             </div>
-        </>
+        </section>
     );
 };
 

@@ -93,12 +93,14 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 import { Cart_detail } from "../interfaces/Cart";
 
 interface CartContextType {
-  cart: Cart_detail | null;
-  setCart: React.Dispatch<React.SetStateAction<Cart_detail | null>>;
+  cart: Cart_detail | null;  // Giỏ hàng có thể là null nếu chưa có sản phẩm nào
+  setCart: React.Dispatch<React.SetStateAction<Cart_detail | null>>;  // Hàm để cập nhật giỏ hàng
 }
 
+// Tạo context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Hook useCart để lấy dữ liệu context giỏ hàng
 export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (!context) {
@@ -107,12 +109,14 @@ export const useCart = (): CartContextType => {
   return context;
 };
 
+// Interface cho props của CartProvider
 interface CartProviderProps {
   children: ReactNode;
 }
 
+// CartProvider để quản lý trạng thái giỏ hàng
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [cart, setCart] = useState<Cart_detail | null>(null);
+  const [cart, setCart] = useState<Cart_detail | null>(null); // Khởi tạo giỏ hàng là null
 
   return (
     <CartContext.Provider value={{ cart, setCart }}>
@@ -120,5 +124,3 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     </CartContext.Provider>
   );
 };
-  
-  

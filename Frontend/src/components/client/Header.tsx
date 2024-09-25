@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import yourImage from "../../public/images/logo.jpg";
+import yourImage from "../../public/images/logofix.png";
 import { AlignJustify, Search, ShoppingCart, User, X } from "lucide-react";
 
 interface HeaderProps {

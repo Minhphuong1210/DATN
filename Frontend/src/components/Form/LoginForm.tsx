@@ -1,8 +1,7 @@
 import React from 'react'
 import { useForm } from 'react-hook-form';
-import { UseAuth } from '../../hook/Auth';
-import { Header } from 'react-native/Libraries/NewAppScreen';
-
+import img from '../../public/images/imglogin.jpg'
+import logo from '../../public/images/logofix.png'
 type AuthFormProps = {
     onSubmit: (data: any) => void
 }
@@ -10,29 +9,34 @@ const LoginForm = ({ onSubmit }: AuthFormProps) => {
     const { handleSubmit, register, formState: { errors } } = useForm();
 
     return (
-        <div>
+        <div className=''>
 
-            <div className="bg-white rounded-lg shadow-lg pt-44 flex h-[800px] w-[500px]" style={{ width: '900px' }}>
+            <div className="bg-white rounded-lg shadow-lg items-center  flex h-full w-[1100px] " >
 
                 {/* Left Image Section */}
-                <div className="flex items-center justify-center w-1/2 bg-white p-10 pb-60">
+                <div className="flex items-center justify-center w-1/2 bg-white ">
                     <img
-                        src="https://via.placeholder.com/384x335"
-                        alt="Illustration"
+                        src={img} alt="Illustration"
                         className="object-cover"
                         style={{ width: '384px', height: '335px' }}
                     />
                 </div>
 
                 {/* Form Section */}
-                <div className="w-1/2 p-10">
-                    <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-                        Đăng Nhập Tài Khoản
+                <div className=" p-10 ">
+                    <div className='text-center flex justify-center items-center mb-3 '>
+                        <img src={logo} alt="" className='w-20' />
+                        <div className='text-3xl font-bold
+                        '>odern men</div>
+                    </div>
+                    <h2 className="text-2xl font-semibold text-center text-gray-800 mb-2">
+                        Đăng Nhập
                     </h2>
+                    <p className='mb-6'>Trải nghiệm mua hàng thật tốt với Modern men.</p>
 
                     <form onSubmit={handleSubmit(onSubmit)}>
                         {/* Username Field */}
-                        
+
 
                         {/* Email Field */}
                         <div className="mb-4">
