@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
-import { useCart } from "../../hook/Cart";
+import { useCarts } from "../../hook/Cart";
 import { Cart_detail } from "../../interfaces/Cart";
 import axios from "axios";
 
 type Props = {};
 
 const Cart = (props: Props) => {
-    const { productCart } = useCart();
+    const { productCart } = useCarts();
     console.log(productCart);
 
     return (

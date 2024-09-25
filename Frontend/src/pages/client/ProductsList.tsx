@@ -3,29 +3,9 @@ import React from 'react';
 
 import { useProduct } from '../../hook/Product';
 
-// const products: Product[] = [
-//     {
-//         id: '1',
-//         name: 'Áo Thun',
-//         price: 200000,
-//         variants: {
-//             sizes: ['S', 'M', 'L'],
-//             colors: ['Đỏ', 'Xanh', 'Đen'],
-//         },
-//     },
-//     {
-//         id: '2',
-//         name: 'Quần Jean',
-//         price: 500000,
-//         variants: {
-//             sizes: ['S', 'M', 'L', 'XL'],
-//             colors: ['Xám', 'Đen'],
-//         },
-//     },
-// ];
 
 const ProductList: React.FC = () => {
-    const { productsHot } = useProduct();
+    const { productsHots } = useProduct();
 
     return (
         <div>
@@ -37,7 +17,7 @@ const ProductList: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {productsHot.map((product, index) => (
+                    {productsHots.map((product, index) => (
 
 
                         <tr key={index}>
