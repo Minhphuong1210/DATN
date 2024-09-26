@@ -7,6 +7,7 @@ use App\Models\Promotion;
 use App\Models\ProductColor;
 use App\Models\SubCategory;
 use App\Models\ProductSize;
+use App\Models\Shipping;
 use Illuminate\Http\Request;
 
 class ApiProductController extends Controller
@@ -101,7 +102,15 @@ class ApiProductController extends Controller
     }
 
 
-   
+    public function Shipping()
+    {
+        $Shipping = Shipping::all(); 
+        $data = [
+            'status' => 'success',
+            'data' => $Shipping,
+        ];
+        return response()->json($data);
+    }
 
 
 }

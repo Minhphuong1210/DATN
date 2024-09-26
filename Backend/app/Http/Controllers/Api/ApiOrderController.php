@@ -10,9 +10,10 @@ use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductDetail;
 use App\Models\SubCategory;
-use Auth;
-use DB;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Log;
 
 class ApiOrderController extends Controller
@@ -40,21 +41,70 @@ class ApiOrderController extends Controller
     public function create()
     {
         $userId = Auth::id();
-
-        $cartDetails = [];
         $subtotal = 0;
         $total = 0;
         $tax = 30000;
+        $cartDetailsFormatted = [];
 
         if ($userId) {
             // Khi người dùng đã đăng nhập
             $cart = Cart::where('user_id', $userId)->with('cartDetails')->first();
+
+            // Kiểm tra nếu có giỏ hàng trong session
+            $sessionCart = session()->get('cart', []);
+
+            if (!$cart && !empty($sessionCart)) {
+                // Tạo giỏ hàng mới từ session nếu người dùng đăng nhập nhưng chưa có giỏ hàng
+                $cart = Cart::create([
+                    'user_id' => $userId,
+                    'status' => 'pending',
+                ]);
+
+                // Chuyển sản phẩm từ session vào giỏ hàng cơ sở dữ liệu
+                foreach ($sessionCart as $sessionDetail) {
+                    $productDetail = ProductDetail::find($sessionDetail['product_detail_id']);
+                    if ($productDetail) {
+                        $cart->cartDetails()->create([
+                            'product_detail_id' => $sessionDetail['product_detail_id'],
+                            'quantity' => $sessionDetail['quantity'],
+                            'price' => $sessionDetail['price'],
+                        ]);
+                    }
+                }
+
+                // Xóa giỏ hàng trong session sau khi đã đồng bộ
+                session()->forget('cart');
+            }
+
             if ($cart) {
                 foreach ($cart->cartDetails as $detail) {
+                    $productDetail = ProductDetail::find($detail->product_detail_id);
+
+                    // Chỉ tiếp tục nếu tìm thấy chi tiết sản phẩm
+                    if (!$productDetail) {
+                        continue;
+                    }
+
+                    // Tính toán subtotal cho sản phẩm
                     $itemSubtotal = $detail->price * $detail->quantity;
                     $subtotal += $itemSubtotal;
-                    $cartDetails[] = [
+
+                    // Gọi dữ liệu từ productDetail
+                    $colorName = $productDetail->productColor->name ?? 'N/A';
+                    $sizeName = $productDetail->productSize->name ?? 'N/A';
+                    $NameProduct = $productDetail->product->name;
+                    $ImageProduct = $productDetail->product->image;
+                    $PriceProduct = $productDetail->product->price;
+
+                    // Thêm vào mảng đã định nghĩa với đầy đủ thông tin sản phẩm
+                    $cartDetailsFormatted[] = [
                         'product_detail_id' => $detail->product_detail_id,
+                        'colorName' => $colorName,
+                        'sizeName' => $sizeName,
+                        'NameProduct' => $NameProduct,
+                        'PriceProduct' => $PriceProduct,
+                        'detail_id' => $detail->id,
+                        'ImageProduct' => $ImageProduct,
                         'quantity' => $detail->quantity,
                         'price' => $detail->price,
                         'subtotal' => $itemSubtotal,
@@ -69,7 +119,7 @@ class ApiOrderController extends Controller
             foreach ($cart as $detail) {
                 $itemSubtotal = $detail['price'] * $detail['quantity'];
                 $subtotal += $itemSubtotal;
-                $cartDetails[] = [
+                $cartDetailsFormatted[] = [
                     'product_detail_id' => $detail['product_detail_id'],
                     'quantity' => $detail['quantity'],
                     'price' => $detail['price'],
@@ -77,11 +127,12 @@ class ApiOrderController extends Controller
                 ];
             }
         }
-        // kiểm tra tính đồng bộ khi người dùng đăng nhập vào
+
+        // Tính tổng
         $total = $subtotal + $tax;
 
         return response()->json([
-            'cart' => $cartDetails,
+            'cart' => $cartDetailsFormatted,
             'tax' => $tax,
             'subtotal' => $subtotal,
             'total' => $total,
@@ -150,9 +201,6 @@ class ApiOrderController extends Controller
             } catch (\Exception $exception) {
                 // Rollback giao dịch nếu có lỗi
                 DB::rollBack();
-
-                // Ghi lỗi vào log (tuỳ chọn)
-                Log::error('Order creation failed: ' . $exception->getMessage());
 
                 // Trả về phản hồi lỗi
                 return response()->json([
