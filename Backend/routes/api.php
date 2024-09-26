@@ -70,3 +70,5 @@ Route::prefix('productSizes')
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
 Route::get('color',[ApiProductController::class,'color']);
 Route::get('size',[ApiProductController::class,'size']);
+Route::get('Shipping',[ApiProductController::class,'Shipping']);
+
