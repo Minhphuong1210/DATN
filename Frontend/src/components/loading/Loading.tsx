@@ -1,22 +1,20 @@
-import React, { FC } from 'react'
-import { Box, LinearProgress } from '@mui/material'
+import { Box, LinearProgress } from "@mui/material";
+import { FC } from "react";
+
 type LoadingProps = {
-    isShow: boolean;
-}
+  isShow: boolean;
+};
 const Loading: FC<LoadingProps> = ({ isShow }) => {
-    return (
-        <>
-            <div className='mt-2'>
-                {isShow && (
-                    <Box sx={{ width: "100%" }}>
-                        <LinearProgress />
-
-                    </Box>
-                )}
-            </div>
-        </>
-    )
-
-}
-
-export default Loading
+  return (
+    <>
+      <div className="mt-2">
+        {isShow && (
+          <Box sx={{ width: "100%" }}>
+            <LinearProgress />
+          </Box>
+        )}
+      </div>
+    </>
+  );
+};
+export default Loading;
