@@ -1,37 +1,28 @@
 import React, { ChangeEvent, useState } from "react";
 import yourImage from "../../public/images/AoPolo.png";
-import yourImage1 from "../../public/images/z5798016468804_8e0562bdb8cf6d307970a5c3643d142d.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
-import { Link } from "react-router-dom";
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-}
-const products: Product[] = [
-    { id: 1, name: 'Sản phẩm 1', price: 100 },
-    { id: 2, name: 'Sản phẩm 2', price: 200 },
-    { id: 3, name: 'Sản phẩm 3', price: 300 },
-    { id: 4, name: 'Sản phẩm 4', price: 400 },
-    { id: 5, name: 'Sản phẩm 5', price: 500 },
-    { id: 6, name: 'Sản phẩm 6', price: 600 },
-    { id: 7, name: 'Sản phẩm 7', price: 700 },
-    { id: 8, name: 'Sản phẩm 8', price: 800 },
-    { id: 9, name: 'Sản phẩm 9', price: 900 },
-    { id: 10, name: 'Sản phẩm 10', price: 1000 }
-];
-type Size = "S" | "M" | "L" | "XL" | "2XL" | "Chọn size";
-type Color = "Đỏ" | "Trắng" | "Đen" | "Chọn màu";
-const ProductDetail: React.FC = () => {
-    const [selectedSize, setSelectedSize] = useState<Size>("Chọn size");
+import { Link, useNavigate } from "react-router-dom";
+import { useProduct } from "../../hook/Product"; import { toast } from "react-toastify";
+import { Product } from "../../interfaces/Product";
+import { useColor } from "../../hook/Color";
+import axios from "axios";
+
+
+
+
+const ProductDetail: React.FC = ({ }) => {
+    const { product } = useProduct();
+    const [selectSize, setSelectSize] = useState<Size>("Chọn size");
     const [selectColor, setSelectColor] = useState<Color>("Chọn màu");
     const [quantity, setQuantity] = useState(1);
     const [showDescription, setShowDescription] = useState(true);
     const [showComment, setShowComment] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const { color, size } = useColor();
+
+
 
     // Tăng giảm sô lượng
     const incurement = () => {
@@ -42,10 +33,11 @@ const ProductDetail: React.FC = () => {
     };
 
     const handleChangeSize = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectedSize(event.target.value as Size);
+        setSelectSize(event.target.value);
     };
+
     const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectColor(event.target.value as Color);
+        setSelectColor(event.target.value);
     };
 
     // Mô tả & Comment
@@ -57,484 +49,635 @@ const ProductDetail: React.FC = () => {
         setShowComment(true);
         setShowDescription(false);
     };
+    const nav = useNavigate()
+    const handleAddToCart = async (
+        product: Product,
+        color_id: string,  // Truyền trực tiếp giá trị đã chọn
+        size_id: string,    // Truyền trực tiếp giá trị đã chọn
+        quantity: number,
 
-
-
-    const itemsPerPage = 4; // Số lượng sản phẩm hiển thị trên màn hình
-    const productsPerPage = 4; // Số lượng sản phẩm chuyển qua mỗi lần bấm nút
-
-    const handleNext = () => {
-        // Chuyển sang 4 sản phẩm tiếp theo
-        if (currentIndex + productsPerPage < products.length) {
-            setCurrentIndex(currentIndex + productsPerPage);
-        } else {
-            setCurrentIndex(products.length - itemsPerPage); // Nếu vượt quá, chỉ hiển thị 2 sản phẩm cuối
+    ) => {
+        console.log('Product:', product.id);
+        console.log('Selected Color:', color_id);
+        console.log('Selected Size:', size_id);
+        console.log('Quantity:', quantity);
+        try {
+            // Only send the product ID instead of the full product object
+            await axios.post('/api/cart/add', {
+                id: product.id,
+                color_id,
+                size_id,
+                quantity,
+                price: product.price
+            });
+            toast.success('Thêm sản phẩm vào giỏ hàng thành công');
+            nav('/cart');
+        } catch (error) {
+            console.error('Error adding to cart:', error);
         }
+
     };
 
-    const handlePrevious = () => {
-        // Quay lại 4 sản phẩm trước
-        if (currentIndex - productsPerPage >= 0) {
-            setCurrentIndex(currentIndex - productsPerPage);
-        } else {
-            setCurrentIndex(0); // Không quay lại quá đầu danh sách
-        }
-    };
     return (
-        <div className="mx-2 mt-4 overflow-hidden md:mx-7 lg:mx-[150px] lg:mt-14">
-            <div className=" lg:flex justify-center lg:space-x-56">
-                <div className=" flex ">
+        <>
+            {product && (
+                <div className="mx-2 mt-4 overflow-hidden md:mx-7 lg:mx-[150px] lg:mt-14">
+                    <div className=" lg:flex justify-center lg:space-x-56">
 
-                    <div className="mb-3  ">
-                        <div className="mr-2 p-1 hover:bg-slate-300">
-                            <img className="h-16 w-12 lg:h-32 lg:w-24 object-fill" src={yourImage} alt="" />
+                        <div className=" flex ">
+                            <div className="mb-3 h-[700px]  ">
+                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
+                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
+                                </div>
+                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
+                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
+                                </div>
+                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
+                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
+                                </div>
+                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
+                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
+                                </div>
+                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
+                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
+                                </div>
+
+                            </div>
+                            <div className="mb-3 flex justify-center w-[500px] h-[700px]">
+                                <img src={product.image} alt="" className="w-full h-full object-cover" />
+                            </div>
                         </div>
-                        <div className="mr-2 p-1 hover:bg-slate-300">
-                            <img className="h-16 w-12  lg:h-32 lg:w-24 object-fill " src={yourImage} alt="" />
-                        </div>
-                        <div className="mr-2 p-1  hover:bg-slate-300">
-                            <img className="h-16 w-12 lg:h-32 lg:w-24 object-fill " src={yourImage} alt="" />
-                        </div>
-                        <div className="mr-2 p-1 hover:bg-slate-300">
-                            <img className="h-16 w-12 lg:h-32 lg:w-24 object-fill " src={yourImage} alt="" />
-                        </div>
-                    </div>
-                    <div className="mb-3 flex justify-center">
-                        <img src={yourImage} alt="" />
-                    </div>
-                </div>
-                <div>
-                    <div className="text-[16px]">
-                        Áo Polo Trắng Recycle Phối họa Tiết Cổ Thân Thiện Với Da 8APCT407TRK
-                    </div>
-                    <div className="flex items-center">
-                        <span>4.0</span>
-                        <span className="ml-2 mr-2 flex text-[14px]">
-                            <FontAwesomeIcon icon={faStarSolid} />
-                            <FontAwesomeIcon icon={faStarSolid} />
-                            <FontAwesomeIcon icon={faStarSolid} />
-                            <FontAwesomeIcon icon={faStarSolid} />
-                            <FontAwesomeIcon icon={faStarRegular} />
-                        </span>
-                        <span className="text-xs">| Đã bán: 1490</span>
-                    </div>
-                    <div className="text-xs">
-                        Tình trạng:
-                        <span className="text-sm font-bold text-green-500">Còn hàng</span>
-                    </div>
-                    <div className="text-lg font-bold">399.000đ</div>
-                    <form action="">
-                        <div className="mb-2 flex justify-between text-sm md:block">
-                            <span className="md:mr-11">Kích thước: {selectedSize}</span>
-                            <span className="hover:text-yellow-400 md:mr-11">
-                                <a href="">Giúp bạn chọn size</a>
-                            </span>
-                            <span className="hover:text-yellow-400">
-                                <a href="">Bảng size</a>
-                            </span>
-                        </div>
+
                         <div>
-                            <div className="flex space-x-2">
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="example"
-                                            value="S"
-                                            checked={selectedSize === "S"}
-                                            onChange={handleChangeSize}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            S
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            value="M"
-                                            checked={selectedSize === "M"}
-                                            onChange={handleChangeSize}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            M
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="example"
-                                            value="L"
-                                            checked={selectedSize === "L"}
-                                            onChange={handleChangeSize}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            L
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="example"
-                                            value="XL"
-                                            checked={selectedSize === "XL"}
-                                            onChange={handleChangeSize}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            XL
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="example"
-                                            value="2XL"
-                                            checked={selectedSize === "2XL"}
-                                            onChange={handleChangeSize}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            2XL
-                                        </span>
-                                    </label>
-                                </div>
+                            <div className="text-[16px]">
+                                Áo Polo Trắng Recycle Phối họa Tiết Cổ Thân Thiện Với Da 8APCT407TRK
                             </div>
-                        </div>
-                        <div className="mb-2 mt-3 text-sm">
-                            <span>Màu Sắc:{selectColor} </span>
-                            <div className="mt-2 flex space-x-2">
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="example"
-                                            value="Đỏ"
-                                            checked={selectColor === "Đỏ"}
-                                            onChange={handleChangeColor}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            Đỏ
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="example"
-                                            value="Trắng"
-                                            checked={selectColor === "Trắng"}
-                                            onChange={handleChangeColor}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm font-thin text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            Trắng
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="inline-flex items-center">
-                                    <label className="relative flex cursor-pointer items-center">
-                                        <input
-                                            type="checkbox"
-                                            name="example"
-                                            value="Đen"
-                                            checked={selectColor === "Đen"}
-                                            onChange={handleChangeColor}
-                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                        />
-                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                            Đen
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    <div className="mt-5">Mô tả:</div>
-                    <div className="m-2">
-                        <p className="text-sm">Chất liệuChất liệu: 100% Polyester</p>
-
-                        <p className="text-sm">
-                            Xử lý hoàn thiện vải: Quick-Dry + Wicking + Stretch
-                        </p>
-
-                        <p className="text-sm">
-                            {" "}
-                            Công nghệ Chafe-Free hạn chế tối đa ma sát trong quá trình vận
-                            động{" "}
-                        </p>
-                    </div>
-                    <div className="mt-7 flex ">
-                        <button
-                            className="rounded-sm border bg-gray-200 px-3 py-1 hover:bg-gray-300"
-                            onClick={dercrement}
-                        >
-                            -
-                        </button>
-                        <input
-                            type="number"
-                            value={quantity}
-                            readOnly
-                            className="w-16 appearance-none border-b border-t border-gray-300 text-center"
-                            style={{
-                                WebkitAppearance: "none",
-                                MozAppearance: "textfield",
-                            }}
-                        />
-                        <button
-                            className="mr-4 rounded-sm border bg-gray-200 px-3 py-1 hover:bg-gray-300"
-                            onClick={incurement}
-                        >
-                            +
-                        </button>
-                        <button className="rounded-sm bg-yellow-400 px-10 py-3">
-                            Thêm vào giỏ hàng
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <hr className="mt-7" />
-            <div>
-                <div className="mb-5 mt-10 flex justify-center space-x-4 lg:space-x-10 lg:text-xl">
-                    <h1
-                        className={`hovermenuNav hover:text-yellow-500 ${showDescription ? "text-yellow-500" : "text-gray-800"
-                            } hover:bg-blue-700}`}
-                    >
-                        <button onClick={showOnlyDescription}>Mô tả chi tiết</button>
-                    </h1>
-                    <h1
-                        className={`hovermenuNav hover:text-yellow-500 ${showComment ? "text-yellow-500" : "text-gray-800"
-                            } hover:bg-blue-700}`}
-                    >
-                        <button onClick={showOnlyComment}>Đánh giá</button>
-                    </h1>
-                </div>
-                {showDescription && (
-                    <p className="mb-8 text-sm lg:text-lg opacity-85  lg:mx-20 lg:mt-8">
-                        Áo Singlet chạy bộ Fast & Free ba lỗ Coolmate chất liệu Polyester
-                        mang tới trải nghiệm thoáng khí, siêu nhẹ và hạn chế tối đa ma sát
-                        khi vận động. Một sản phẩm thời trang yêu thích dành cho các chàng
-                        trai trong mùa hè này.
-                    </p>
-                )}
-
-                {showComment && (
-                    <div className="mb-10 border-2 lg:mt-8">
-                        <div className="flex flex-col items-center justify-center p-5 ">
-                            <div>ĐÁNH GIÁ SẢN PHẨM</div>
-                            <span>5.0</span>
-                            <span className="ml-2 mr-2 flex text-[14px]">
-                                <FontAwesomeIcon icon={faStarSolid} />
-                                <FontAwesomeIcon icon={faStarSolid} />
-                                <FontAwesomeIcon icon={faStarSolid} />
-                                <FontAwesomeIcon icon={faStarSolid} />
-                                <FontAwesomeIcon icon={faStarRegular} />
-                                <span className="text-xs">| 1900 đánh giá</span>
-                            </span>
-                        </div>
-                        <div className="ml-2 lg:mx-20 h-[500px] overflow-y-scroll">
-                            <div className="mb-3 ">
-                                <div className="flex items-center">
-                                    <div className="mr-2">
-                                        <User
-                                            size={25}
-                                            strokeWidth={1.5}
-                                            className="rounded-full bg-slate-300 p-1"
-                                        />
-                                    </div>
-                                    <div>
-                                        <div>Hoàng Hùng</div>
-                                        <span className="flex text-[10px]">
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarRegular} />
-                                        </span>
-                                    </div>
-                                </div>
-                                <span className="ml-8 text-xs opacity-70">
-                                    Phân loại: S, Đỏ
+                            <div className="flex items-center">
+                                <span>4.0</span>
+                                <span className="ml-2 mr-2 flex text-[14px]">
+                                    <FontAwesomeIcon icon={faStarSolid} />
+                                    <FontAwesomeIcon icon={faStarSolid} />
+                                    <FontAwesomeIcon icon={faStarSolid} />
+                                    <FontAwesomeIcon icon={faStarSolid} />
+                                    <FontAwesomeIcon icon={faStarRegular} />
                                 </span>
-                                <div className="ml-8 mb-1">
-                                    Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
-                                    Bông tẩy trang dùng được ko bị mủn , nói chung là được
-                                </div>
-                                <div className="ml-8 flex">
-                                    <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
-                                    <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
-                                </div>
-                                <div className="ml-8 text-sm opacity-70 mt-1">
-                                    Ngày đăng: 2021-08-14
-                                </div>
+                                <span className="text-xs">| Đã bán: 1490</span>
                             </div>
-                            <div className="mb-3">
-                                <div className="flex items-center">
-                                    <div className="mr-2">
-                                        <User
-                                            size={25}
-                                            strokeWidth={1.5}
-                                            className="rounded-full bg-slate-300 p-1"
-                                        />
-                                    </div>
-                                    <div>
-                                        <div>Hoàng Hùng</div>
-                                        <span className="flex text-[10px]">
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarRegular} />
-                                        </span>
-                                    </div>
-                                </div>
-                                <span className="ml-8 text-xs opacity-70">
-                                    Phân loại: S, Đỏ
-                                </span>
-                                <div className="ml-8 mb-1">
-                                    Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
-                                    Bông tẩy trang dùng được ko bị mủn , nói chung là được
-                                </div>
-                                <div className="ml-8 flex">
-                                    <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
-                                    <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
-                                </div>
-                                <div className="ml-8 text-sm opacity-70 mt-1">
-                                    Ngày đăng: 2021-08-14
-                                </div>
+                            <div className="text-xs">
+                                Tình trạng:
+                                <span className="text-sm font-bold text-green-500">Còn hàng</span>
                             </div>
-                            <div className="mb-3">
-                                <div className="flex items-center">
-                                    <div className="mr-2">
-                                        <User
-                                            size={25}
-                                            strokeWidth={1.5}
-                                            className="rounded-full bg-slate-300 p-1"
-                                        />
-                                    </div>
-                                    <div>
-                                        <div>Hoàng Hùng</div>
-                                        <span className="flex text-[10px]">
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarSolid} />
-                                            <FontAwesomeIcon icon={faStarRegular} />
-                                        </span>
-                                    </div>
-                                </div>
-                                <span className="ml-8 text-xs opacity-70">
-                                    Phân loại: S, Đỏ
-                                </span>
-                                <div className="ml-8 mb-1">
-                                    Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
-                                    Bông tẩy trang dùng được ko bị mủn , nói chung là được
-                                </div>
-                                <div className="ml-8 flex">
-                                    <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
-                                    <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
-                                </div>
-                                <div className="ml-8 text-sm opacity-70 mt-1">
-                                    Ngày đăng: 2021-08-14
-                                </div>
-                            </div>
-                            <hr className="mr-2 mt-3" />
-
-                        </div>
-                        <div className=" lg:flex justify-center">
-                            <form className="mb-6 text-sm ml-2 lg:mx-20">
-                                <textarea
-
-                                    placeholder="Viết đánh giá của bạn về sản phẩm"
-                                    className="mt-4 w-80 h-36 rounded-md border-2 p-2 outline-none"
-                                />
-                                <button className="rounded-sm border-2 bg-yellow-500 px-5 py-2 hover:bg-yellow-300">
-                                    Gửi
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                )}
-            </div>
-            <hr className="mb-8" />
-
-            <h1 className="mb-5 text-center text-lg">CÓ THỂ BẠN SẼ THÍCH</h1>
-            <div className=" overflow-hidden">
-                <div
-                    className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 transition-transform duration-500 ease-in-out"
-                    style={{ transform: `translateX(-${(currentIndex / itemsPerPage) * 100}%)` }}
-                >
-                    {products.slice(currentIndex, currentIndex + itemsPerPage).map((product) => (
-                        <div className="w-52 group relative" key={product.id}>
-                            <div className="mb-3 h-52 w-52 overflow-hidden bg-slate-200 p-2 ">
-                                <img
-                                    src={yourImage}
-                                    alt=""
-                                    className="h-full w-full object-cover transform transition-transform duration-300 ease-in-out hover:scale-125"
-                                />
-                            </div>
-                            <div className="relative ">
-                                <div className="absolute bottom-[25px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                        <Eye color="currentColor" strokeWidth="1.5" size={20} />
-                                    </div>
-                                    <div className="rounded-full  bg-white p-2 hover:bg-black hover:text-white">
-                                        <ShoppingCart
-                                            color="currentColor"
-                                            strokeWidth="1.5"
-                                            size={20}
-                                        />
-                                    </div>
-                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                        <Heart color="currentColor" strokeWidth="1.5" size={20} />
-                                    </div>
-                                </div>
-                            </div>
-                            <Link to={"#"} className="block">
-                                <div className="truncate hover:text-yellow-500">
-                                    {product.name}
-                                </div>
-                                <div className="">
-                                    <span className="mr-1 text-sm text-gray-500 line-through hover:text-yellow-500">
-                                        399.000đ
+                            <div className="text-lg font-bold">{product?.price} </div>
+                            <form action="">
+                                <div className="mb-2 flex justify-between text-sm md:block">
+                                    <span className="md:mr-11">Kích thước: {selectSize}</span>
+                                    <span className="hover:text-yellow-400 md:mr-11">
+                                        <a href="">Giúp bạn chọn size</a>
                                     </span>
-                                    <span className="hover:text-yellow-500">199.000đ</span>
+                                    <span className="hover:text-yellow-400">
+                                        <a href="">Bảng size</a>
+                                    </span>
                                 </div>
-                            </Link>
-                        </div>
-                    ))}
-                </div>
-            </div>
-            <div className="flex justify-between mt-4">
-                <button
-                    className="px-4 py-2 bg-gray-300 hover:bg-gray-400"
-                    onClick={handlePrevious}
-                    disabled={currentIndex === 0}
-                >
-                    +
-                </button>
-                <button
-                    className="px-4 py-2 bg-gray-300 hover:bg-gray-400"
-                    onClick={handleNext}
-                    disabled={currentIndex + productsPerPage >= products.length}
-                >
-                    -
-                </button>
-            </div>
+                                <div>
+                                    <div className="inline-flex items-center">
+                                        <div className="flex space-x-2">
+                                            {size.map((size, index) => {
+                                                return (
+                                                    <label key={index} className="relative flex cursor-pointer items-center">
+                                                        <input
+                                                            type="radio"  // Thay đổi từ checkbox sang radio
+                                                            name="size"   // Tất cả radio button cần cùng một name để được nhóm lại
+                                                            value={size.id}
+                                                            checked={selectSize === size.id}  // Kiểm tra nếu size đã được chọn
+                                                            onChange={(event) => handleChangeSize(event)}  // Khi người dùng chọn, cập nhật state
+                                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
+                                                        />
+                                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                            {size.name}
+                                                        </span>
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div className="flex space-x-2">
 
-        </div>
+                                    </div>
+                                </div>
+                                <div className="mb-2 mt-3 text-sm">
+                                    <span>Màu Sắc:{selectColor} </span>
+                                    <div className="mt-2 flex space-x-2">
+                                        {color.map((color, index) => {
+                                            return (
+                                                <div key={index} className="inline-flex items-center">
+                                                    <label className="relative flex cursor-pointer items-center">
+                                                        <input
+                                                            type="radio"
+                                                            name="color"
+                                                            value={color.id}
+                                                            checked={selectColor === color.id}
+                                                            onChange={(event) => handleChangeColor(event)}
+                                                            className="peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
+                                                            style={{ backgroundColor: color.name }} // Apply color from db
+                                                        />
+                                                    </label>
+                                                    <div>{color.name}</div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </form>
+                            <div className="mt-5">Mô tả:</div>
+                            <div className="m-2">
+                                <p>{product.description}</p>
+                            </div>
+                            <div className="mt-7 flex ">
+                                <button
+                                    className="rounded-sm border bg-gray-200 px-3 py-1 hover:bg-gray-300"
+                                    onClick={dercrement}
+                                >
+                                    -
+                                </button>
+                                <input
+                                    type="number"
+                                    value={quantity}
+                                    readOnly
+                                    className="w-16 appearance-none border-b border-t border-gray-300 text-center"
+                                    style={{
+                                        WebkitAppearance: "none",
+                                        MozAppearance: "textfield",
+                                    }}
+                                />
+                                <button
+                                    className="mr-4 rounded-sm border bg-gray-200 px-3 py-1 hover:bg-gray-300"
+                                    onClick={incurement}
+                                >
+                                    +
+                                </button>
+                                <button onClick={() => handleAddToCart(product, selectColor, selectSize, quantity)}>
+                                    Add to Cart
+                                </button>
+
+                                {/* <button className="rounded-sm bg-yellow-400 px-10 py-3" onClick={() => { handleAddToCart(product, setSelectColor, setsize_id
+
+                                ) }} >
+                                    Thêm vào giỏ hàng
+                                </button> */}
+                            </div>
+                        </div>
+                    </div>
+                    <hr className="mt-7" />
+                    <div>
+
+                        <div className="mb-5 mt-10 flex justify-center space-x-4 lg:space-x-10 lg:text-xl">
+                            <h1
+                                className={`hovermenuNav hover:text-yellow-500 ${showDescription ? "text-yellow-500" : "text-gray-800"
+                                    } hover:bg-blue-700}`}
+                            >
+                                <button onClick={showOnlyDescription}>Mô tả chi tiết</button>
+                            </h1>
+                            <h1
+                                className={`hovermenuNav hover:text-yellow-500 ${showComment ? "text-yellow-500" : "text-gray-800"
+                                    } hover:bg-blue-700}`}
+                            >
+                                <button onClick={showOnlyComment}>Đánh giá</button>
+                            </h1>
+                        </div>
+                        {showDescription && (
+                            <p className="mb-8 text-sm lg:text-lg opacity-85  lg:mx-20 lg:mt-8">
+                                {product.description}
+                            </p>
+                        )}
+
+                        {showComment && (
+                            <div className="mb-10 border-2 lg:mt-8">
+                                <div className="flex flex-col items-center justify-center p-5 ">
+                                    <div>ĐÁNH GIÁ SẢN PHẨM</div>
+                                    <span>5.0</span>
+                                    <span className="ml-2 mr-2 flex text-[14px]">
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarRegular} />
+                                        <span className="text-xs">| 1900 đánh giá</span>
+                                    </span>
+                                </div>
+                                <div className="ml-2 lg:mx-20 h-[500px] overflow-y-scroll">
+                                    <div className="mb-3 ">
+                                        <div className="flex items-center">
+                                            <div className="mr-2">
+                                                <User
+                                                    size={25}
+                                                    strokeWidth={1.5}
+                                                    className="rounded-full bg-slate-300 p-1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <div>Hoàng Hùng</div>
+                                                <span className="flex text-[10px]">
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarRegular} />
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span className="ml-8 text-xs opacity-70">
+                                            Phân loại: S, Đỏ
+                                        </span>
+                                        <div className="ml-8 mb-1">
+                                            Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
+                                            Bông tẩy trang dùng được ko bị mủn , nói chung là được
+                                        </div>
+                                        <div className="ml-8 flex">
+                                            <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
+                                            <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
+                                        </div>
+                                        <div className="ml-8 text-sm opacity-70 mt-1">
+                                            Ngày đăng: 2021-08-14
+                                        </div>
+                                    </div>
+                                    <div className="mb-3">
+                                        <div className="flex items-center">
+                                            <div className="mr-2">
+                                                <User
+                                                    size={25}
+                                                    strokeWidth={1.5}
+                                                    className="rounded-full bg-slate-300 p-1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <div>Hoàng Hùng</div>
+                                                <span className="flex text-[10px]">
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarRegular} />
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span className="ml-8 text-xs opacity-70">
+                                            Phân loại: S, Đỏ
+                                        </span>
+                                        <div className="ml-8 mb-1">
+                                            Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
+                                            Bông tẩy trang dùng được ko bị mủn , nói chung là được
+                                        </div>
+                                        <div className="ml-8 flex">
+                                            <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
+                                            <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
+                                        </div>
+                                        <div className="ml-8 text-sm opacity-70 mt-1">
+                                            Ngày đăng: 2021-08-14
+                                        </div>
+                                    </div>
+                                    <div className="mb-3">
+                                        <div className="flex items-center">
+                                            <div className="mr-2">
+                                                <User
+                                                    size={25}
+                                                    strokeWidth={1.5}
+                                                    className="rounded-full bg-slate-300 p-1"
+                                                />
+                                            </div>
+                                            <div>
+                                                <div>Hoàng Hùng</div>
+                                                <span className="flex text-[10px]">
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarSolid} />
+                                                    <FontAwesomeIcon icon={faStarRegular} />
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span className="ml-8 text-xs opacity-70">
+                                            Phân loại: S, Đỏ
+                                        </span>
+                                        <div className="ml-8 mb-1">
+                                            Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
+                                            Bông tẩy trang dùng được ko bị mủn , nói chung là được
+                                        </div>
+                                        <div className="ml-8 flex">
+                                            <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
+                                            <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
+                                        </div>
+                                        <div className="ml-8 text-sm opacity-70 mt-1">
+                                            Ngày đăng: 2021-08-14
+                                        </div>
+                                    </div>
+                                    <hr className="mr-2 mt-3" />
+
+                                </div>
+                                <div className=" lg:flex justify-center">
+                                    <div className="w-full mx-20 mt-10">
+                                        <form>
+                                            <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                                <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
+                                                    <label htmlFor="comment" className="sr-only">Your comment</label>
+                                                    <textarea id="comment" rows={4} className="w-full px-0 text-sm text-gray-900 bg-white border-0 outline-none dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400 pt-4 ml-4" placeholder="Viết đánh giá của bạn về sản phẩm..." required defaultValue={""} />
+                                                </div>
+                                                <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
+                                                    <button type="submit" className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
+                                                        Post comment
+                                                    </button>
+                                                    <div className="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
+                                                        <button type="button" className="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                            <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 12 20">
+                                                                <path stroke="currentColor" strokeLinejoin="round" strokeWidth={2} d="M1 6v8a5 5 0 1 0 10 0V4.5a3.5 3.5 0 1 0-7 0V13a2 2 0 0 0 4 0V6" />
+                                                            </svg>
+                                                            <span className="sr-only">Attach file</span>
+                                                        </button>
+                                                        <button type="button" className="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                            <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                                                                <path d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
+                                                            </svg>
+                                                            <span className="sr-only">Set location</span>
+                                                        </button>
+                                                        <button type="button" className="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                                            <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                                                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+                                                            </svg>
+                                                            <span className="sr-only">Upload image</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <p className="ms-auto text-xs text-gray-500 dark:text-gray-400">Remember, contributions to this topic should follow our <a href="#" className="text-blue-600 dark:text-blue-500 hover:underline">Community Guidelines</a>.</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <hr className="mb-8" />
+
+                    <h1 className="mb-5 text-center text-lg">CÓ THỂ BẠN SẼ THÍCH</h1>
+                    <div className=" overflow-hidden">
+                        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 ">
+                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
+                                <div
+                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
+
+                                >
+
+
+
+                                    <div
+                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
+
+                                    >
+                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                            <img
+                                                src={product.image}
+                                                alt={product.image}
+                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Eye
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </a>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <ShoppingCart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Heart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#" className="block overflow-hidden">
+                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                {product.name}
+                                            </div>
+                                            <div className="text-center block">
+                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                    399.000đ
+                                                </span>
+                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                    {product.price}.000đ
+                                                </span>
+                                            </div>
+                                        </a>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
+                                <div
+                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
+
+                                >
+
+
+
+                                    <div
+                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
+
+                                    >
+                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                            <img
+                                                src={product.image}
+                                                alt={product.image}
+                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Eye
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </a>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <ShoppingCart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Heart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#" className="block overflow-hidden">
+                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                {product.name}
+                                            </div>
+                                            <div className="text-center block">
+                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                    399.000đ
+                                                </span>
+                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                    {product.price}.000đ
+                                                </span>
+                                            </div>
+                                        </a>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
+                                <div
+                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
+
+                                >
+
+                                    <div
+                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
+
+                                    >
+                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                            <img
+                                                src={product.image}
+                                                alt={product.image}
+                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Eye
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </a>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <ShoppingCart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Heart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#" className="block overflow-hidden">
+                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                {product.name}
+                                            </div>
+                                            <div className="text-center block">
+                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                    399.000đ
+                                                </span>
+                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                    {product.price}.000đ
+                                                </span>
+                                            </div>
+                                        </a>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
+                                <div
+                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
+
+                                >
+
+
+
+                                    <div
+                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
+
+                                    >
+                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                            <img
+                                                src={product.image}
+                                                alt={product.image}
+                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Eye
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </a>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <ShoppingCart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                    <Heart
+                                                        color="currentColor"
+                                                        strokeWidth="1.5"
+                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#" className="block overflow-hidden">
+                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                {product.name}
+                                            </div>
+                                            <div className="text-center block">
+                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                    399.000đ
+                                                </span>
+                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                    {product.price}.000đ
+                                                </span>
+                                            </div>
+                                        </a>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            )}
+        </>
     );
 };
 

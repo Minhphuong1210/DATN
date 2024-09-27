@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import yourImage from "../../public/images/logo.jpg";
+import yourImage from "../../public/images/logofix.png";
 import { AlignJustify, Search, ShoppingCart, User, X } from "lucide-react";
 
 interface HeaderProps {
@@ -15,11 +15,11 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
   return (
     <div className={`sticky top-0 z-50 w-full bg-white p-2`}>
-      <div className="relative mt-2 flex items-center justify-between md:mx-[60px] md:mt-0 lg:mx-[150px]">
+      <div className="relative mt-2 flex items-center justify-between md:mx-[60px] md:mt-0 lg:mx-[150px] xl:mx-[150px]">
         {/* Logo */}
         <div>
           <a
-            href="#"
+            href="/"
             className="flex items-center justify-center md:justify-start"
           >
             <div className="w-10 md:w-16">
@@ -124,11 +124,12 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               className="cursor-pointer text-slate-500 hover:text-black"
             />
           </a>
-
-          <ShoppingCart
-            size={25}
-            className="cursor-pointer text-slate-500 hover:text-black"
-          />
+          <a href="/cart">
+            <ShoppingCart
+              size={25}
+              className="cursor-pointer text-slate-500 hover:text-black"
+            />
+          </a>
           <Search
             size={25}
             className="hidden cursor-pointer text-slate-500 hover:text-black md:block lg:block"
