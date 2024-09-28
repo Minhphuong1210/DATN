@@ -15,5 +15,5 @@ export type Product_detail = {
     id: number | string
     product_id: number
     size_id: number
-    color_id: number  
+    color_id: number
 }

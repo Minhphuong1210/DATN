@@ -1,31 +1,32 @@
 import React from 'react';
-import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Alert } from '@mui/material';
+import { useShipping } from '../../../hook/useShipping';
+import { Order } from '../../../interfaces/oder';
 
 interface ShippingFormProps {
-    shippingInfo: {
-        fullName: string;
-        address: string;
-        city: string;
-        tel: string;
-        note: string;
+    shippingInfo: Omit<Order, 'commodity_money' | 'total_amount' | 'shipping_id' | 'code_order'> & {
         shippingMethod: string;
     };
-
     handleShippingChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleShippingMethodChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    error: string;
 }
 
 const ShippingForm: React.FC<ShippingFormProps> = ({
     shippingInfo,
 
     handleShippingChange,
+    error
 }) => {
+    const { shippings } = useShipping();
+
     return (
         <div>
+            {error && <Alert className='my-4' severity="error">{error}</Alert>}
             <TextField
                 label="Họ và tên"
-                name="fullName"
-                value={shippingInfo.fullName}
+                name="username"
+                value={shippingInfo.username}
                 onChange={handleShippingChange}
                 fullWidth
                 margin="normal"
@@ -39,17 +40,17 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
                 margin="normal"
             />
             <TextField
-                label="Thành phố"
-                name="city"
-                value={shippingInfo.city}
+                label="Email"
+                name="email"
+                value={shippingInfo.email}
                 onChange={handleShippingChange}
                 fullWidth
                 margin="normal"
             />
             <TextField
                 label="Số điện thoại"
-                name="tel"
-                value={shippingInfo.tel}
+                name="phone"
+                value={shippingInfo.phone}
                 onChange={handleShippingChange}
                 fullWidth
                 margin="normal"
@@ -73,9 +74,10 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
                     value={shippingInfo.shippingMethod}
                     onChange={handleShippingChange}
                 >
-                    <FormControlLabel value="standard" control={<Radio />} label="Vận chuyển tiêu chuẩn (3-5 ngày)" />
-                    <FormControlLabel value="express" control={<Radio />} label="Vận chuyển nhanh (1-2 ngày)" />
-                    <FormControlLabel value="overnight" control={<Radio />} label="Giao hàng qua đêm" />
+                    {shippings.map((shipp) => (
+
+                        <FormControlLabel key={shipp.id} value={`${shipp.id}`} control={<Radio />} label={shipp.name} />
+                    ))}
                 </RadioGroup>
             </FormControl>
         </div>

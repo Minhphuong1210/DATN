@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import Cart from './pages/client/Cart';
 import Login from './pages/Login';
 import Color from './pages/client/Color';
+import PaymentMomo from './pages/client/PaymentMomo';
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="color" element={<Color />} />
+          <Route path="payment" element={<PaymentMomo />} />
         </Route>
       </Routes>
       <ToastContainer />

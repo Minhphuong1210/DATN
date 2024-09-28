@@ -4,26 +4,24 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useProduct } from "../../hook/Product"; import { toast } from "react-toastify";
-import { Product } from "../../interfaces/Product";
+import { Colors, Product, Sizes } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
 import axios from "axios";
 
 
 
 
-const ProductDetail: React.FC = ({ }) => {
+const ProductDetail: React.FC = () => {
     const { product } = useProduct();
-    const [selectSize, setSelectSize] = useState<Size>("Chọn size");
-    const [selectColor, setSelectColor] = useState<Color>("Chọn màu");
+    const [selectSize, setSelectSize] = useState<Sizes>({ id: '', name: '' });
+    const [selectColor, setSelectColor] = useState<Colors>({ id: '', name: '', color_code: '' });
     const [quantity, setQuantity] = useState(1);
     const [showDescription, setShowDescription] = useState(true);
     const [showComment, setShowComment] = useState(false);
     const { color, size } = useColor();
-
-
-
+    const token = localStorage.getItem('token');
     // Tăng giảm sô lượng
     const incurement = () => {
         setQuantity((prevQuantity) => prevQuantity + 1);
@@ -32,12 +30,19 @@ const ProductDetail: React.FC = ({ }) => {
         setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
     };
 
-    const handleChangeSize = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectSize(event.target.value);
+    const handleChangeSize = (event: ChangeEvent<HTMLInputElement>, sizeName: string) => {
+        setSelectSize({
+            id: event.target.value,
+            name: sizeName
+        });
     };
 
-    const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectColor(event.target.value);
+    const handleChangeColor = (event: ChangeEvent<HTMLInputElement>, colorName: string) => {
+        setSelectColor({
+            id: event.target.value,
+            name: colorName,
+            color_code: ''
+        });
     };
 
     // Mô tả & Comment
@@ -52,8 +57,8 @@ const ProductDetail: React.FC = ({ }) => {
     const nav = useNavigate()
     const handleAddToCart = async (
         product: Product,
-        color_id: string,  // Truyền trực tiếp giá trị đã chọn
-        size_id: string,    // Truyền trực tiếp giá trị đã chọn
+        color_id: string,
+        size_id: string,
         quantity: number,
 
     ) => {
@@ -62,7 +67,10 @@ const ProductDetail: React.FC = ({ }) => {
         console.log('Selected Size:', size_id);
         console.log('Quantity:', quantity);
         try {
-            // Only send the product ID instead of the full product object
+            if (!token) {
+                toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
+                nav('/login')
+            }
             await axios.post('/api/cart/add', {
                 id: product.id,
                 color_id,
@@ -129,43 +137,42 @@ const ProductDetail: React.FC = ({ }) => {
                             </div>
                             <div className="text-lg font-bold">{product?.price} </div>
                             <form action="">
-                                <div className="mb-2 flex justify-between text-sm md:block">
-                                    <span className="md:mr-11">Kích thước: {selectSize}</span>
-                                    <span className="hover:text-yellow-400 md:mr-11">
-                                        <a href="">Giúp bạn chọn size</a>
-                                    </span>
-                                    <span className="hover:text-yellow-400">
-                                        <a href="">Bảng size</a>
-                                    </span>
-                                </div>
                                 <div>
-                                    <div className="inline-flex items-center">
-                                        <div className="flex space-x-2">
-                                            {size.map((size, index) => {
-                                                return (
-                                                    <label key={index} className="relative flex cursor-pointer items-center">
-                                                        <input
-                                                            type="radio"  // Thay đổi từ checkbox sang radio
-                                                            name="size"   // Tất cả radio button cần cùng một name để được nhóm lại
-                                                            value={size.id}
-                                                            checked={selectSize === size.id}  // Kiểm tra nếu size đã được chọn
-                                                            onChange={(event) => handleChangeSize(event)}  // Khi người dùng chọn, cập nhật state
-                                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                        />
-                                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                            {size.name}
-                                                        </span>
-                                                    </label>
-                                                );
-                                            })}
-                                        </div>
+                                    <div className="mb-2 flex justify-between text-sm md:block">
+                                        <span className="md:mr-11  uppercase">Kích thước: {selectSize.name}</span>
+                                        <span className="hover:text-yellow-400 md:mr-11">
+                                            <a href="">Giúp bạn chọn size</a>
+                                        </span>
+                                        <span className="hover:text-yellow-400">
+                                            <a href="">Bảng size</a>
+                                        </span>
                                     </div>
-                                    <div className="flex space-x-2">
-
+                                    <div>
+                                        <div className="inline-flex items-center">
+                                            <div className="flex space-x-2">
+                                                {size.map((size, index) => {
+                                                    return (
+                                                        <label key={index} className="relative flex cursor-pointer items-center">
+                                                            <input
+                                                                type="radio"
+                                                                name={size.name}
+                                                                value={size.id}
+                                                                checked={selectSize.id === size.id}
+                                                                onChange={(event) => handleChangeSize(event, size.name)}
+                                                                className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
+                                                            />
+                                                            <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                                {size.name}
+                                                            </span>
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="mb-2 mt-3 text-sm">
-                                    <span>Màu Sắc:{selectColor} </span>
+                                    <span>Màu Sắc:{selectColor.name} </span>
                                     <div className="mt-2 flex space-x-2">
                                         {color.map((color, index) => {
                                             return (
@@ -173,15 +180,15 @@ const ProductDetail: React.FC = ({ }) => {
                                                     <label className="relative flex cursor-pointer items-center">
                                                         <input
                                                             type="radio"
-                                                            name="color"
+                                                            name={color.name}
                                                             value={color.id}
-                                                            checked={selectColor === color.id}
-                                                            onChange={(event) => handleChangeColor(event)}
+                                                            checked={selectColor.id === color.id}
+                                                            onChange={(event) => handleChangeColor(event, color.name)}
                                                             className="peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
-                                                            style={{ backgroundColor: color.name }} // Apply color from db
+                                                            style={{ backgroundColor: color.color_code }}
                                                         />
                                                     </label>
-                                                    <div>{color.name}</div>
+
                                                 </div>
                                             );
                                         })}
