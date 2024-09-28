@@ -5,30 +5,60 @@ import ShippingForm from '../../components/client/checkout/ShippingForm';
 import PaymentForm from '../../components/client/checkout/PaymentForm';
 import Confirmation from '../../components/client/checkout/Confirmation';
 import ThankYouModal from '../../components/client/checkout/ThankYouModal';
-
+import CostShipping from '../../components/client/checkout/CostShpping';
+import { useOder } from '../../hook/useOder';
+import { useShipping } from '../../hook/useShipping';
+import { validateShippingInfo } from '../../validation/validateInfoOder';
+import ConfirmModal from '../../modalConfirm/ConfirmOder';
+import { ChevronLeft, ChevronRight, PackageX } from 'lucide-react';
+import type { CollapseProps } from 'antd';
+import { Collapse } from 'antd';
 const steps = ['Thông tin giao hàng', 'Phương thức thanh toán', 'Xác nhận đơn hàng'];
+
+
 
 
 const Checkout = () => {
     const [activeStep, setActiveStep] = useState(0);
-    const [isOrderSuccessful, setIsOrderSuccessful] = useState(false);
-    // State lưu trữ thông tin giao hàng và phương thức vận chuyển
+    const { oders, total, isOrderSuccessful, handleSubmitOrder, handleCloseModal, isOfBtn, isConfirmVisible, confirmOrder, setConfirmVisible } = useOder();
+
+    const [shippingCost, setShippingCost] = useState<number>(0);
+    const [shippingMethod, setShippingMethod] = useState('standard');
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const totalPayment = (total?.subtotal || 0) + (shippingCost || 0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 4;
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = oders.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(oders.length / productsPerPage);
+
     const [shippingInfo, setShippingInfo] = useState({
-        fullName: '',
+        username: '',
         address: '',
-        city: '',
-        tel: '',
+        email: '',
+        phone: '',
         note: '',
         shippingMethod: '',
     });
-    const [shippingMethod, setShippingMethod] = useState('standard');
-    const [paymentMethod, setPaymentMethod] = useState('');
-    const handleCloseModal = () => {
-        setIsOrderSuccessful(false);
-    };
-    const handleNext = () => {
-        setActiveStep((prevStep) => prevStep + 1);
-        setIsOrderSuccessful(true);
+    const [error, setError] = useState<string | null>(null);
+    const handleNext = async () => {
+        if (activeStep === 0) {
+            const errorMessage = validateShippingInfo(shippingInfo);
+            if (errorMessage) {
+                setError(errorMessage);
+                return;
+            } else {
+                setError(null);
+            }
+        }
+        if (activeStep === steps.length - 1) {
+            handleSubmitOrder(shippingInfo, total, shippingCost);
+
+
+        } else {
+            setActiveStep((prevStep) => prevStep + 1);
+        }
     };
 
     const handleBack = () => {
@@ -36,17 +66,17 @@ const Checkout = () => {
     };
 
     const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
         setShippingInfo({
             ...shippingInfo,
-            [name]: value,
+            [e.target.name]: e.target.value,
         });
     };
 
     const handleShippingMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShippingMethod(e.target.value);
-
     };
+
+    const { shippings } = useShipping();
 
     const getStepContent = (stepIndex: number) => {
         switch (stepIndex) {
@@ -56,6 +86,7 @@ const Checkout = () => {
                         shippingInfo={shippingInfo}
                         handleShippingChange={handleShippingChange}
                         handleShippingMethodChange={handleShippingMethodChange}
+                        error={error ?? ''}
                     />
                 );
             case 1:
@@ -70,8 +101,7 @@ const Checkout = () => {
                     <Confirmation
                         shippingInfo={shippingInfo}
                         paymentMethod={paymentMethod}
-
-
+                        shippings={shippings}
                     />
                 );
             default:
@@ -79,8 +109,11 @@ const Checkout = () => {
         }
     };
 
+
     return (
         <>
+
+
             <div className="min-w-screen min-h-screen bg-gray-50 py-5 md:mx-[150px] lg:mx-[150px]">
                 <div className="px-5">
                     <div className="mb-2">
@@ -94,134 +127,171 @@ const Checkout = () => {
                     </div>
                 </div>
                 <div className="w-full bg-white border-t border-b border-gray-200 px-5 py-10 text-gray-800">
-                    <div className="w-full">
-                        <div className="-mx-3 md:flex items-start">
-                            <div className="px-3 md:w-7/12 lg:pr-10">
-                                <div className="w-full mx-auto text-gray-800 font-light mb-6 border-b border-gray-200 pb-6">
-                                    <div className="w-full flex items-center">
-                                        <div className="overflow-hidden rounded-lg w-16 h-16 bg-gray-50 border border-gray-200">
-                                            <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80" />
-                                        </div>
-                                        <div className="flex-grow pl-3">
-                                            <h6 className="font-semibold uppercase text-gray-600">Ray Ban Sunglasses.</h6>
-                                            <p className="text-gray-400">x 1, Size: S, Màu: Đỏ</p>
 
-                                        </div>
-                                        <div>
-                                            <span className="font-semibold text-gray-600 text-xl">$210</span><span className="font-semibold text-gray-600 text-sm">.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mb-6 pb-6 border-b border-gray-200">
-                                    <div className="-mx-2 flex items-end justify-end">
-                                        <div className="flex-grow px-2 lg:max-w-xs">
-                                            <label className="text-gray-600 font-semibold text-sm mb-2 ml-1">Mã khuyến mại</label>
-                                            <div>
-                                                <TextField
-                                                    label="Nhập mã khuyến mãi"
-                                                    name="fullName"
-                                                    value={shippingInfo.fullName}
-                                                    onChange={handleShippingChange}
-                                                    fullWidth
-                                                    margin="normal"
-                                                />                                            </div>
-                                        </div>
-                                        <div className="px-2 mb-2">
-                                            <button className=" w-full max-w-xs mx-auto border border-transparent bg-blue-600 hover:bg-gray-500 focus:bg-gray-500 text-white rounded-md px-5 py-[15px] font-semibold">Áp Dụng</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mb-6 pb-6 border-b border-gray-200 text-gray-800">
-                                    <div className="w-full flex mb-3 items-center">
-                                        <div className="flex-grow">
-                                            <span className="text-gray-600">Tổng tiền sản phẩm</span>
-                                        </div>
-                                        <div className="pl-3">
-                                            <span className="font-semibold">$190.91</span>
-                                        </div>
-                                    </div>
-                                    <div className="w-full flex items-center">
-                                        <div className="flex-grow">
-                                            <span className="text-gray-600">Phí vận chuyển (GHTK)</span>
-                                        </div>
-                                        <div className="pl-3">
-                                            <span className="font-semibold">$19.09</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mb-6 pb-6 border-b border-gray-200 md:border-none text-gray-800 text-xl">
-                                    <div className="w-full flex items-center">
-                                        <div className="flex-grow">
-                                            <span className="text-gray-600">Tổng thanh toán</span>
-                                        </div>
-                                        <div className="pl-3">
-                                            <span className="font-semibold text-gray-400 text-sm">AUD</span> <span className="font-semibold">$210.00</span>
-                                        </div>
-                                    </div>
-                                </div>
+                    {oders.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="mt-6 flex flex-col items-center">
+                                <PackageX size={200} strokeWidth="0.1" className="opacity-50" />
+                                <span className="text-gray-500">Không có sản phẩm nào trong giỏ hàng.</span>
                             </div>
-                            <div className="px-3 md:w-5/12">
-                                <div className="w-full mx-auto rounded-lg bg-white border border-gray-200 p-3 text-gray-800 font-light mb-6">
-                                    {/* <div className="w-full flex mb-3 items-center">
-                                        <div className="w-32">
-                                            <span className="text-gray-600 font-semibold">Contact</span>
+                        </div>
+
+
+                    ) : (
+                        <div className="w-full">
+                            <div className="-mx-3 md:flex items-start">
+                                <div className="px-3 md:w-7/12 lg:pr-10">
+                                    {currentProducts.map((oder, index) => (
+                                        <div key={index} className="w-full mx-auto text-gray-800 font-light mb-6 border-b border-gray-200 pb-6">
+                                            <div className="w-full flex items-center">
+                                                <div className="overflow-hidden rounded-lg w-16 h-16 bg-gray-50 border border-gray-200">
+                                                    <img src={oder.ImageProduct} />
+                                                </div>
+                                                <div className="flex-grow pl-3">
+                                                    <h6 className="font-semibold uppercase text-gray-600">{oder.NameProduct}</h6>
+                                                    <p className="text-gray-400">x {oder.quantity}, Size: {oder.sizeName}, Màu: {oder.colorName}</p>
+
+                                                </div>
+                                                <div>
+                                                    <span className="font-semibold text-gray-600 text-xl">{oder.PriceProduct}</span><span className="font-semibold text-gray-600 text-sm">.00</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex-grow pl-3">
-                                            <span>Scott Windon</span>
+                                    ))}
+                                    <div className="flex justify-center mt-4 ">
+                                        <button
+                                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                            disabled={currentPage === 1}
+                                            className="mx-2 p-1 border-2 text-gray-700 rounded-md hover:bg-yellow-300"
+                                        >
+                                            <ChevronLeft strokeWidth={0.5} />
+                                        </button>
+                                        <span className="p-2 opacity-60">{` ${currentPage} / ${totalPages}`}</span>
+                                        <button
+                                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                            disabled={currentPage === totalPages}
+                                            className="mx-2 p-1  border-2 text-gray-700 rounded-md hover:bg-yellow-300"
+                                        >
+                                            <ChevronRight strokeWidth={0.5} />
+                                        </button>
+                                    </div>
+                                    <div className="mb-6 pb-6 border-b border-gray-200">
+                                        <div className="-mx-2 flex items-end justify-end">
+                                            <div className="flex-grow px-2 lg:max-w-xs">
+                                                <div>
+                                                    <TextField
+                                                        label="Nhập mã khuyến mãi"
+
+                                                        fullWidth
+                                                        margin="normal"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="px-2 mb-2">
+                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[15px] font-semibold">Áp Dụng</button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="w-full flex items-center">
-                                        <div className="w-32">
-                                            <span className="text-gray-600 font-semibold">Billing Address</span>
+                                    {total && (
+                                        <div className="mb-6 pb-6 border-b border-gray-200 text-gray-800">
+                                            <div className="w-full flex mb-3 items-center">
+                                                <div className="flex-grow">
+                                                    <span className="text-gray-600">Tổng tiền sản phẩm</span>
+                                                </div>
+                                                <div className="pl-3">
+                                                    <span className="font-semibold">{total.subtotal}</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-full flex items-center">
+                                                <div className="flex-grow">
+                                                    <span className="text-gray-600">Phí vận chuyển </span>
+                                                </div>
+                                                <div className="pl-3">
+                                                    <span className="font-semibold">
+                                                        <CostShipping
+                                                            shippingInfo={shippingInfo}
+                                                            shippings={shippings}
+                                                            onCostChange={setShippingCost}
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex-grow pl-3">
-                                            <span>123 George Street, Sydney, NSW 2000 Australia</span>
+                                    )}
+                                    <div className="mb-6 pb-6 border-b border-gray-200 md:border-none text-gray-800 text-xl">
+                                        <div className="w-full flex items-center">
+                                            <div className="flex-grow">
+                                                <span className="text-gray-600">Tổng thanh toán</span>
+                                            </div>
+                                            <div className="pl-3">
+
+                                                <span className="font-semibold">{totalPayment.toFixed(2)}</span> <span className="font-semibold text-gray-400 text-sm">VND</span>
+                                            </div>
                                         </div>
-                                    </div> */}
-                                    <div>
-                                        <Stepper activeStep={activeStep}>
-                                            {steps.map((label, index) => (
-                                                <Step key={index}>
-                                                    <StepLabel>{label}</StepLabel>
-                                                </Step>
-                                            ))}
-                                        </Stepper>
+                                    </div>
+
+                                </div>
+                                <div className="px-3 md:w-5/12">
+                                    <div className="w-full mx-auto rounded-lg bg-white border border-gray-200 p-3 text-gray-800 font-light mb-6">
 
                                         <div>
-                                            {activeStep === steps.length ? (
-                                                <Typography>
+                                            <Stepper activeStep={activeStep}>
+                                                {steps.map((label, index) => (
+                                                    <Step key={index}>
+                                                        <StepLabel>{label}</StepLabel>
+                                                    </Step>
+                                                ))}
+                                            </Stepper>
 
-                                                    <Confirmation
-                                                        shippingInfo={shippingInfo}
-                                                        paymentMethod={paymentMethod}
-                                                    />
-                                                    <ThankYouModal isVisible={isOrderSuccessful} onClose={handleCloseModal} />
-                                                </Typography>
-                                            ) : (
-                                                <div>
-                                                    {getStepContent(activeStep)}
+                                            <div>
+                                                {activeStep === steps.length ? (
+                                                    <Typography>
 
-                                                    <div style={{ marginTop: '20px' }}>
-                                                        <button className='mr-6 opacity-70'
-                                                            disabled={activeStep === 0}
-                                                            onClick={handleBack}
-                                                        >
-                                                            Quay lại
-                                                        </button>
-                                                        <button onClick={handleNext} className=" max-w-xs mx-auto border border-transparent bg-blue-600 hover:bg-gray-500 focus:bg-gray-500 text-white rounded-md px-5 py-2 " >
-                                                            {activeStep === steps.length - 1 ? 'Hoàn tất' : 'Tiếp theo'}
-                                                        </button>
+                                                        <Confirmation
+                                                            shippingInfo={shippingInfo}
+                                                            paymentMethod={paymentMethod}
+                                                            shippings={shippings}
+                                                        />
+
+                                                    </Typography>
+                                                ) : (
+                                                    <div>
+                                                        {getStepContent(activeStep)}
+
+                                                        <div style={{ marginTop: '20px' }}>
+                                                            <button className='mr-6 opacity-70'
+                                                                disabled={activeStep === 0}
+                                                                onClick={handleBack}
+                                                            >
+                                                                Quay lại
+                                                            </button>
+
+                                                            {!isOfBtn && (
+                                                                <button
+                                                                    onClick={handleNext}
+                                                                    className="max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300   rounded-md px-5 py-2"
+                                                                >
+                                                                    {activeStep === steps.length - 1 ? 'Hoàn tất' : 'Tiếp theo'}
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
+                                        <ConfirmModal
+                                            isVisible={isConfirmVisible}
+                                            onConfirm={confirmOrder}
+                                            onCancel={() => setConfirmVisible(false)}
+                                        />
+                                        <ThankYouModal isVisible={isOrderSuccessful} onClose={handleCloseModal} />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
-            </div>
+            </div >
         </>
     )
 }

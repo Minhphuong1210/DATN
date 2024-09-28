@@ -24,8 +24,8 @@ export interface ApiResponse {
     products_showhome: Product[];
 }
 
-export interface Colors  {
-    id:string
+export interface Colors {
+    id: string
     name: string
     color_code: string
 }

@@ -262,7 +262,7 @@ class ApiOrderController extends Controller
     {
         do {
             $code_order = 'ORD_' . Auth::id() . '_' . now()->timestamp;
-        } while (Order::where('order_code', $code_order)->exists());
+        } while (Order::where('code_order', $code_order)->exists());
         return $code_order;
     }
 }
