@@ -10,10 +10,10 @@ class Discount extends Model
     use HasFactory;
 
     protected $table = 'discounts';
-    protected $fillable = ['category_id', 'discount_percent', 'is_active'];
+    protected $fillable = ['sub_category_id', 'discount_percent', 'is_active','expires_at'];
 
-    public function category()
+    public function subCategory()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(SubCategory::class);
     }
 }
