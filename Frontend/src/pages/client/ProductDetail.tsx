@@ -139,7 +139,7 @@ const ProductDetail: React.FC = () => {
                             <form action="">
                                 <div>
                                     <div className="mb-2 flex justify-between text-sm md:block">
-                                        <span className="md:mr-11  uppercase">Kích thước: {selectSize.name}</span>
+                                        
                                         <span className="hover:text-yellow-400 md:mr-11">
                                             <a href="">Giúp bạn chọn size</a>
                                         </span>
@@ -147,31 +147,7 @@ const ProductDetail: React.FC = () => {
                                             <a href="">Bảng size</a>
                                         </span>
                                     </div>
-                                    <div>
-                                        <div className="inline-flex items-center">
-                                            <div className="flex space-x-2">
-                                                {size.map((size, index) => {
-                                                    return (
-                                                        <label key={index} className="relative flex cursor-pointer items-center">
-                                                            <input
-                                                                type="radio"
-                                                                name={size.name}
-                                                                value={size.id}
-                                                                checked={selectSize.id === size.id}
-                                                                onChange={(event) => handleChangeSize(event, size.name)}
-                                                                className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                            />
-                                                            <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                                {size.name}
-                                                            </span>
-                                                        </label>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mb-2 mt-3 text-sm">
+                                    <div className="mb-2 mt-3 text-sm">
                                     <span>Màu Sắc:{selectColor.name} </span>
                                     <div className="mt-2 flex space-x-2">
                                         {color.map((color, index) => {
@@ -194,6 +170,32 @@ const ProductDetail: React.FC = () => {
                                         })}
                                     </div>
                                 </div>
+                                    <div>
+                                        <div className="inline-flex items-center text-sm md:block md:mr-11 md:mt-3">
+                                        <span className="md:mr-11  uppercase">Kích thước: {selectSize.name}</span>
+                                            <div className="flex space-x-2">
+                                                {size.map((size, index) => {
+                                                    return (
+                                                        <label key={index} className="relative flex cursor-pointer items-center">
+                                                            <input
+                                                                type="radio"
+                                                                name={size.name}
+                                                                value={size.id}
+                                                                checked={selectSize.id === size.id}
+                                                                onChange={(event) => handleChangeSize(event, size.name)}
+                                                                className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-500 hover:bg-zinc-400 hover:shadow-md"
+                                                            />
+                                                            <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                                {size.name}
+                                                            </span>
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                             </form>
                             <div className="mt-5">Mô tả:</div>
                             <div className="m-2">
@@ -222,7 +224,7 @@ const ProductDetail: React.FC = () => {
                                 >
                                     +
                                 </button>
-                                <button onClick={() => handleAddToCart(product, selectColor, selectSize, quantity)}>
+                                <button className=" w-[300px] rounded-sm bg-yellow-400 px-10 py-3" onClick={() => handleAddToCart(product, selectColor.id, selectSize.id, quantity)}>
                                     Add to Cart
                                 </button>
 

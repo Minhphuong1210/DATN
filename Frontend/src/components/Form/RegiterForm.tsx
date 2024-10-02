@@ -15,11 +15,12 @@ const RegisterForm = ({ onSubmit }: AuthFormProps) => {
   } = useForm();
 
   return (
-    <div className="ml-9">
+    <div className="ml-9 pb-10">
       <div
-        className="mt-10 flex h-[650px] w-[500px] rounded-lg bg-blue-950 shadow-lg"
+        className="mt-10 flex h-[550px] w-[500px] rounded-lg bg-white shadow-lg"
         style={{ width: "900px" }}
       >
+        
         {/* Left Image Section */}
         <div className="flex w-1/2 items-center justify-center bg-white p-10">
           <img
@@ -31,15 +32,16 @@ const RegisterForm = ({ onSubmit }: AuthFormProps) => {
         </div>
 
         {/* Form Section */}
+        
         <div className="w-1/2 p-10 mt-14">
-          <h2 className="mb-6 text-center text-2xl font-semibold text-white">
+          <h2 className="mb-6 text-center text-2xl font-semibold text-black">
             Đăng Ký Tài Khoản
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Username Field */}
             <div className="mb-4">
-              <label className="mb-2 block text-white" htmlFor="name">
+              <label className="mb-2 block text-black" htmlFor="name">
                 Name
               </label>
               <input
@@ -55,16 +57,16 @@ const RegisterForm = ({ onSubmit }: AuthFormProps) => {
                   },
                 })}
               />
-              {errors.username && (
+              {errors.name && (
                 <p className="mt-1 text-sm text-red-500">
-                  {String(errors.username.message)}
+                  {String(errors.name.message)}
                 </p>
               )}
             </div>
 
             {/* Email Field */}
             <div className="mb-4">
-              <label className="mb-2 block text-white" htmlFor="email">
+              <label className="mb-2 block text-black" htmlFor="email">
                 Email
               </label>
               <input
@@ -85,10 +87,10 @@ const RegisterForm = ({ onSubmit }: AuthFormProps) => {
                   {String(errors.email.message)}
                 </p>
               )}
-</div>
+            </div>
             {/* Password Field */}
             <div className="mb-6">
-              <label className="mb-2 block text-white" htmlFor="password">
+              <label className="mb-2 block text-black" htmlFor="password">
                 Mật khẩu
               </label>
               <input
@@ -117,13 +119,9 @@ const RegisterForm = ({ onSubmit }: AuthFormProps) => {
 
             {/* Login Link */}
             <div className="text-center">
-              <a href="" className="text-base text-blue-400 hover:underline">
+              <a href="/login" className="text-sm text-blue-500 hover:underline">
                 Bạn đã có tài khoản?
-              </a>
-              <a
-                href="/login"
-                className="ml-2 text-base text-blue-400 underline"
-              >
+              
                 Đăng Nhập
               </a>
             </div>
