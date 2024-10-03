@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // 5 phút load 1 lần 
+        $schedule->command('api:home-view-command')->everyMinute();
     }
 
     /**

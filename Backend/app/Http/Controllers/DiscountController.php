@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
+use App\Models\SubCategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Discount;
+use Illuminate\Support\Facades\DB;
 
 class DiscountController extends Controller
 {
@@ -13,17 +17,46 @@ class DiscountController extends Controller
      */
     public function index()
     {
-        $discounts = Discount::with('category')->get();
+        $discounts = Discount::with('subCategory')->orderBy('created_at', 'desc')->get();
+        $sub_category_ids = $discounts->pluck('sub_category_id');
+        $products = Product::query()->whereIn('sub_category_id', $sub_category_ids)->get();
+        foreach ($products as $product) {
+            $discount = $discounts->firstWhere('sub_category_id', $product->sub_category_id);
+        
+            if ($discount) {
+                $now = Carbon::now('Asia/Ho_Chi_Minh');
+                $expires_at = Carbon::parse($discount->expires_at);
+                foreach ($discounts as $key => $value) {
+                    if ($now->lessThan($expires_at)) {
+                        $sale = $product->price *$value->discount_percent / 100;
+                        $product->discount_id = $discount->id;
+                        $product->price_sale = $product->price - $sale;
+                    } else {
+                        $product->discount_id = null;
+                        $product->price_sale = null;
+                        $product->is_active = 0;
+                    }
+                }
+            } else {
+                $product->discount_id = null;
+                $product->price_sale = null;
+            }
+            $saved = $product->save();
+        }
         return view('Admin.Discount.index', compact('discounts'));
     }
+    
+
+
+
+    
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        $categories = Category::all();
-
+        $categories = SubCategory::all();
         return view('Admin.Discount.create', compact('categories'));
     }
 
@@ -32,33 +65,32 @@ class DiscountController extends Controller
      */
     public function store(Request $request)
     {
-        // dd ($request->all());
         $request->validate([
-            'category_id' => 'required|integer',
+            'sub_category_id' => 'required|integer',
             'discount_percent' => 'required|numeric|min:0|max:100',
             'is_active' => 'required|boolean',
+            'expires_at' => 'required|date',
         ]);
 
-        Discount::create($request->all());
-        return redirect()->route('admins.discounts.index')->with('success','Discount add successfully');
+        // Tạo bản ghi discount mới với các trường cụ thể
+        Discount::create($request->only(['sub_category_id', 'discount_percent', 'is_active', 'expires_at']));
 
+
+
+
+        return redirect()->route('admins.discounts.index')->with('success', 'Discount added successfully');
     }
 
     /**
-     * Display the specified resource.
+     * Apply discount to related products.
      */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
+
     public function edit(string $id)
     {
         $discount = Discount::findOrFail($id);
-        $categories = Category::all(); // Lấy tất cả các danh mục
+        $categories = SubCategory::all(); // Lấy tất cả các danh mục
         return view('Admin.Discount.edit', compact('discount', 'categories'));
     }
 
@@ -68,13 +100,14 @@ class DiscountController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'category_id' => 'integer',
+            'sub_category_id' => 'integer',
             'discount_percent' => 'numeric|min:0|max:100',
             'is_active' => 'boolean',
         ]);
 
         $discount = Discount::findOrFail($id);
         $discount->update($request->all());
+
         return redirect()->route('admins.discounts.index')->with('success', 'Discount updated successfully.');
     }
 
@@ -87,4 +120,5 @@ class DiscountController extends Controller
         $discount->delete();
         return redirect()->route('admins.discounts.index')->with('success', 'Discount deleted successfully.');
     }
+
 }

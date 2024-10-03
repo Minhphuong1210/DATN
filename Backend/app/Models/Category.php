@@ -15,8 +15,5 @@ class Category extends Model
     {
         return $this->hasMany(SubCategory::class);
     }
-    public function discounts()
-    {
-        return $this->hasMany(Discount::class);
-    }
+   
 }

@@ -9,17 +9,6 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\ApiProductController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -37,11 +26,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // API xóa sản phẩm khỏi giỏ hàng
     Route::delete('/cart/{id}/delete', [CartController::class, 'destroy']);
 });
-
+// lấy sản phẩm product
 Route::resource('/products', ProductController::class);
+// lấy sản phẩm category
 Route::resource('/categorys', CategoryController::class);
+// lấy sản phẩm promotion
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
+
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
+// banner
+Route::get('/banner', [ApiProductController::class,'Banner']);
+
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
@@ -56,15 +51,7 @@ Route::middleware('auth:sanctum')
         Route::put('/{id}/update', [ApiOrderController::class, 'update'])->name('update');
 
 });
-Route::prefix('productSizes')
-    ->as('productSizes.')
-    ->group(function () {
-        Route::get('/', [\App\Http\Controllers\ApiProductController::class, 'indexProductSize'])->name('indexProductSize');
-        Route::get('/create', [\App\Http\Controllers\ApiProductController::class, 'createProductSize'])->name('createProductSize');
-        Route::post('/store', [\App\Http\Controllers\ApiProductController::class, 'storeProductSize'])->name('storeProductSize');
-        Route::put('/{id}/update', [\App\Http\Controllers\ApiProductController::class, 'updateProductSize'])->name('updateProductSize');
-        Route::delete('/{id}', [\App\Http\Controllers\ApiProductController::class, 'destroyProductSize'])->name('destroyProductSize'); 
-    });
+
 
 
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
