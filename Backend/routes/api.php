@@ -3,6 +3,7 @@ use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiOrderController;
 
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
@@ -57,5 +58,16 @@ Route::middleware('auth:sanctum')
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
 Route::get('color',[ApiProductController::class,'color']);
 Route::get('size',[ApiProductController::class,'size']);
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    // API lưu bình luận
+    Route::post('products/{id}/comments', [CommentController::class, 'store']);
+
+    // API lấy tất cả bình luận của sản phẩm
+    Route::get('products/{id}/comments', [CommentController::class, 'index']);
+}); 
 Route::get('Shipping',[ApiProductController::class,'Shipping']);
+
 
