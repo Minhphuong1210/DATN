@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\ApiProductController;
-
+use App\Http\Controllers\Api\PaymentController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -33,7 +32,7 @@ Route::resource('/categorys', CategoryController::class);
 // lấy sản phẩm promotion
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
 // Payment
-Route::post('/payment/momo', [PaymentController::class, 'payment_momo']);
+Route::post('/payment/momo', [PaymentController::class,'payment_momo']);
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 // banner
 Route::get('/banner', [ApiProductController::class,'Banner']);
