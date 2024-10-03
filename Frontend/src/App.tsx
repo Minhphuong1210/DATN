@@ -9,11 +9,10 @@ import Home from './pages/client/Home';
 import { Routes, Route } from 'react-router-dom';
 import ProductDetail from './pages/client/ProductDetail';
 import Register from './pages/Register';
-
 import Cart from './pages/client/Cart';
 import Login from './pages/Login';
-import Color from './pages/client/Color';
 import PaymentMomo from './pages/client/PaymentMomo';
+import Contact from './pages/client/Contact';
 
 
 function App() {
@@ -27,8 +26,8 @@ function App() {
           <Route path='productdetail/:id/subcate/:idd' element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
-          <Route path="color" element={<Color />} />
           <Route path="payment" element={<PaymentMomo />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
       </Routes>
       <ToastContainer />
