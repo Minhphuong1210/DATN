@@ -19,38 +19,6 @@ class CartController extends Controller
     /**
      * Display a listing of the resource.
      */
-    //Lấy chi tiết sản phẩm
-    public function detailProduct(string $id)
-    {
-        try {
-            $productDetail = ProductDetail::find($id);
-            $color = ProductColor::all();
-            $size = ProductSize::all();
-            return response()->json([
-                'productDetail' => $productDetail,
-                'color' => $color,
-                'size' => $size,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    //Lấy tất cả sản phẩm
-    public function Product()
-    {
-        $product = Product::all();
-        $color = ProductColor::all();
-        $size = ProductSize::all();
-        return response()->json([
-            'product' => $product,
-            'color' => $color,
-            'size' => $size,
-        ], 200);
-    }
 
     /**
      * Display the specified resource.
@@ -122,12 +90,14 @@ class CartController extends Controller
                     $NameProduct=$productDetail->product->name;
                     $ImageProduct=$productDetail->product->image;
                     $PriceProduct=$productDetail->product->price;
+                    $id = $detail->id;
                     if ($productDetail) {
                         $productsDetails[] = [
                             'colorName'=>$colorName,
                             'sizeName'=>$sizeName,
                             'NameProduct'=>$NameProduct,
                             'PriceProduct'=>$PriceProduct,
+                            'id'=>$id,
                             'ImageProduct'=>$ImageProduct,
                             'product_detail' => $productDetail,
                             'quantity' => $detail->quantity,

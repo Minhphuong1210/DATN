@@ -9,16 +9,16 @@
         @method('PUT')
 
         <div>
-            <label for="category_id" class="mt-2">Category</label>
-            <select id="category_id" name="category_id" class="form-control">
+            <label for="sub_category_id" class="mt-2">Category</label>
+            <select id="sub_category_id" name="sub_category_id" class="form-control">
                 <option value="" disabled>Select a category</option>
                 @foreach ($categories as $category)
-                    <option value="{{ $category->id }}" {{ $category->id == $discount->category_id ? 'selected' : '' }}>
+                    <option value="{{ $category->id }}" {{ $category->id == $discount->sub_category_id ? 'selected' : '' }}>
                         {{ $category->name }}
                     </option>
                 @endforeach
             </select>
-            @error('category_id')
+            @error('sub_category_id')
                 <span class="text-danger">{{ $message }}</span>
             @enderror
         </div>
@@ -31,7 +31,13 @@
                 <span class="text-danger">{{ $message }}</span>
             @enderror
         </div>
-
+        <div>
+            <label for="expires_at" class="mt-2">Ngày và giờ hết hạn</label>
+            <input type="datetime-local" id="expires_at" name="expires_at" class="form-control" value="{{ $discount->expires_at }}">
+            @error('expires_at')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
+        </div>
         <div>
             <label for="is_active">Is Active</label>
             <input type="hidden" name="is_active" value="0">

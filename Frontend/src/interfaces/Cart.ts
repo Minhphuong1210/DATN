@@ -1,3 +1,4 @@
+
 export type Cart_detail = {
     id: number
     NameProduct: string
@@ -11,7 +12,7 @@ export type Cart_detail = {
     sizeName: string
 }
 export type Product_detail = {
-    id: number|string
+    id: number | string
     product_id: number
     size_id: number
     color_id: number

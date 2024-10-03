@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
 use App\Models\Product;
+use App\Models\Promotion;
 use App\Models\ProductColor;
-use App\Models\ProductSize;
 use App\Models\SubCategory;
 use App\Models\ProductSize;
+use App\Models\Shipping;
 use Illuminate\Http\Request;
 
 class ApiProductController extends Controller
@@ -15,61 +17,37 @@ class ApiProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $subCategory = SubCategory::findOrFail($sub_category_id);
-        $productSize = ProductSize::all();
-        $productColor=ProductColor::all();
-        $productSubCategory = $subCategory->product;
-        $product->view = $product->view + 1;
+
+
+        $productSubCategory = $subCategory->product; 
+        $product->view = $product->view + 1; 
         $product->save();
         return response()->json([
-            'productSize'=>$productSize,
-            'productColor'=>$productColor,
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
         ], 200);
     }
-    public function indexProductSize()
+
+
+
+    public function promotion()
     {
-        $productSizes = ProductSize::all();
-        return response()->json($productSizes);
+        $promotion = Promotion::all(); 
+        $data = [
+            'status' => 'success',
+            'data' => $promotion,
+        ];
+        return response()->json($data);
     }
-
-    // Tạo kích thước sản phẩm (trả về form tạo)
-    public function createProductSize()
+    public function subcategory()
     {
-    
+        $category = SubCategory::all(); 
+        $data = [
+            'status' => 'success',
+            'data' => $category,
+        ];
+        return response()->json($data);
     }
-
-    // Lưu kích thước sản phẩm
-    public function storeProductSize(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $productSize = ProductSize::create($request->all());
-        return response()->json($productSize, 201);
-    }
-
-    // Cập nhật kích thước sản phẩm
-    public function updateProductSize(Request $request, $id)
-    {
-        $productSize = ProductSize::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $productSize->update($request->all());
-        return response()->json($productSize);
-    }
-
-    // Xóa kích thước sản phẩm
-    public function destroyProductSize($id)
-    {
-        $productSize = ProductSize::findOrFail($id);
-        $productSize->delete();
-
-        return response()->json(['message' => 'Kích thước sản phẩm đã được xóa thành công.'], 204);
     public function color(){
         $productColor=ProductColor::all();
         return response()->json([
@@ -83,4 +61,25 @@ class ApiProductController extends Controller
         ]);
 
     }
+
+
+    public function Shipping()
+    {
+        $Shipping = Shipping::all(); 
+        $data = [
+            'status' => 'success',
+            'data' => $Shipping,
+        ];
+        return response()->json($data);
+    }
+
+    public function Banner(){
+        $banner = Banner::all();
+        $data = [
+            'status' => 'success',
+            'data' => $banner,
+        ];
+        return response()->json($data);
+    }
+
 }

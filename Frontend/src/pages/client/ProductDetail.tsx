@@ -4,41 +4,24 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useProduct } from "../../hook/Product";
-import { useCarts } from "../../hook/Cart";
-import { toast } from "react-toastify";
-import { Product_detail } from "../../interfaces/Cart";
-import { useCart } from "../../context/CartContext";
-import { Product } from "../../interfaces/Product";
+import { useNavigate } from "react-router-dom";
+import { useProduct } from "../../hook/Product"; import { toast } from "react-toastify";
+import { Colors, Product, Sizes } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
+import axios from "axios";
 
 
 
-const products = [
-    {
-        id: '1',
-        name: 'Áo Thun',
-        price: 200000,
-        variants: {
-            sizes: ['S', 'M', 'L'],
-            colors: ['Đỏ', 'Xanh', 'Đen'],
-        },
-    }
 
-];
-
-const ProductDetail: React.FC = ({ }) => {
+const ProductDetail: React.FC = () => {
     const { product } = useProduct();
-    const [selectedSize, setSelectedSize] = useState<Size>("Chọn size");
-    const [selectColor, setSelectColor] = useState<Color>("Chọn màu");
+    const [selectSize, setSelectSize] = useState<Sizes>({ id: '', name: '' });
+    const [selectColor, setSelectColor] = useState<Colors>({ id: '', name: '', color_code: '' });
     const [quantity, setQuantity] = useState(1);
     const [showDescription, setShowDescription] = useState(true);
     const [showComment, setShowComment] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const { addToCart } = useCarts();
     const { color, size } = useColor();
-
+    const token = localStorage.getItem('token');
     // Tăng giảm sô lượng
     const incurement = () => {
         setQuantity((prevQuantity) => prevQuantity + 1);
@@ -47,14 +30,19 @@ const ProductDetail: React.FC = ({ }) => {
         setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
     };
 
-    const handleChangeSize = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectedSize(event.target.value as Size);
+    const handleChangeSize = (event: ChangeEvent<HTMLInputElement>, sizeName: string) => {
+        setSelectSize({
+            id: event.target.value,
+            name: sizeName
+        });
     };
-    // const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
-    //     setSelectColor(event.target.value as Color);
-    // };
-    const handleChangeColor = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectColor(event.target.value as Color);
+
+    const handleChangeColor = (event: ChangeEvent<HTMLInputElement>, colorName: string) => {
+        setSelectColor({
+            id: event.target.value,
+            name: colorName,
+            color_code: ''
+        });
     };
 
     // Mô tả & Comment
@@ -66,44 +54,37 @@ const ProductDetail: React.FC = ({ }) => {
         setShowComment(true);
         setShowDescription(false);
     };
+    const nav = useNavigate()
+    const handleAddToCart = async (
+        product: Product,
+        color_id: string,
+        size_id: string,
+        quantity: number,
 
-
-    const itemsPerPage = 4; // Số lượng sản phẩm hiển thị trên màn hình
-    const productsPerPage = 4; // Số lượng sản phẩm chuyển qua mỗi lần bấm nút
-
-    const handleNext = () => {
-        // Chuyển sang 4 sản phẩm tiếp theo
-        if (currentIndex + productsPerPage < products.length) {
-            setCurrentIndex(currentIndex + productsPerPage);
-        } else {
-            setCurrentIndex(products.length - itemsPerPage); // Nếu vượt quá, chỉ hiển thị 2 sản phẩm cuối
-        }
-    };
-
-    const handlePrevious = () => {
-        // Quay lại 4 sản phẩm trước
-        if (currentIndex - productsPerPage >= 0) {
-            setCurrentIndex(currentIndex - productsPerPage);
-        } else {
-            setCurrentIndex(0); // Không quay lại quá đầu danh sách
-        }
-    };
-    
-    const handleAddToCart = (
-        product: Product, 
-        selectedColor: string,  // Truyền trực tiếp giá trị đã chọn
-        selectedSize: string,    // Truyền trực tiếp giá trị đã chọn
-        quantity: number
-        
-      ) => {
+    ) => {
         console.log('Product:', product.id);
-        console.log('Selected Color:', selectedColor);
-        console.log('Selected Size:', selectedSize);
+        console.log('Selected Color:', color_id);
+        console.log('Selected Size:', size_id);
         console.log('Quantity:', quantity);
-        
-      
-        // Thực hiện các thao tác thêm vào giỏ hàng tại đây
-      };
+        try {
+            if (!token) {
+                toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
+                nav('/login')
+            }
+            await axios.post('/api/cart/add', {
+                id: product.id,
+                color_id,
+                size_id,
+                quantity,
+                price: product.price
+            });
+            toast.success('Thêm sản phẩm vào giỏ hàng thành công');
+            nav('/cart');
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+        }
+
+    };
 
     return (
         <>
@@ -156,43 +137,18 @@ const ProductDetail: React.FC = ({ }) => {
                             </div>
                             <div className="text-lg font-bold">{product?.price} </div>
                             <form action="">
-                                <div className="mb-2 flex justify-between text-sm md:block">
-                                    <span className="md:mr-11">Kích thước: {selectedSize}</span>
-                                    <span className="hover:text-yellow-400 md:mr-11">
-                                        <a href="">Giúp bạn chọn size</a>
-                                    </span>
-                                    <span className="hover:text-yellow-400">
-                                        <a href="">Bảng size</a>
-                                    </span>
-                                </div>
                                 <div>
-                                    <div className="inline-flex items-center">
-                                        <div className="flex space-x-2">
-                                            {size.map((size, index) => {
-                                                return (
-                                                    <label key={index} className="relative flex cursor-pointer items-center">
-                                                        <input
-                                                            type="radio"  // Thay đổi từ checkbox sang radio
-                                                            name="size"   // Tất cả radio button cần cùng một name để được nhóm lại
-                                                            value={size.name}
-                                                            checked={selectedSize === size.name}  // Kiểm tra nếu size đã được chọn
-                                                            onChange={() => setSelectedSize(size.name)}  // Khi người dùng chọn, cập nhật state
-                                                            className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                        />
-                                                        <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                            {size.name}
-                                                        </span>
-                                                    </label>
-                                                );
-                                            })}
-                                        </div>
+                                    <div className="mb-2 flex justify-between text-sm md:block">
+                                        
+                                        <span className="hover:text-yellow-400 md:mr-11">
+                                            <a href="">Giúp bạn chọn size</a>
+                                        </span>
+                                        <span className="hover:text-yellow-400">
+                                            <a href="">Bảng size</a>
+                                        </span>
                                     </div>
-                                    <div className="flex space-x-2">
-
-                                    </div>
-                                </div>
-                                <div className="mb-2 mt-3 text-sm">
-                                    <span>Màu Sắc:{selectColor} </span>
+                                    <div className="mb-2 mt-3 text-sm">
+                                    <span>Màu Sắc:{selectColor.name} </span>
                                     <div className="mt-2 flex space-x-2">
                                         {color.map((color, index) => {
                                             return (
@@ -200,22 +156,46 @@ const ProductDetail: React.FC = ({ }) => {
                                                     <label className="relative flex cursor-pointer items-center">
                                                         <input
                                                             type="radio"
-                                                            name="color"
-                                                            value={color.name}
-                                                            checked={selectColor === color.name}
-                                                            onChange={(event) => handleChangeColor(event)}
+                                                            name={color.name}
+                                                            value={color.id}
+                                                            checked={selectColor.id === color.id}
+                                                            onChange={(event) => handleChangeColor(event, color.name)}
                                                             className="peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
-                                                            style={{ backgroundColor: color.name }} // Apply color from db
+                                                            style={{ backgroundColor: color.color_code }}
                                                         />
                                                     </label>
-                                                    <div>{color.name}</div>
+
                                                 </div>
                                             );
                                         })}
                                     </div>
-
-
                                 </div>
+                                    <div>
+                                        <div className="inline-flex items-center text-sm md:block md:mr-11 md:mt-3">
+                                        <span className="md:mr-11  uppercase">Kích thước: {selectSize.name}</span>
+                                            <div className="flex space-x-2">
+                                                {size.map((size, index) => {
+                                                    return (
+                                                        <label key={index} className="relative flex cursor-pointer items-center">
+                                                            <input
+                                                                type="radio"
+                                                                name={size.name}
+                                                                value={size.id}
+                                                                checked={selectSize.id === size.id}
+                                                                onChange={(event) => handleChangeSize(event, size.name)}
+                                                                className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-500 hover:bg-zinc-400 hover:shadow-md"
+                                                            />
+                                                            <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                                {size.name}
+                                                            </span>
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                             </form>
                             <div className="mt-5">Mô tả:</div>
                             <div className="m-2">
@@ -244,11 +224,11 @@ const ProductDetail: React.FC = ({ }) => {
                                 >
                                     +
                                 </button>
-                                <button onClick={() => handleAddToCart(product, selectColor, selectedSize, quantity)}>
+                                <button className=" w-[300px] rounded-sm bg-yellow-400 px-10 py-3" onClick={() => handleAddToCart(product, selectColor.id, selectSize.id, quantity)}>
                                     Add to Cart
                                 </button>
 
-                                {/* <button className="rounded-sm bg-yellow-400 px-10 py-3" onClick={() => { handleAddToCart(product, setSelectColor, setSelectedSize
+                                {/* <button className="rounded-sm bg-yellow-400 px-10 py-3" onClick={() => { handleAddToCart(product, setSelectColor, setsize_id
 
                                 ) }} >
                                     Thêm vào giỏ hàng

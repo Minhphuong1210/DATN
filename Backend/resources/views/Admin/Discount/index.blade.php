@@ -21,6 +21,7 @@ Discounts
                 <th>ID</th>
                 <th>Category</th> 
                 <th>Discount Percent</th>
+                <th>Date Time</th>
                 <th>Is Active</th>
                 <th>Actions</th>
             </tr>
@@ -29,8 +30,10 @@ Discounts
             @foreach($discounts as $discount)
                 <tr>
                     <td>{{ $discount->id }}</td>
-                    <td>{{ $discount->category ? $discount->category->name : 'N/A' }}</td> <!-- Hiển thị tên category -->
+                    <td>{{ $discount->subCategory ? $discount->subCategory->name : 'N/A' }}</td> <!-- Hiển thị tên category -->
                     <td>{{ $discount->discount_percent }}</td>
+                    <td>{{ $discount->expires_at }}</td>
+                    {{-- <td>{{}}</td> --}}
                     <td>{{ $discount->is_active ? 'Yes' : 'No' }}</td>
                     <td>
                         <a href="{{ route('admins.discounts.edit', $discount->id) }}" class="btn btn-primary">Edit</a>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import yourImage from "../../public/images/logo.jpg";
+import yourImage from "../../public/images/logofix.png";
 import { AlignJustify, Search, ShoppingCart, User, X } from "lucide-react";
 
 interface HeaderProps {
@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               </a>
             </li>
             <li className="hovermenuNav">
-              <a href="#" className="hover:text-slate-600">
+              <a href="/contact" className="hover:text-slate-600">
                 LIÊN HỆ
               </a>
             </li>
@@ -118,22 +118,23 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
         {/* Biểu tượng menu */}
         <div className="mr-1 flex space-x-2">
-          <a href="/login">
-            <User
-              size={25}
-              className="cursor-pointer text-slate-500 hover:text-black"
-            />
-          </a>
+        <Search
+            size={25}
+            className="hidden cursor-pointer text-slate-500 hover:text-black md:block lg:block"
+          />
           <a href="/cart">
             <ShoppingCart
               size={25}
               className="cursor-pointer text-slate-500 hover:text-black"
             />
           </a>
-          <Search
-            size={25}
-            className="hidden cursor-pointer text-slate-500 hover:text-black md:block lg:block"
-          />
+          <a href="/login">
+            <User
+              size={25}
+              className="cursor-pointer text-slate-500 hover:text-black"
+            />
+          </a>
+          
 
           {/* Nút mở/đóng menu di động */}
           {isMobile && (
