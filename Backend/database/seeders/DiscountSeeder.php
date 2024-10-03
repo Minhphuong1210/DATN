@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Discount;
+use App\Models\SubCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,11 +15,11 @@ class DiscountSeeder extends Seeder
      */
     public function run(): void
     {
-        $category = Category::query()->pluck('id')->toArray();
+        $subcategory = SubCategory::query()->pluck('id')->toArray();
         $discount = [];
         for ($i = 0; $i < 10; $i++) {
             $discount[] = [
-                'category_id' => fake()->randomElement($category),
+                'sub_category_id' => fake()->randomElement($subcategory),
                 'discount_percent' => fake()->numberBetween(1, 100),
             ];
         }
