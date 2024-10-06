@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../../css/Checkout.css'
 import { Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
 import ShippingForm from '../../components/client/checkout/ShippingForm';
@@ -19,7 +19,10 @@ const steps = ['Thông tin giao hàng', 'Phương thức thanh toán', 'Xác nh�
 
 
 const Checkout = () => {
-    const [activeStep, setActiveStep] = useState(0);
+    const [activeStep, setActiveStep] = useState<number>(() => {
+        const savedStep = localStorage.getItem('activeStep');
+        return savedStep !== null ? JSON.parse(savedStep) : 0;
+    });
     const { oders, total, isOrderSuccessful, handleSubmitOrder, handleCloseModal, isOfBtn, isConfirmVisible, confirmOrder, setConfirmVisible } = useOder();
 
     const [shippingCost, setShippingCost] = useState<number>(0);
@@ -42,6 +45,16 @@ const Checkout = () => {
         shippingMethod: '',
     });
     const [error, setError] = useState<string | null>(null);
+    useEffect(() => {
+        const savedShippingInfo = localStorage.getItem('shippingInfo');
+        if (savedShippingInfo) {
+            setShippingInfo(JSON.parse(savedShippingInfo));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('activeStep', JSON.stringify(activeStep));
+    }, [activeStep]);
     const handleNext = async () => {
         if (activeStep === 0) {
             const errorMessage = validateShippingInfo(shippingInfo);
@@ -50,19 +63,25 @@ const Checkout = () => {
                 return;
             } else {
                 setError(null);
+                // Lưu thông tin vào localStorage
+                localStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
             }
         }
         if (activeStep === steps.length - 1) {
-            handleSubmitOrder(shippingInfo, total, shippingCost);
 
+            const savedShippingInfo = JSON.parse(localStorage.getItem('shippingInfo')); // hoặc một giá trị mặc định nếu không có thông tin
 
+            handleSubmitOrder(savedShippingInfo || shippingInfo, total, shippingCost);
         } else {
             setActiveStep((prevStep) => prevStep + 1);
         }
     };
 
     const handleBack = () => {
-        setActiveStep((prevStep) => prevStep - 1);
+        // Chỉ giảm activeStep nếu không ở bước đầu tiên
+        if (activeStep > 0) {
+            setActiveStep((prevStep) => prevStep - 1);
+        }
     };
 
     const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +113,7 @@ const Checkout = () => {
                     <PaymentForm
                         paymentMethod={paymentMethod}
                         setPaymentMethod={setPaymentMethod}
+                        totalPayment={totalPayment}  
                     />
                 );
             case 2:

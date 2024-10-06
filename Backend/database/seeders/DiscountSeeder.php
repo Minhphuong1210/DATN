@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\SubCategory;
 use App\Models\Discount;
-use App\Models\SubCategory;
+
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
