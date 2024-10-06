@@ -14,6 +14,7 @@ class PromotionController extends Controller
     public function index()
     {
         $promotion = Promotion::all();
+    
         return view('Admin.Promotion.index',compact('promotion'));
     }
 
