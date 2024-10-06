@@ -3,11 +3,14 @@
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiOrderController;
 use App\Http\Controllers\Api\CategoryController;
+
+use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\ApiProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\ApiProductController;
+
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

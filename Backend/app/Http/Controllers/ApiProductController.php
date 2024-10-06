@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContasUsMail;
 use App\Models\Banner;
+use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Promotion;
 use App\Models\ProductColor;
@@ -26,10 +27,42 @@ class ApiProductController extends Controller
         $productSubCategory = $subCategory->product;
         $product->view = $product->view + 1;
         $product->save();
+        $comments = Comment::where('product_id', $id)
+            ->whereNull('parent_id')
+            ->with('replies.user')
+            ->get();
+        $commentsArray = $comments->map(function ($comment) {
+            return [
+                'id' => $comment->id,
+                'content' => $comment->comment,
+                'rating' => $comment->rating,
+                'created_at' => $comment->created_at,
+                'user' => [
+                    'id' => $comment->user->id,
+                    'name' => $comment->user->name,
+                ],
+                'replies' => $comment->replies->map(function ($reply) {
+                    return [
+                        'id' => $reply->id,
+                        'content' => $reply->comment,
+                        'rating' => $reply->rating,
+                        'created_at' => $reply->created_at,
+                        'user' => [
+                            'id' => $reply->user->id,
+                            'name' => $reply->user->name,
+                        ],
+                    ];
+                }),
+            ];
+        });
+
+
         return response()->json([
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
+            'comments' => $commentsArray,
         ], 200);
+
     }
 
 
@@ -80,7 +113,11 @@ class ApiProductController extends Controller
     }
 
     public function Banner()
-    {
+
+
+
+{
+
         $banner = Banner::all();
         $data = [
             'status' => 'success',

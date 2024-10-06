@@ -34,3 +34,8 @@ export interface Sizes {
     id: string
     name: string
 }
+export interface Comment{
+    id:string,
+    rating:string,
+    comment:string
+}
