@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\SubCategory;
 use App\Models\Discount;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
