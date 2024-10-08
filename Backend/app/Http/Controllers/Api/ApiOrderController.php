@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderConfirm;
 use App\Models\Cart;
 use App\Models\CartDetail;
 use App\Models\Order;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Log;
+use Mail;
 
 class ApiOrderController extends Controller
 {
@@ -194,6 +196,7 @@ class ApiOrderController extends Controller
                 CartDetail::where('cart_id', $cart->id)->delete();
                 $cart->delete();
                 DB::commit();
+                Mail::to($order->email)->queue(new OrderConfirm($order));
                 return response()->json([
                     'success' => 'Mua hàng thành công'
                 ], 201); // Created

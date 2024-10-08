@@ -71,6 +71,8 @@ export const useOder = () => {
             await axios.post('/api/donhangs/store', orderData);
             toast.success("Đặt hàng thành công");
             setIsOrderSuccessful(true);
+            localStorage.removeItem('activeStep');
+            localStorage.removeItem('shippingInfo');
             setIsOffBtn(true);
         } catch (error) {
             console.error("Error submitting order:", error);
