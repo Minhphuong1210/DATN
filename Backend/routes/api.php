@@ -13,7 +13,8 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
 
 
-
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\ApiProductController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -25,6 +26,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::put('update/{id}', [ApiAuthController::class, 'update']); // Cập nhật thông tin người dùng
     Route::post('logout', [ApiAuthController::class, 'logout']); // Đăng xuất
 });
+Route::post('/payment/momo', [PaymentController::class,'payment_momo']);
 Route::get('forgot_password',[ApiAuthController::class, 'forgot_password']);
 Route::post('check_forgot_password',[ApiAuthController::class, 'check_forgot_password']);
 // từ đây có thể xử lí thường

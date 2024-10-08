@@ -1,15 +1,13 @@
-<div>
-    <!-- Live as if you were to die tomorrow. Learn as if you were to live forever. - Mahatma Gandhi -->
-</div>
 <footer class="footer">
     <div class="container-fluid">
         <div class="row">
-            <div class="col fs-13 text-muted text-center">
-                &copy;
-                <script>
-                    document.write(new Date().getFullYear())
-                </script> - Made with <span class="mdi mdi-heart text-danger"></span> by <a
-                    href="#!" class="text-reset fw-semibold">Zoyothemes</a>
+            <div class="col-sm-6">
+                <script>document.write(new Date().getFullYear())</script> © Velzon.
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end d-none d-sm-block">
+                    Design & Develop by Themesbrand
+                </div>
             </div>
         </div>
     </div>
