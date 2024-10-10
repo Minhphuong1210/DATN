@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -35,10 +36,10 @@ class PaymentController extends Controller
         $accessKey = 'klm05TvNBzhg7h7j';
         $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
         $orderInfo = "Thanh toán qua ATM MoMo";
-        $amount = "10000"; // Bạn có thể lấy giá trị này từ request nếu cần thiết
+        $amount = $request->amount; // Bạn có thể lấy giá trị này từ request nếu cần thiết
         $orderId = time() . "";
-        $redirectUrl = "http://127.0.0.1:8000/admins/promotion";
-        $ipnUrl = "http://127.0.0.1:8000/admins/promotion";
+        $redirectUrl = "http://localhost:5173/checkout";
+        $ipnUrl = "http://localhost:5173/checkout";
         $extraData = "";
 
         $requestId = time() . "";
@@ -74,8 +75,7 @@ class PaymentController extends Controller
                 'errorCode' => $jsonResult['errorCode']
             ], 400);
         }
-
-        // Trả về JSON response với URL thanh toán nếu thành công
+// Trả về JSON response với URL thanh toán nếu thành công
         if (isset($jsonResult['payUrl'])) {
             return response()->json([
                 'error' => 'Đã tìm thấy trang thanh toán',

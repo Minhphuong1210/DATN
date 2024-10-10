@@ -1,0 +1,1 @@
+ấn vào đây để lấy mật khẩu  <a href=""></a>

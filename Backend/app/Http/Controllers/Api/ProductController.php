@@ -108,6 +108,22 @@ class ProductController extends Controller
     {
         //
     }
+    public function search(Request $request)
+    {
+        $query = $request->input('q', '');
+
+        // Thêm logic tìm kiếm sản phẩm của bạn
+        $products = Product::where('name', 'like', '%' . $query . '%')
+            ->orWhere('description', 'like', '%' . $query . '%')
+            ->orWhereRaw('CAST(price AS CHAR) like ?', ['%' . $query . '%'])
+            ->get();
+
+        if ($products->isEmpty()) {
+            return response()->json(['message' => 'No products found'], 404);
+        }
+
+        return response()->json($products);
+    }
 
 
 }
