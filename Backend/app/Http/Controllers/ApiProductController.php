@@ -11,6 +11,7 @@ use App\Models\ProductColor;
 use App\Models\SubCategory;
 use App\Models\ProductSize;
 use App\Models\Shipping;
+use App\Models\Discount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -140,6 +141,16 @@ class ApiProductController extends Controller
             Log::error('Error sending email: ' . $th->getMessage());
             return response()->json(['error' => 'Gửi contact thất bại']);
         }
+    }
+    public function discount()
+    {
+
+        $discount = discount::all();
+        $data = [
+            'status' => 'success',
+            'data' => $discount,
+        ];
+        return response()->json($data);
     }
 
 }

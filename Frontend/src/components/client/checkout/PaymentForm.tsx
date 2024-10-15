@@ -52,12 +52,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ paymentMethod, setPaymentMeth
                     name="paymentMethod"
                     value={paymentMethod}
                     onChange={handlePaymentMethodChange}
+                    onClick={handlePayment}
                 >
                     <FormControlLabel value="Momo" control={<Radio />} label="Momo" />
                 </RadioGroup>
-                <button onClick={handlePayment} className='bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded'>
+                {/* <button onClick={handlePayment} className='bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded'>
                     Thanh toán với Momo
-                </button>
+                </button> */}
             </FormControl>
         </div>
     );

@@ -1,100 +1,13 @@
-// // CartContext.tsx
-// import React, { createContext, useReducer, useContext, useEffect } from 'react';
-// import { addToCartApi } from './api'; // giả lập API
-
-// type ProductVariant = {
-//   size: string;
-//   color: string;
-// };
-
-// type Product = {
-//   id: string;
-//   name: string;
-//   price: number;
-//   quantity: number;
-//   variant: ProductVariant;
-// };
-
-// type CartState = {
-//   cartItems: Product[];
-// };
-
-// type CartAction =
-//   | { type: 'ADD_TO_CART'; product: Product }
-//   | { type: 'REMOVE_FROM_CART'; id: string };
-
-// const initialState: CartState = {
-//   cartItems: [],
-// };
-
-// function cartReducer(state: CartState, action: CartAction): CartState {
-//   switch (action.type) {
-//     case 'ADD_TO_CART':
-//       const itemExists = state.cartItems.find(
-//         item =>
-//           item.id === action.product.id &&
-//           item.variant.size === action.product.variant.size &&
-//           item.variant.color === action.product.variant.color
-//       );
-//       if (itemExists) {
-//         return {
-//           ...state,
-//           cartItems: state.cartItems.map(item =>
-//             item.id === action.product.id &&
-//             item.variant.size === action.product.variant.size &&
-//             item.variant.color === action.product.variant.color
-//               ? { ...item, quantity: item.quantity + 1 }
-//               : item
-//           ),
-//         };
-//       } else {
-//         return {
-//           ...state,
-//           cartItems: [...state.cartItems, { ...action.product, quantity: 1 }],
-//         };
-//       }
-//     case 'REMOVE_FROM_CART':
-//       return {
-//         ...state,
-//         cartItems: state.cartItems.filter(item => item.id !== action.id),
-//       };
-//     default:
-//       return state;
-//   }
-// }
-
-// const CartContext = createContext<{
-//   state: CartState;
-//   dispatch: React.Dispatch<CartAction>;
-// }>({ state: initialState, dispatch: () => null });
-
-// export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-//   const [state, dispatch] = useReducer(cartReducer, initialState);
-
-//   const addToCart = async (product: Product) => {
-//     try {
-//       await addToCartApi(product); // Gọi API để lưu vào database
-//       dispatch({ type: 'ADD_TO_CART', product });
-//     } catch (error) {
-//       console.error('Failed to add to cart', error);
-//     }
-//   };
-
-//   return (
-//     <CartContext.Provider value={{ state, dispatch }}>
-//       {children}
-//     </CartContext.Provider>
-//   );
-// };
-
-// export const useCart = () => useContext(CartContext);import { createContext, useState } from 'react';
-
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { Cart_detail } from "../interfaces/Cart";
 
+// Interface cho context của giỏ hàng
 interface CartContextType {
-  cart: Cart_detail | null;  // Giỏ hàng có thể là null nếu chưa có sản phẩm nào
-  setCart: React.Dispatch<React.SetStateAction<Cart_detail | null>>;  // Hàm để cập nhật giỏ hàng
+  cart: Cart_detail[];  // Giỏ hàng là một mảng chứa nhiều sản phẩm
+  setCart: React.Dispatch<React.SetStateAction<Cart_detail[]>>;  // Hàm để cập nhật giỏ hàng
+  addToCart: (item: Cart_detail) => void;  // Hàm để thêm sản phẩm vào giỏ hàng
+  removeFromCart: (id: number) => void;  // Hàm để xoá sản phẩm khỏi giỏ hàng
+  cartQuantity: number;  // Tổng số lượng sản phẩm trong giỏ
 }
 
 // Tạo context
@@ -104,7 +17,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
+    throw new Error("useCart phải được sử dụng trong CartProvider");
   }
   return context;
 };
@@ -116,10 +29,23 @@ interface CartProviderProps {
 
 // CartProvider để quản lý trạng thái giỏ hàng
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [cart, setCart] = useState<Cart_detail | null>(null); // Khởi tạo giỏ hàng là null
+  const [cart, setCart] = useState<Cart_detail[]>([]);  // Khởi tạo giỏ hàng là một mảng rỗng
+
+  // Hàm để thêm sản phẩm vào giỏ hàng
+  const addToCart = (item: Cart_detail) => {
+    setCart(prevCart => [...prevCart, item]);  // Thêm sản phẩm vào cuối mảng giỏ hàng
+  };
+
+  // Hàm để xoá sản phẩm khỏi giỏ hàng dựa trên ID sản phẩm
+  const removeFromCart = (id: number) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));  // Loại bỏ sản phẩm có id tương ứng
+  };
+
+  // Hàm để tính tổng số lượng sản phẩm trong giỏ hàng
+  const cartQuantity = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, setCart }}>
+    <CartContext.Provider value={{ cart, setCart, addToCart, removeFromCart, cartQuantity }}>
       {children}
     </CartContext.Provider>
   );

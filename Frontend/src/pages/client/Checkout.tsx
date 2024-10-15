@@ -13,6 +13,9 @@ import ConfirmModal from '../../modalConfirm/ConfirmOder';
 import { ChevronLeft, ChevronRight, PackageX } from 'lucide-react';
 import type { CollapseProps } from 'antd';
 import { Collapse } from 'antd';
+import axios from 'axios';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 const steps = ['Thông tin giao hàng', 'Phương thức thanh toán', 'Xác nhận đơn hàng'];
 
 
@@ -35,7 +38,25 @@ const Checkout = () => {
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = oders.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(oders.length / productsPerPage);
+    interface appLy {
+        code: string
+        total_price: number
+    }
+    const [apply, setApply] = useState()
+    
 
+    const handleChange = (e:any) =>{
+        setApply(e.target.value)
+
+    }
+    const Apply = async()=>{
+        try {
+             await axios.post('/api/applyPromotion', {code:apply,totalPayment: totalPayment})
+            toast.success('Áp dụng thành công')            
+        } catch (error) {
+            toast.error('Phiếu khuyến mại hết hạn')
+        }
+    }
     const [shippingInfo, setShippingInfo] = useState({
         username: '',
         address: '',
@@ -173,7 +194,7 @@ const Checkout = () => {
 
                                                 </div>
                                                 <div>
-                                                    <span className="font-semibold text-gray-600 text-xl">{oder.PriceProduct}</span><span className="font-semibold text-gray-600 text-sm">.00</span>
+                                                    <span className="font-semibold text-gray-600 text-xl">{oder.price}</span><span className="font-semibold text-gray-600 text-sm">.00</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -201,14 +222,15 @@ const Checkout = () => {
                                                 <div>
                                                     <TextField
                                                         label="Nhập mã khuyến mãi"
-
                                                         fullWidth
                                                         margin="normal"
+                                                        value={apply}
+                                                        onChange={handleChange}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="px-2 mb-2">
-                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[15px] font-semibold">Áp Dụng</button>
+                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[15px] font-semibold" onClick={Apply}>Áp Dụng</button>
                                             </div>
                                         </div>
                                     </div>
