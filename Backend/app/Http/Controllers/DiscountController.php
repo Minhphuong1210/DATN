@@ -22,7 +22,7 @@ class DiscountController extends Controller
         $products = Product::query()->whereIn('sub_category_id', $sub_category_ids)->get();
         foreach ($products as $product) {
             $discount = $discounts->firstWhere('sub_category_id', $product->sub_category_id);
-        
+
             if ($discount) {
                 $now = Carbon::now('Asia/Ho_Chi_Minh');
                 $expires_at = Carbon::parse($discount->expires_at);
@@ -45,11 +45,11 @@ class DiscountController extends Controller
         }
         return view('Admin.Discount.index', compact('discounts'));
     }
-    
 
 
 
-    
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -120,5 +120,14 @@ class DiscountController extends Controller
         $discount->delete();
         return redirect()->route('admins.discounts.index')->with('success', 'Discount deleted successfully.');
     }
+    public function discount()
+    {
 
+        $discount = Discount::all();
+        $data = [
+            'status' => 'success',
+            'data' => $discount,
+        ];
+        return response()->json($data);
+    }
 }
