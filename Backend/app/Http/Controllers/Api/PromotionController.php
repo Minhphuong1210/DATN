@@ -20,7 +20,6 @@ class PromotionController extends Controller
                               ->where('start_date', '<=', now())
                               ->where('end_date', '>=', now())
                               ->first();
-    
         if (!$promotion) {
             return response()->json(['message' => 'Mã khuyến mãi không hợp lệ hoặc đã hết hạn'], 400);
         }

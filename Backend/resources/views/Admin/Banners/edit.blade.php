@@ -1,7 +1,7 @@
 <div>
     <!-- He who is contented is rich. - Laozi -->
 </div>
-@extends('Layout.admin')
+@extends('Layout.master')
 @section('title')
    Sửa banner
 @endsection

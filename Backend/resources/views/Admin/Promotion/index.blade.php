@@ -10,6 +10,10 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
+                    <h5 class="card-title align-content-center mb-2">Danh sách Promotion</h5>
+                    <a href="{{ route('admins.promotion.create') }}" class="btn btn-success">Thêm Promotion</a>
+                </div>
+                <div class="card-header">
                     <h5 class="card-title mb-0">Basic Datatables</h5>
                 </div>
                 <div class="card-body">

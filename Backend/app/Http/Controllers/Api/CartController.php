@@ -89,7 +89,12 @@ class CartController extends Controller
                     $sizeName= $productDetail->productSize->name;
                     $NameProduct=$productDetail->product->name;
                     $ImageProduct=$productDetail->product->image;
-                    $PriceProduct=$productDetail->product->price;
+                    if($productDetail->product->price_sale){
+
+                        $PriceProduct=$productDetail->product->price_sale;
+                    }else{
+                        $PriceProduct=$productDetail->product->price;
+                    }
                     $id = $detail->id;
                     if ($productDetail) {
                         $productsDetails[] = [
