@@ -27,6 +27,7 @@ class ProductController extends Controller
         return view('Admin.Product.index', compact('Product'));
     }
 
+
     /**
      * Show the form for creating a new resource.
      */
@@ -263,4 +264,5 @@ class ProductController extends Controller
     
         return redirect()->route('admins.product.index')->with('success', 'Xóa sản phẩm thành công');
     }
+
 }

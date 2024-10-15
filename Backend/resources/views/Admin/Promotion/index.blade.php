@@ -60,18 +60,19 @@
                                         <td>{{ $item->status }}</td>
                                         <td>
                                             <div class="d-flex ">
-                                                <form action="{{ route('admins.promotion.destroy', $item) }}"
-                                                    method="post">
+                                                <form action="{{ route('admins.promotion.destroy', $item) }}" method="post">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button class="btn btn-danger"
-                                                        onclick="return confirm('Bạn có chắc chắn xóa không?') ">Delete</button>
+                                                    <button class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn xóa không?')" style="border: none; background: none;">
+                                                        <i class="fas fa-trash-alt text-danger"></i> <!-- Icon xóa -->
+                                                    </button>
                                                 </form>
-                                                <a href="{{ route('admins.promotion.edit', $item) }}"
-                                                    class="btn btn-success ms-2 ">Edit</a>
+                                                <a href="{{ route('admins.promotion.edit', $item) }}" class="btn btn-success ms-2" style="border: none; background: none;">
+                                                    <i class="fas fa-edit text-success"></i> <!-- Icon sửa -->
+                                                </a>
                                             </div>
-
                                         </td>
+                                        
 
                             </tr>
                             @endforeach
