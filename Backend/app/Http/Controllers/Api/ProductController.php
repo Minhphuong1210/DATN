@@ -110,7 +110,7 @@ class ProductController extends Controller
     }
     public function search(Request $request)
     {
-        $query = $request->input('q', '');
+        $query = $request->input('q');
 
         // Thêm logic tìm kiếm sản phẩm của bạn
         $products = Product::where('name', 'like', '%' . $query . '%')
