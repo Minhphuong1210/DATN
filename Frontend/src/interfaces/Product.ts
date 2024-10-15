@@ -13,8 +13,8 @@ export interface Product {
     variants: ProductVariants;
     description: string;
     sub_category_id: string
-    // color: Colors[]
-    // size: Sizes[]
+    price_sale: number
+
 }
 export interface ApiResponse {
     status: string;
@@ -34,8 +34,14 @@ export interface Sizes {
     id: string
     name: string
 }
-export interface Comment{
-    id:string,
-    rating:string,
-    comment:string
+export interface Comment {
+    id: string,
+    rating: string,
+    comment: string
+}
+export interface Discount {
+    id: number,
+    discount_percent: number,
+    is_active: number,
+    sub_category_id: number
 }

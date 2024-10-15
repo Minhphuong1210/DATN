@@ -1,7 +1,7 @@
 <div>
     <!-- You must be the change you wish to see in the world. - Mahatma Gandhi -->
 </div>
-@extends('Layout.admin')
+@extends('Layout.master')
 @section('title')
     danh sách đơn hàng
 @endsection
@@ -47,10 +47,9 @@
     
     
                                         <td>{{ $item->created_at->format('d-m-y') }}</td>
-                                        <td>{{ $item->order_status }}</td>
+                                        <td>{{ $trangThaiDonHang[$item->order_status] ?? 'Không xác định' }}</td>
                                         <td>{{ number_format($item->total_amount) }}</td>
                                         <td>
-    
                                             <form action="{{ route('admins.orders.update', $item->id) }}" method="post">
                                                 @csrf
                                                 @method('PUT')
@@ -98,7 +97,7 @@
     </div>
 </div>
 @endsection
-@section('js')
+@section('script-libs')
     <script>
         function confirmSubmit(selectElement) {
             if (confirm("bạn có chắc muốn thay đổi trạng thái đơn hàng ")) {

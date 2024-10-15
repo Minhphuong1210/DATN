@@ -1,4 +1,4 @@
-@extends('Layout.admin')
+@extends('Layout.master')
 
 @section('title')
 Product Size
