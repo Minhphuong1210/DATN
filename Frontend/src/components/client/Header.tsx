@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import yourImage from "../../public/images/logofix.png";
 import { AlignJustify, Search, ShoppingCart, User, X } from "lucide-react";
+import { useCart } from "../../context/Cart";
 
 interface HeaderProps {
   isMobile: boolean;
@@ -8,6 +9,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [openMenu, setOpenMenu] = useState(false);
+  const { cartQuantity } = useCart();
 
   const handleMenu = () => {
     setOpenMenu(!openMenu);
@@ -123,11 +125,15 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             className="hidden cursor-pointer text-slate-500 hover:text-black md:block lg:block"
           />
           <a href="/cart">
-            <ShoppingCart
-              size={25}
-              className="cursor-pointer text-slate-500 hover:text-black"
-            />
-          </a>
+      <div className="relative">
+        <ShoppingCart size={25} className="cursor-pointer text-slate-500 hover:text-black" />
+        {cartQuantity > 0 && (
+          <span className="absolute top-0 right-0 rounded-full bg-red-500 text-white text-xs px-2">
+            {cartQuantity}
+          </span>
+        )}
+      </div>
+    </a>
           <a href="/login">
             <User
               size={25}
