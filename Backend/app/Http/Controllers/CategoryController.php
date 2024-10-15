@@ -79,7 +79,7 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
         $category->subCategories()->delete();
-        $category->discounts()->delete();
+        // $category->discounts()->delete();
         $category->delete();
         return redirect()->route('admins.category.index')->with('success', 'Xóa danh mục thành công');
     }

@@ -114,10 +114,7 @@ class ApiProductController extends Controller
     }
 
     public function Banner()
-
-
-
-{
+    {
 
         $banner = Banner::all();
         $data = [
@@ -135,7 +132,7 @@ class ApiProductController extends Controller
         $note = $request->note;
 
         try {
-            Mail::to($yourEmail)->send(new ContasUsMail($yourEmail,$email, $name, $phone, $note));
+            Mail::to($yourEmail)->send(new ContasUsMail($yourEmail, $email, $name, $phone, $note));
             return response()->json(['success' => 'Gửi contact thành công']);
         } catch (\Throwable $th) {
             Log::error('Error sending email: ' . $th->getMessage());
