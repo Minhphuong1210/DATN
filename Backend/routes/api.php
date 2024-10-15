@@ -14,7 +14,6 @@ use App\Http\Controllers\Api\ProductController;
 
 
 use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\ApiProductController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
