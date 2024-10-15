@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductColorController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\DiscountController;
@@ -129,6 +130,17 @@ Route::prefix('admins')
                 Route::put('/{id}/update', [ProductController::class, 'update'])->name('update');
                 Route::delete('/{id}/destroy', [ProductController::class, 'destroy'])->name('destroy');
             }); 
+            Route::prefix('product_colors')
+            ->as('product_colors.')
+            ->group(function () {
+                Route::get('/', [ProductColorController::class, 'index'])->name('index');
+                Route::get('/create', [ProductColorController::class, 'create'])->name('create');
+                Route::post('/store', [ProductColorController::class, 'store'])->name('store');
+                Route::get('/show/{id}', [ProductColorController::class, 'show'])->name('show');
+                Route::get('/{id}/edit', [ProductColorController::class, 'edit'])->name('edit');
+                Route::put('/{id}/update', [ProductColorController::class, 'update'])->name('update');
+                Route::delete('/{id}/destroy', [ProductColorController::class, 'destroy'])->name('destroy');
+            });
 
     });
  
