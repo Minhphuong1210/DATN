@@ -17,6 +17,15 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PaymentController;
 
 
+<<<<<<< HEAD
+=======
+
+
+
+use App\Http\Controllers\Api\PaymentController;
+
+
+>>>>>>> 922ae2ddb7d5de060aa91569725da3e4daf8dea7
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -57,10 +66,13 @@ Route::get('/promotion',[ ApiProductController::class,'promotion']);
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 // banner
 Route::get('/banner', [ApiProductController::class,'Banner']);
+<<<<<<< HEAD
 // Tìm sản phẩm theo danh mục
 Route::get('/category/{name}/products', [ProductController::class, 'getProductsByCategory']);
 // Lọc
 // Route::get('/products/filter', [ProductController::class, 'filter']);
+=======
+>>>>>>> 922ae2ddb7d5de060aa91569725da3e4daf8dea7
 
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
