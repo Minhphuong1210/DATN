@@ -13,11 +13,13 @@ export const useOder = () => {
     const { loading, setLoading } = useLoading();
     const [isConfirmVisible, setConfirmVisible] = useState(false); // State cho modal confirm
     const [shippingInfo, setShippingInfo] = useState<any>(null); // State cho thông tin vận chuyển
+    const [apply, setApply] = useState()
 
     const getAllOder = async () => {
         try {
             setLoading(true);
             const resposive = await axios.get('/api/donhangs/create');
+            console.log(resposive.data.cart);
             serOders(resposive.data.cart);
         } catch (error) {
             console.log(error);
@@ -86,6 +88,14 @@ export const useOder = () => {
     const handleCloseModal = () => {
         setIsOrderSuccessful(false);
     };
+    const applyDiscount = async(value: any) =>{
+        try {
+             await axios.post('/api/applyPromotion', value) 
+        } catch (error) {
+            console.log(error);
+            
+        }
+    }
 
     return {
         oders,
@@ -97,6 +107,8 @@ export const useOder = () => {
         loading,
         isConfirmVisible,
         confirmOrder,
-        setConfirmVisible // Cho phép đóng modal confirm
+        setConfirmVisible, // Cho phép đóng modal confirm
+        apply,
+        applyDiscount
     };
 };

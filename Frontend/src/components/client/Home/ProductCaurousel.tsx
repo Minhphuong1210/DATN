@@ -2,12 +2,14 @@ import React from 'react';
 import { useProductPagination, useProductSwipe } from '../../../hook/useProductCarousel';
 import { ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart } from 'lucide-react';
 import { Product } from '../../../interfaces/Product';
+import { useDiscount } from '../../../hook/Discount';
 
 // Thay thế bằng các import phù hợp
 
 const ProductCarousel = ({ products }: { products: Product[] }) => {
     const { currentProducts, handleNext, handlePrev } = useProductPagination(products);
     const swipeHandlers = useProductSwipe(handleNext, handlePrev);
+    const {discounts}= useDiscount()
 
     return (
         <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
@@ -16,12 +18,18 @@ const ProductCarousel = ({ products }: { products: Product[] }) => {
                 {...swipeHandlers}
             >
 
-
                 {currentProducts.map((product, index) => (
                     <div
                         className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
                         key={index}
                     >
+                            {discounts.map((dis, index)=>{
+                                return(
+                        <div className='absolute top-1 right-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold'>
+                              {dis.discount_percent}%      
+                        </div>
+                                )
+                            })}
                         <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
                             <img
                                 src={product.image}
@@ -60,10 +68,10 @@ const ProductCarousel = ({ products }: { products: Product[] }) => {
                             </div>
                             <div className="text-center block">
                                 <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-                                    399.000đ
+                                {product.price}.000đ
                                 </span>
                                 <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                    {product.price}.000đ
+                                    {product.price_sale}.000đ
                                 </span>
                             </div>
                         </a>
