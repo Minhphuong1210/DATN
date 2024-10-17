@@ -26,7 +26,7 @@ const Home = () => {
                 <div className="lg:mx-[150px]">
                     <h1 className="mb-4 mt-8 text-center text-2xl">SẢN PHẨM HOT</h1>
                     <hr />
-                    <ProductCarousel products={productsHots} />
+                    <ProductCarousel productsHot={productsHots} />
                 </div>
                 {/* Banner */}
                 <div className="mb-10 h-96 overflow-hidden" >
