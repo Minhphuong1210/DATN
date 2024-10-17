@@ -6,8 +6,9 @@ use App\Models\Wishlist;
 
 use App\Models\WishlistsDetail;
 use App\Http\Controllers\Controller;
-use Auth;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ApiWishlistController extends Controller
 {
