@@ -4,7 +4,14 @@ import { OderProducts, OderTotal, Order } from "../interfaces/oder";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
-
+interface DataType {
+    key: React.Key;
+    name: string;
+    age: number;
+    address: string;
+    orderID: string;
+    status: string;
+}
 export const useOder = () => {
     const [oders, serOders] = useState<OderProducts[]>([]);
     const [total, serTotal] = useState<OderTotal>();
@@ -14,6 +21,8 @@ export const useOder = () => {
     const [isConfirmVisible, setConfirmVisible] = useState(false); // State cho modal confirm
     const [shippingInfo, setShippingInfo] = useState<any>(null); // State cho thông tin vận chuyển
     const [apply, setApply] = useState()
+    const [myOrder, setMyOrder] = useState<DataType[]>([]);
+    const [myOrderStatus, setMyStatus] = useState();
 
     const getAllOder = async () => {
         try {
@@ -88,15 +97,27 @@ export const useOder = () => {
     const handleCloseModal = () => {
         setIsOrderSuccessful(false);
     };
-    const applyDiscount = async(value: any) =>{
+    const applyDiscount = async (value: any) => {
         try {
-             await axios.post('/api/applyPromotion', value) 
+            await axios.post('/api/applyPromotion', value)
         } catch (error) {
             console.log(error);
-            
+
         }
     }
+    const getMyOrder = async () => {
+        try {
+            const response = await axios.get('/api/donhangs')
+            setMyOrder(response.data.chitietDonHang)
+            setMyStatus(response.data.trangThaiDonHang);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
+    useEffect(() => {
+        getMyOrder();
+    }, []);
     return {
         oders,
         total,
@@ -109,6 +130,8 @@ export const useOder = () => {
         confirmOrder,
         setConfirmVisible, // Cho phép đóng modal confirm
         apply,
-        applyDiscount
+        applyDiscount,
+        myOrder,
+        myOrderStatus
     };
 };

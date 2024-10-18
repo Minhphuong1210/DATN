@@ -13,6 +13,8 @@ import Cart from './pages/client/Cart';
 import Login from './pages/Login';
 import PaymentMomo from './pages/client/PaymentMomo';
 import Contact from './pages/client/Contact';
+import AllProducts from './pages/client/AllProducts';
+import Order from './pages/client/Order';
 
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
           <Route path="checkout" element={<Checkout />} />
           <Route path="payment" element={<PaymentMomo />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="allproducts" element={<AllProducts />} />
+          <Route path="order" element={<Order />} />
         </Route>
       </Routes>
       <ToastContainer />

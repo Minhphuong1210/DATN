@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\PaymentController;
 
 
 
-use App\Http\Controllers\Api\PaymentController;
+
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
