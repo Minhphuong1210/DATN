@@ -59,6 +59,9 @@ Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 Route::get('/banner', [ApiProductController::class,'Banner']);
 // Tìm sản phẩm theo danh mục
 Route::get('/category/{name}/products', [ProductController::class, 'getProductsByCategory']);
+// 
+Route::get('/filter-products', [ProductController::class, 'filter']);
+
 
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);

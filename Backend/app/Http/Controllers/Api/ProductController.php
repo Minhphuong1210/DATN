@@ -157,41 +157,46 @@ class ProductController extends Controller
         return response()->json($products);
     }
     
-    // public function filter(Request $request)
-    // {
-    //     // Nhận tham số từ request (tên màu sắc và kích thước)
-    //     $colorName = $request->input('color_name');
-    //     $sizeName = $request->input('size_name');
-    //     // Tạo query ban đầu
-    //     $query = ProductDetail::query();
+    public function filter(Request $request)
+{
+    // Nhận tham số từ request (tên màu sắc và kích thước)
+    $colorName = $request->input('color_name');
+    $sizeName = $request->input('size_name');
+    
+    // Tạo query ban đầu
+    $query = ProductDetail::query();
 
-    //     // Lọc theo tên màu sắc nếu có
-    //     if ($colorName) {
-    //         $query->whereHas('color', function ($q) use ($colorName) {
-    //             $q->where('name', 'like', '%' . $colorName . '%');
-    //         });
-    //     }
+    // Lọc theo tên màu sắc nếu có
+    if ($colorName) {
+        $query->whereHas('color', function ($q) use ($colorName) {
+            $q->where('name', '=', $colorName); // Tìm kiếm chính xác màu sắc
+        });
+    }
 
-    //     // Lọc theo tên kích thước nếu có
-    //     if ($sizeName) {
-    //         $query->whereHas('size', function ($q) use ($sizeName) {
-    //             $q->where('name', 'like', '%' . $sizeName . '%');
-    //         });
-    //     }
+    // Lọc theo tên kích thước nếu có
+    if ($sizeName) {
+        $query->whereHas('size', function ($q) use ($sizeName) {
+            $q->where('name', '=', $sizeName); // Tìm kiếm chính xác kích thước
+        });
+    }
 
-    //     // Lấy các sản phẩm với thông tin sản phẩm, màu sắc và kích thước
-    //     $products = $query->with(['product', 'color', 'size'])->get();
+    // Thực hiện truy vấn sau khi áp dụng các điều kiện
+    $products = $query->with(['product', 'color', 'size'])->get();
 
-    //     // Kiểm tra xem có sản phẩm nào không
-    //     if ($products->isEmpty()) {
-    //         return response()->json([
-    //             'message' => 'Không tìm thấy sản phẩm nào phù hợp với màu sắc và kích thước bạn đã chọn.'
-    //         ], 404);
-    //     }
+    // Kiểm tra xem có sản phẩm nào không
+    if ($products->isEmpty()) {
+        return response()->json([
+            'message' => 'Không tìm thấy sản phẩm nào phù hợp với màu sắc và kích thước bạn đã chọn.'
+        ], 404);
+    }
 
-    //     // Trả về kết quả
-    //     return response()->json($products);
-    // }
+    // Trả về kết quả
+    return response()->json($products);
+}
+
+    
+    
+    
     
     
 
