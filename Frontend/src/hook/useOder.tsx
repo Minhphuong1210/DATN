@@ -5,12 +5,12 @@ import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
 interface DataType {
-    key: React.Key;
-    name: string;
-    age: number;
-    address: string;
-    orderID: string;
-    status: string;
+    order_id: string;
+    product_name: string;
+    image: string;
+    quantity: number;
+    price: number;
+    orderStatus: string;
 }
 export const useOder = () => {
     const [oders, serOders] = useState<OderProducts[]>([]);
@@ -22,7 +22,7 @@ export const useOder = () => {
     const [shippingInfo, setShippingInfo] = useState<any>(null); // State cho thông tin vận chuyển
     const [apply, setApply] = useState()
     const [myOrder, setMyOrder] = useState<DataType[]>([]);
-    const [myOrderStatus, setMyStatus] = useState();
+
 
     const getAllOder = async () => {
         try {
@@ -36,7 +36,6 @@ export const useOder = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         getAllOder();
     }, []);
@@ -109,7 +108,6 @@ export const useOder = () => {
         try {
             const response = await axios.get('/api/donhangs')
             setMyOrder(response.data.chitietDonHang)
-            setMyStatus(response.data.trangThaiDonHang);
         } catch (error) {
             console.log(error);
         }
@@ -132,6 +130,7 @@ export const useOder = () => {
         apply,
         applyDiscount,
         myOrder,
-        myOrderStatus
+        setMyOrder
+
     };
 };
