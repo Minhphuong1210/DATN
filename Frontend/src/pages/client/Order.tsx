@@ -40,7 +40,7 @@ const Order: React.FC = () => {
                         order.order_id === orderId
                             ? {
                                 ...order,
-                                orderStatus: action === "confirm" ? "Nhận" : "Đã hủy",
+                                orderStatus: action === "confirm" ? "Nhận" : "Hủy hàng",
                             }
                             : order
                     )

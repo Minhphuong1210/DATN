@@ -186,7 +186,7 @@ const Checkout = () => {
                                         <div key={index} className="w-full mx-auto text-gray-800 font-light mb-6 border-b border-gray-200 pb-6">
                                             <div className="w-full flex items-center">
                                                 <div className="overflow-hidden rounded-lg w-16 h-16 bg-gray-50 border border-gray-200">
-                                                    <img src={oder.ImageProduct} />
+                                                    <img src={oder.imageUrl} />
                                                 </div>
                                                 <div className="flex-grow pl-3">
                                                     <h6 className="font-semibold uppercase text-gray-600">{oder.NameProduct}</h6>

@@ -43,14 +43,15 @@ class ApiOrderController extends Controller
         ];
     });
 
-    $arrayChitietDonHang = $donHangs->flatMap(function($donHang) {
-        return $donHang->orderDetail->map(function($detail) {
+    $arrayChitietDonHang = $donHangs->flatMap(function($donHang) use ($trangThaiDonHang) {
+        return $donHang->orderDetail->map(function($detail) use ($donHang, $trangThaiDonHang) {
             return [
-                'image' => $detail->productDetail->product->image,
-                'product_name' => $detail->productDetail->product->name ,
-                'quantity' => $detail->quantity,
-                'price' => $detail->price,
-                'order_id' => $detail->id
+                'image' => $detail->productDetail->product->image, 
+                'product_name' => $detail->productDetail->product->name, 
+                'quantity' => $detail->quantity, 
+                'price' => $detail->price, 
+                'order_id' => $detail->id, 
+                'orderStatus' => $trangThaiDonHang[$donHang->order_status] 
             ];
         });
     });
@@ -137,6 +138,7 @@ class ApiOrderController extends Controller
                         'quantity' => $detail->quantity,
                         'price' => $detail->price,
                         'subtotal' => $itemSubtotal,
+                        'imageUrl' => 'http://127.0.0.1:8000/storage/' . $ImageProduct
                     ];
                 }
             } else {
@@ -256,14 +258,17 @@ class ApiOrderController extends Controller
         DB::beginTransaction();
         try {
             if ($request->has('huy_don_hang')) {
-                $donHang->update(['trang_thai_don_hang' => Order::HUY_HANG]);
+                $donHang['order_status'] =Order::HUY_HANG;
+                $donHang->save();
+             
                 DB::commit();
                 return response()->json([
                     'success' => true,
                     'message' => 'Đơn hàng đã được hủy thành công.'
                 ], 200);
             } else if ($request->has('da_nhan_hang')) {
-                $donHang->update(['trang_thai_don_hang' => Order::DA_NHAN_HANG]);
+                $donHang['order_status'] =Order::DA_NHAN_HANG;
+                $donHang->save();
                 DB::commit();
                 return response()->json([
                     'success' => true,

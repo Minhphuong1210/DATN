@@ -56,4 +56,7 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function shipping(){
+        return $this->hasOne(Shipping::class,'id','shipping_id');
+    }
 }

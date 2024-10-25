@@ -34,12 +34,9 @@ const Home = () => {
                 </div >
                 {/* SP SALE */}
                 <div className=" lg:mx-[150px] ">
-                    <h1 className="mb-4 mt-8 text-center text-2xl">SẢN PHẨM HOT</h1>
+                    <h1 className="mb-4 mt-8 text-center text-2xl">SẢN PHẨM Khuyến Mại</h1>
                     <hr />
-                    <ProductCarousel products={productsSale} />
-
-
-
+                    <ProductCarousel productsHot={productsSale} />
                 </div >
                 <div className="mx-[150px] mt-16 flex justify-center gap-4">
                     <div className="h-[600px] w-[600px]">
