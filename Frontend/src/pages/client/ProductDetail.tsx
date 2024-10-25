@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import yourImage from "../../public/images/AoPolo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
@@ -6,7 +6,7 @@ import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProduct } from "../../hook/Product"; import { toast } from "react-toastify";
-import { Colors, Product, Sizes } from "../../interfaces/Product";
+import { Colors, Product, Sizes, Comment } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
 import axios from "axios";
 
@@ -14,7 +14,7 @@ import axios from "axios";
 
 
 const ProductDetail: React.FC = () => {
-    const { product } = useProduct();
+    const { product, comments, ProductBycategorys } = useProduct();
     const [selectSize, setSelectSize] = useState<Sizes>({ id: '', name: '' });
     const [selectColor, setSelectColor] = useState<Colors>({ id: '', name: '', color_code: '' });
     const [quantity, setQuantity] = useState(1);
@@ -22,7 +22,60 @@ const ProductDetail: React.FC = () => {
     const [showComment, setShowComment] = useState(false);
     const { color, size } = useColor();
     const token = localStorage.getItem('token');
-    
+    const [addcomment, setAddcomment] = useState({
+        comment: '',
+        rating: '',
+        parent_id: '',
+        product_id: product ? product.id : '',
+    });
+
+    const [loading, setLoading] = useState(false); 
+
+    useEffect(() => {
+        setAddcomment(prev => ({
+            ...prev,
+            product_id: product ? product.id : '',
+        }));
+    }, [product]);
+
+    const handleChangeComment = (e) => {
+        const { name, value } = e.target;
+        setAddcomment({
+            ...addcomment,
+            [name]: value,
+        });
+    };
+    const handleSubmitComment = async (e) => {
+        e.preventDefault();
+        console.log(addcomment); 
+        const id = product.id;
+        try {
+            if (!token) {
+                toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
+                nav('/login')
+            }
+            setLoading(true);
+            const response = await axios.post(`/api/comment/${id}`, {
+                comment: addcomment.comment,
+                rating: addcomment.rating,
+                parent_id: addcomment.parent_id,
+                product_id: addcomment.product_id,
+            });
+            toast.success("Bình luận thành công");
+            // Reset form sau khi gửi thành công
+            setAddcomment({
+                comment: '',
+                rating: '',
+                parent_id: '',
+                product_id: product ? product.id : '',
+            });
+            // window.location.reload();
+        } catch (error) {
+            toast.error("bạn cần mua sản phẩm mới được bình luận");
+        } finally {
+            setLoading(false);
+        }
+    };
     // Tăng giảm sô lượng
     const incurement = () => {
         setQuantity((prevQuantity) => prevQuantity + 1);
@@ -56,74 +109,33 @@ const ProductDetail: React.FC = () => {
         setShowDescription(false);
     };
     const nav = useNavigate()
-    // const handleAddToCart = async (
-    //     product: Product,
-    //     color_id: string,
-    //     size_id: string,
-    //     quantity: number,
-
-    // ) => {
-    //     console.log('Product:', product.id);
-    //     console.log('Selected Color:', color_id);
-    //     console.log('Selected Size:', size_id);
-    //     console.log('Quantity:', quantity);
-    //     try {
-    //         if (!token) {
-    //             toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
-    //             nav('/login')
-    //         }
-    //         await axios.post('/api/cart/add', {
-    //             id: product.id,
-    //             color_id,
-    //             size_id,
-    //             quantity,
-    //             price: product.price
-    //         });
-    //         toast.success('Thêm sản phẩm vào giỏ hàng thành công');
-    //         nav('/cart');
-    //     } catch (error) {
-    //         console.error('Error adding to cart:', error);
-    //     }
-
-    // };
     const handleAddToCart = async (
         product: Product,
         color_id: string,
         size_id: string,
         quantity: number,
+
     ) => {
-        console.log('Product:', product.id);
-        console.log('Selected Color:', color_id);
-        console.log('Selected Size:', size_id);
-        console.log('Quantity:', quantity);
-    
+
         try {
             if (!token) {
-                toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
-                nav('/login');
-                return;
+                toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
+                nav('/login')
             }
-    
-            // Kiểm tra giá: Nếu có price_sale thì dùng price_sale, nếu không dùng giá gốc product.price
-            const price = product.price_sale ? product.price_sale : product.price;
-            console.log(price);
-            
             await axios.post('/api/cart/add', {
                 id: product.id,
                 color_id,
                 size_id,
                 quantity,
-                price
+                price: product.price
             });
-            
             toast.success('Thêm sản phẩm vào giỏ hàng thành công');
             nav('/cart');
         } catch (error) {
             console.error('Error adding to cart:', error);
-            toast.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
         }
+
     };
-    
 
     return (
         <>
@@ -178,7 +190,7 @@ const ProductDetail: React.FC = () => {
                             <form action="">
                                 <div>
                                     <div className="mb-2 flex justify-between text-sm md:block">
-                                        
+
                                         <span className="hover:text-yellow-400 md:mr-11">
                                             <a href="">Giúp bạn chọn size</a>
                                         </span>
@@ -187,31 +199,31 @@ const ProductDetail: React.FC = () => {
                                         </span>
                                     </div>
                                     <div className="mb-2 mt-3 text-sm">
-                                    <span>Màu Sắc:{selectColor.name} </span>
-                                    <div className="mt-2 flex space-x-2">
-                                        {color.map((color, index) => {
-                                            return (
-                                                <div key={index} className="inline-flex items-center">
-                                                    <label className="relative flex cursor-pointer items-center">
-                                                        <input
-                                                            type="radio"
-                                                            name={color.name}
-                                                            value={color.id}
-                                                            checked={selectColor.id === color.id}
-                                                            onChange={(event) => handleChangeColor(event, color.name)}
-                                                            className="peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
-                                                            style={{ backgroundColor: color.color_code }}
-                                                        />
-                                                    </label>
+                                        <span>Màu Sắc:{selectColor.name} </span>
+                                        <div className="mt-2 flex space-x-2">
+                                            {color.map((color, index) => {
+                                                return (
+                                                    <div key={index} className="inline-flex items-center">
+                                                        <label className="relative flex cursor-pointer items-center">
+                                                            <input
+                                                                type="radio"
+                                                                name={color.name}
+                                                                value={color.id}
+                                                                checked={selectColor.id === color.id}
+                                                                onChange={(event) => handleChangeColor(event, color.name)}
+                                                                className="peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
+                                                                style={{ backgroundColor: color.color_code }}
+                                                            />
+                                                        </label>
 
-                                                </div>
-                                            );
-                                        })}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
                                     <div>
                                         <div className="inline-flex items-center text-sm md:block md:mr-11 md:mt-3">
-                                        <span className="md:mr-11  uppercase">Kích thước: {selectSize.name}</span>
+                                            <span className="md:mr-11  uppercase">Kích thước: {selectSize.name}</span>
                                             <div className="flex space-x-2">
                                                 {size.map((size, index) => {
                                                     return (
@@ -234,7 +246,7 @@ const ProductDetail: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </form>
                             <div className="mt-5">Mô tả:</div>
                             <div className="m-2">
@@ -313,121 +325,61 @@ const ProductDetail: React.FC = () => {
                                     </span>
                                 </div>
                                 <div className="ml-2 lg:mx-20 h-[500px] overflow-y-scroll">
-                                    <div className="mb-3 ">
-                                        <div className="flex items-center">
-                                            <div className="mr-2">
-                                                <User
-                                                    size={25}
-                                                    strokeWidth={1.5}
-                                                    className="rounded-full bg-slate-300 p-1"
-                                                />
+
+                                    {comments.map((comment) => (
+                                        <div className="mb-3" key={comment.id}>
+                                            <div className="flex items-center">
+                                                <div className="mr-2">
+                                                    <User
+                                                        size={25}
+                                                        strokeWidth={1.5}
+                                                        className="rounded-full bg-slate-300 p-1"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <div>{comment.user.name}</div>
+                                                    <span className="flex text-[10px]">
+                                                        {Array.from({ length: 5 }, (_, index) => (
+                                                            <FontAwesomeIcon
+                                                                key={index}
+                                                                icon={index < comment.rating ? faStarSolid : faStarRegular}
+                                                            />
+                                                        ))}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div>Hoàng Hùng</div>
-                                                <span className="flex text-[10px]">
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarRegular} />
-                                                </span>
+
+                                            <div className="ml-8 mb-1">
+                                                {comment.content}
                                             </div>
-                                        </div>
-                                        <span className="ml-8 text-xs opacity-70">
-                                            Phân loại: S, Đỏ
-                                        </span>
-                                        <div className="ml-8 mb-1">
-                                            Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
-                                            Bông tẩy trang dùng được ko bị mủn , nói chung là được
-                                        </div>
-                                        <div className="ml-8 flex">
-                                            <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
-                                            <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
-                                        </div>
-                                        <div className="ml-8 text-sm opacity-70 mt-1">
-                                            Ngày đăng: 2021-08-14
-                                        </div>
-                                    </div>
-                                    <div className="mb-3">
-                                        <div className="flex items-center">
-                                            <div className="mr-2">
-                                                <User
-                                                    size={25}
-                                                    strokeWidth={1.5}
-                                                    className="rounded-full bg-slate-300 p-1"
-                                                />
-                                            </div>
-                                            <div>
-                                                <div>Hoàng Hùng</div>
-                                                <span className="flex text-[10px]">
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarRegular} />
-                                                </span>
+                                            <div className="ml-8 text-sm opacity-70 mt-1">
+                                                Ngày đăng: {new Date(comment.created_at).toLocaleDateString()}
                                             </div>
                                         </div>
-                                        <span className="ml-8 text-xs opacity-70">
-                                            Phân loại: S, Đỏ
-                                        </span>
-                                        <div className="ml-8 mb-1">
-                                            Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
-                                            Bông tẩy trang dùng được ko bị mủn , nói chung là được
-                                        </div>
-                                        <div className="ml-8 flex">
-                                            <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
-                                            <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
-                                        </div>
-                                        <div className="ml-8 text-sm opacity-70 mt-1">
-                                            Ngày đăng: 2021-08-14
-                                        </div>
-                                    </div>
-                                    <div className="mb-3">
-                                        <div className="flex items-center">
-                                            <div className="mr-2">
-                                                <User
-                                                    size={25}
-                                                    strokeWidth={1.5}
-                                                    className="rounded-full bg-slate-300 p-1"
-                                                />
-                                            </div>
-                                            <div>
-                                                <div>Hoàng Hùng</div>
-                                                <span className="flex text-[10px]">
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarSolid} />
-                                                    <FontAwesomeIcon icon={faStarRegular} />
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <span className="ml-8 text-xs opacity-70">
-                                            Phân loại: S, Đỏ
-                                        </span>
-                                        <div className="ml-8 mb-1">
-                                            Giao hàng nhanh ok , đúng như hình ảnh trên hình , giá thành hợp lý .
-                                            Bông tẩy trang dùng được ko bị mủn , nói chung là được
-                                        </div>
-                                        <div className="ml-8 flex">
-                                            <img className="mr-3 h-[100px] w-[75px]" src={yourImage} alt="" />
-                                            <img className="h-[100px] w-[75px]" src={yourImage} alt="" />
-                                        </div>
-                                        <div className="ml-8 text-sm opacity-70 mt-1">
-                                            Ngày đăng: 2021-08-14
-                                        </div>
-                                    </div>
+                                    ))}
+
                                     <hr className="mr-2 mt-3" />
 
                                 </div>
                                 <div className=" lg:flex justify-center">
                                     <div className="w-full mx-20 mt-10">
-                                        <form>
-                                            <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 ">
-                                                <div className="px-4 py-2 bg-white rounded-t-lg ">
+                                        <form onSubmit={handleSubmitComment}>
+                                            <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                                <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
                                                     <label htmlFor="comment" className="sr-only">Your comment</label>
-                                                    <textarea id="comment" rows={4} className="w-full px-0 text-sm text-black bg-white border-0 outline-none  focus:ring-0  dark:placeholder-gray-400 pt-4 ml-4" placeholder="Viết đánh giá của bạn về sản phẩm..." required defaultValue={""} />
+                                                    <textarea
+                                                        id="comment"
+                                                        name="comment"
+                                                        rows={4}
+                                                        className="w-full px-0 text-sm text-gray-900 bg-white border-0 outline-none dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400 pt-4 ml-4"
+                                                        placeholder="Viết đánh giá của bạn về sản phẩm..."
+                                                        required
+                                                        value={addcomment.comment}
+                                                        onChange={handleChangeComment}
+                                                    />
+                                                    <input type="hidden" name="product_id" value={addcomment.product_id}
+                                                        onChange={handleChangeComment}
+                                                    />
                                                 </div>
                                                 <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
                                                     <button type="submit" className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
@@ -468,261 +420,61 @@ const ProductDetail: React.FC = () => {
                     <h1 className="mb-5 text-center text-lg">CÓ THỂ BẠN SẼ THÍCH</h1>
                     <div className=" overflow-hidden">
                         <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 ">
-                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
-                                <div
-                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
-
-                                >
-
-
-
-                                    <div
-                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
-
-                                    >
-                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
-                                            <img
-                                                src={product.image}
-                                                alt={product.image}
-                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
-                                            />
-                                        </div>
-                                        <div className="relative">
-                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Eye
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </a>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <ShoppingCart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </div>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Heart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
+                            {ProductBycategorys.map((ProductBycategory) => (
+                                <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 " key={ProductBycategory.id}>
+                                    <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                                        <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw]">
+                                            <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                                <img
+                                                    src={ProductBycategory.image || 'default-image-url.jpg'}
+                                                    alt={ProductBycategory.name}
+                                                    className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                                />
+                                            </div>
+                                            <div className="relative">
+                                                <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                    <a href={`/productdetail/${ProductBycategory.id}/subcate/${ProductBycategory.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                        <Eye
+                                                            color="currentColor"
+                                                            strokeWidth="1.5"
+                                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                        />
+                                                    </a>
+                                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                        <ShoppingCart
+                                                            color="currentColor"
+                                                            strokeWidth="1.5"
+                                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                        />
+                                                    </div>
+                                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                        <Heart
+                                                            color="currentColor"
+                                                            strokeWidth="1.5"
+                                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <a href={`/productdetail/${ProductBycategory.id}/subcate/${ProductBycategory.sub_category_id}`} className="block overflow-hidden">
+                                                <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                    {ProductBycategory.name}
+                                                </div>
+                                                <div className="text-center block">
+                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(399000)} {/* Giá cũ */}
+                                                    </span>
+                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ProductBycategory.price)} {/* Giá hiện tại */}
+                                                    </span>
+                                                </div>
+                                            </a>
                                         </div>
-                                        <a href="#" className="block overflow-hidden">
-                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
-                                                {product.name}
-                                            </div>
-                                            <div className="text-center block">
-                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-                                                    399.000đ
-                                                </span>
-                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                    {product.price}.000đ
-                                                </span>
-                                            </div>
-                                        </a>
                                     </div>
-
-
-
                                 </div>
-                            </div>
-                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
-                                <div
-                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
-
-                                >
-
-
-
-                                    <div
-                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
-
-                                    >
-                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
-                                            <img
-                                                src={product.image}
-                                                alt={product.image}
-                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
-                                            />
-                                        </div>
-                                        <div className="relative">
-                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Eye
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </a>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <ShoppingCart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </div>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Heart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="#" className="block overflow-hidden">
-                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
-                                                {product.name}
-                                            </div>
-                                            <div className="text-center block">
-                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-                                                    399.000đ
-                                                </span>
-                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                    {product.price}.000đ
-                                                </span>
-                                            </div>
-                                        </a>
-                                    </div>
-
-
-
-                                </div>
-                            </div>
-                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
-                                <div
-                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
-
-                                >
-
-                                    <div
-                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
-
-                                    >
-                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
-                                            <img
-                                                src={product.image}
-                                                alt={product.image}
-                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
-                                            />
-                                        </div>
-                                        <div className="relative">
-                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Eye
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </a>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <ShoppingCart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </div>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Heart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="#" className="block overflow-hidden">
-                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
-                                                {product.name}
-                                            </div>
-                                            <div className="text-center block">
-                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-                                                    399.000đ
-                                                </span>
-                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                    {product.price}.000đ
-                                                </span>
-                                            </div>
-                                        </a>
-                                    </div>
-
-
-
-                                </div>
-                            </div>
-                            <div className="relative mt-9 ml-3.5 md:ml-4 lg:ml-3 ">
-                                <div
-                                    className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
-
-                                >
-
-
-
-                                    <div
-                                        className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] "
-
-                                    >
-                                        <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
-                                            <img
-                                                src={product.image}
-                                                alt={product.image}
-                                                className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
-                                            />
-                                        </div>
-                                        <div className="relative">
-                                            <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Eye
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </a>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <ShoppingCart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </div>
-                                                <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                    <Heart
-                                                        color="currentColor"
-                                                        strokeWidth="1.5"
-                                                        className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="#" className="block overflow-hidden">
-                                            <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
-                                                {product.name}
-                                            </div>
-                                            <div className="text-center block">
-                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-                                                    399.000đ
-                                                </span>
-                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                    {product.price}.000đ
-                                                </span>
-                                            </div>
-                                        </a>
-                                    </div>
-
-
-
-                                </div>
-                            </div>
-
+                            ))}
                         </div>
                     </div>
-
-
                 </div>
             )}
         </>

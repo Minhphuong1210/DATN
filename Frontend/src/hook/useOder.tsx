@@ -77,7 +77,7 @@ export const useOder = () => {
                 total_amount: (total?.subtotal ?? 0) + shippingCost,
                 shipping_id: info.shippingMethod,
             };
-
+            console.log("Order Data:", orderData);
             setLoading(true);
             await axios.post('/api/donhangs/store', orderData);
             toast.success("Đặt hàng thành công");
@@ -87,6 +87,7 @@ export const useOder = () => {
             setIsOffBtn(true);
         } catch (error) {
             console.error("Error submitting order:", error);
+            
             alert("Error submitting order");
         } finally {
             setLoading(false);
