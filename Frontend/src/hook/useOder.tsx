@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { OderProducts, OderTotal, Order } from "../interfaces/oder";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
-import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
+// import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
 interface DataType {
     key: React.Key;
     name: string;
