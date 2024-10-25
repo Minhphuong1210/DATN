@@ -1,99 +1,98 @@
-import axios, { AxiosError } from "axios"
-import { Product } from "../interfaces/Product"
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { useLoading } from "../context/Loading"
+import axios, { AxiosError } from "axios";
+import { Comment, Product } from "../interfaces/Product";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
+
 export const useProduct = () => {
-    const [products, setProducts] = useState<Product[]>([])
-    const [product, setProduct] = useState<Product>()
+    const [products, setProducts] = useState<Product[]>([]);
+    const [product, setProduct] = useState<Product>();
     const [productsHots, setProductsHots] = useState<Product[]>([]);
     const [productsSale, setProductsSale] = useState<Product[]>([]);
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [ProductBycategorys, setProductBycategory] = useState<Product[]>([]);
     const { loading, setLoading } = useLoading();
     const { id, idd } = useParams();
-  
-    // console.log(id, idd);
-
-    //Lấy tất cả sản phẩm
-    const getAllProducts = async () => {
+    
+    
+    // để nhiều cái này bị lỗi api là 429
+    const fetchProducts = async () => {
         try {
-            setLoading(true)
-            const { data } = await axios.get('/api/products')
+            setLoading(true);
+            const { data } = await axios.get('/api/products');
             setProducts(data);
-
+            setProductsHots(data.products_hot);
+            setProductsSale(data.products_sale);
         } catch (error) {
             console.log(error);
-
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
+
     useEffect(() => {
-        getAllProducts();
-    }, [])
+        fetchProducts();
+    }, []);
 
-    // SANR PHẨM HOT 
-    const getProductsHot = async () => {
-        try {
-            setLoading(true)
-            const response = await axios.get('/api/products')
-            setProductsHots(response.data.products_hot);
-        } catch (error) {
-            console.log(error);
-
-        } finally {
-            setLoading(false)
-        }
-    }
-    useEffect(() => {
-        getProductsHot();
-    }, [])
-    // Lấy sản  phẩm Sale
-    const getProductsSale = async () => {
-        try {
-            setLoading(true)
-            const response = await axios.get('/api/products')
-            setProductsSale(response.data.products_sale);
-
-        } catch (error) {
-            console.log(error);
-
-        } finally {
-            setLoading(false)
-        }
-    }
-    useEffect(() => {
-        getProductsSale();
-    }, [])
-
-
-    // Lấy sản phẩm theo id 
+    // Lấy sản phẩm theo ID
     const getProductById = async (id: string, idd: string) => {
         try {
             setLoading(true);
-
-            // Combine the two IDs into the URL
             const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
-           
-            
-            // Log the response data
-            setProduct(response.data.Product
-            );
-
+            setProduct(response.data.Product);
         } catch (error) {
             toast.error((error as AxiosError)?.message);
         } finally {
             setLoading(false);
         }
-    }
-    
-
+    };
 
     useEffect(() => {
-        if (!id || !idd) return;
-        getProductById(id, idd);
+        if (id && idd) {
+            getProductById(id, idd);
+        }
     }, [id, idd]);
 
+    // Lấy bình luận theo sản phẩm
+    const getComment = async (id: string) => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
+            setComments(response.data.comments);
+        } catch (error) {
+            toast.error((error as AxiosError)?.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    return { products, product, loading, productsHots, productsSale }
-}
+    useEffect(() => {
+        if (id) {
+            getComment(id);
+        }
+    }, [id]);
+
+    // Lấy sản phẩm theo danh mục
+    const getProductBycategory = async (id: string, idd: string) => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
+            setProductBycategory(response.data.ProductSubCategory);
+            console.log(response.data.ProductSubCategory);
+        } catch (error) {
+            toast.error((error as AxiosError)?.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (id && idd) {
+            getProductBycategory(id, idd);
+        }
+    }, [id, idd]);
+    // thêm bình luận
+  
+    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory };
+};
