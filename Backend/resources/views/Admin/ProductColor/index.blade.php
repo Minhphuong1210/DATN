@@ -29,8 +29,15 @@ ProductColor
                 <tr>
                     <td>{{ $productcolors->id }}</td>
                     <td>{{ $productcolors->name }}</td> 
-                    <td style="background-color: {{ $productcolors->color_code }}; width:200px" ></td> 
-
+                    <td style="width: 200px; text-align: center;">
+                        <button type="button" class="btn" style="
+                            background-color: {{ $productcolors->color_code }};
+                            width: 30px; /* Kích thước nút */
+                            height: 30px; /* Kích thước nút */
+                            border-radius: 50%; /* Tạo hình tròn */
+                            padding: 0; /* Bỏ padding để giữ hình tròn */
+                        " title="Màu: {{ $productcolors->color_code }}"></button>
+                    </td>
                     <td>
                         <a href="{{ route('admins.product_colors.edit', $productcolors->id) }}" class="btn btn-primary">Edit</a>
                         <form action="{{ route('admins.product_colors.destroy', $productcolors->id) }}" method="POST" style="display:inline-block;">

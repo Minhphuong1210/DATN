@@ -29,7 +29,7 @@ const ProductDetail: React.FC = () => {
         product_id: product ? product.id : '',
     });
 
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setAddcomment(prev => ({
@@ -47,7 +47,7 @@ const ProductDetail: React.FC = () => {
     };
     const handleSubmitComment = async (e) => {
         e.preventDefault();
-        console.log(addcomment); 
+        console.log(addcomment);
         const id = product.id;
         try {
             if (!token) {
@@ -75,6 +75,13 @@ const ProductDetail: React.FC = () => {
         } finally {
             setLoading(false);
         }
+    };
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 0,
+        }).format(price);
     };
     // Tăng giảm sô lượng
     const incurement = () => {
@@ -163,13 +170,13 @@ const ProductDetail: React.FC = () => {
 
                             </div>
                             <div className="mb-3 flex justify-center w-[500px] h-[700px]">
-                                <img src={product.image} alt="" className="w-full h-full object-cover" />
+                                <img src={product.imageUrl} alt="" className="w-full h-full object-cover" />
                             </div>
                         </div>
 
                         <div>
                             <div className="text-[16px]">
-                                Áo Polo Trắng Recycle Phối họa Tiết Cổ Thân Thiện Với Da 8APCT407TRK
+                                {product.name}
                             </div>
                             <div className="flex items-center">
                                 <span>4.0</span>
@@ -186,7 +193,23 @@ const ProductDetail: React.FC = () => {
                                 Tình trạng:
                                 <span className="text-sm font-bold text-green-500">Còn hàng</span>
                             </div>
-                            <div className="text-lg font-bold">{product?.price} </div>
+                            <div className="text-lg font-bold">
+                                {product.price_sale !== null ? (
+                                    <>
+                                        <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                            {formatPrice(product.price)}
+                                        </span>
+                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                            {formatPrice(product.price_sale)}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                        {formatPrice(product.price)}
+                                    </span>
+                                )}
+
+                            </div>
                             <form action="">
                                 <div>
                                     <div className="mb-2 flex justify-between text-sm md:block">

@@ -46,7 +46,7 @@
                                         <td>{{ $item->id }}</td>
                                         <td>{{ $item->name }}</td>
                                         <td>
-                                            <img src="{{asset($item->image)}}" alt="" height="100px" width="100px">
+                                            <img src="{{Storage::url($item->image)}}" alt="" height="100px" width="100px">
                                         </td>
                                         <td>{{ $item->status }}</td>
                                         <td>{{ $item->category ? $item->category->name : 'N/A' }}</td>

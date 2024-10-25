@@ -36,13 +36,14 @@ class SubCategoryController extends Controller
     {
         $data = $request->except('image');
     
-        if($request->hasFile('image')){
-            $pathImage = Storage::putFile('Images',$request->file('image'));
-            $imageUrl = 'storage/' .$pathImage;
-            $data['image'] = $imageUrl;
-        }
-        SubCategory::query()->create($data);
+        if ($request->hasFile('image')) {
+            $filePath = $request->file('image')->store('uploads/subcategory', 'public');
 
+        } else {
+            $filePath = null;
+        }
+        $data['image'] = $filePath;
+        SubCategory::query()->create($data);
         return redirect()->route('admins.subcategory.index');
     }
 

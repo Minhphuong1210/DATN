@@ -31,10 +31,11 @@ class DiscountController extends Controller
                         $sale = $product->price *$value->discount_percent / 100;
                         $product->discount_id = $discount->id;
                         $product->price_sale = $product->price - $sale;
+                        $product->is_sale=1;
                     } else {
                         $product->discount_id = null;
                         $product->price_sale = null;
-                        $product->is_active = 0;
+                        $product->is_sale = 0;
                     }
                 }
             } else {

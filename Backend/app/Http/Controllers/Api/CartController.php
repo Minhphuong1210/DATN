@@ -89,6 +89,7 @@ class CartController extends Controller
                     $sizeName= $productDetail->productSize->name;
                     $NameProduct=$productDetail->product->name;
                     $ImageProduct=$productDetail->product->image;
+                    $imageUrl = 'http://127.0.0.1:8000/storage/' . $ImageProduct;
                     if($productDetail->product->price_sale){
 
                         $PriceProduct=$productDetail->product->price_sale;
@@ -107,6 +108,7 @@ class CartController extends Controller
                             'product_detail' => $productDetail,
                             'quantity' => $detail->quantity,
                             'total_price' => $detail->price * $detail->quantity,
+                            'imageUrl'=>$imageUrl,
                         ];
                     }
                 }

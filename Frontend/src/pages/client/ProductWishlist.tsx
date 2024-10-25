@@ -14,7 +14,13 @@ type Props = {};
 const ProductWishlist: React.FC<Props> = () => {
     const { favorites } = useFavorites();
     const lastProductRef = useRef<HTMLDivElement | null>(null); // Tạo ref cho sản phẩm cuối
-
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 0,
+        }).format(price);
+    };
     useEffect(() => {
         if (favorites.length >= 4) {
             lastProductRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -35,18 +41,22 @@ const ProductWishlist: React.FC<Props> = () => {
                             <div className="group relative mx-auto mb-4 h-[80vw] w-[45vw] p-2 md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw]">
                                 <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out ">
                                     <img
-                                        src={product.product.image}
-                                        alt={product.product.name}
+                                        src={product.imageUrl}
+                                        alt={product.imageUrl}
                                         className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                                     />
                                     <div className="sale-badge absolute right-0 top-0 mx-1 my-2 rounded-md bg-red-500 px-2 py-1 text-white">
-                                        100%
+                                        {product.product.discount_id !== null && (
+                                            <div className='absolute top-0 right-0 my-3 mx-3 py-1 px-2 rounded-md bg-red-500 text-white sale-badge'>
+                                                {product.product.discount.discount_percent}%
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="relative">
                                     <div className="absolute bottom-[30px] left-0 right-0 z-10 flex justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:opacity-100">
                                         <a
-                                             href={`productdetail/${product.product.id}/subcate/${product.product.sub_category_id}`}
+                                            href={`productdetail/${product.product.id}/subcate/${product.product.sub_category_id}`}
                                             className="rounded-full bg-white p-2 hover:bg-black hover:text-white"
                                         >
                                             <Eye
@@ -79,12 +89,20 @@ const ProductWishlist: React.FC<Props> = () => {
                                         {product.product.name}
                                     </div>
                                     <div className="block text-center">
-                                        <span className="mr-1 text-xs text-gray-500 line-through hover:text-yellow-500 md:text-sm lg:text-base xl:text-base">
-                                            399.000đ
-                                        </span>
-                                        <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
-                                            {product.product.price}.000đ
-                                        </span>
+                                        {product.product.price_sale !== null && !isNaN(product.product.price_sale) ? (
+                                            <>
+                                                <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                    {formatPrice(product.product.price)}
+                                                </span>
+                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                    {formatPrice(product.product.price_sale)}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                {formatPrice(product.product.price)}
+                                            </span>
+                                        )}
                                     </div>
                                 </a>
                             </div>
