@@ -32,7 +32,11 @@ function App() {
           <Route path="payment" element={<PaymentMomo />} />
           <Route path="contact" element={<Contact />} />
           <Route path="allproduct" element={<AllProducts />} />
+
+          <Route path="order" element={<Order />} />
+
           <Route path="wishlist" element={<ProductWishlist />} />
+
         </Route>
       </Routes>
       <ToastContainer />

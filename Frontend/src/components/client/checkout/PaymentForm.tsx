@@ -26,6 +26,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ paymentMethod, setPaymentMeth
         }
     
         try {
+            
             const response = await axios.post('http://127.0.0.1:8000/api/payment/momo', {
                 orderInfo: 'Thông tin đơn hàng',
                 amount: totalPayment,  
