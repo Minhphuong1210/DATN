@@ -90,6 +90,9 @@ const Contact = (props: Props) => {
                     <p className='pt-3'><strong>VP Phía Nam:</strong>186A Nam Kỳ Khởi Nghĩa, Phường Võ Thị Sáu, Quận 3, TP.HCM</p>
                 </div>
             </div>
+            <div>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13490.503724367582!2d105.8882687932083!3d20.917429734931797!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135b1fcdf03cce9%3A0x17d478e57be2f31a!2zVuG6oW4gUGjDumMsIFRoYW5oIFRyw6wsIEjDoCBO4buZaSwgVmnhu4d0IE5hbQ!5e1!3m2!1svi!2s!4v1729573760962!5m2!1svi!2s" className='w-full h-[350px]' ></iframe>
+            </div>
         </>
     )
 }

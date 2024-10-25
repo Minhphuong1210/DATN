@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserInput } from '../interfaces/auth';
+import { CommentInput, UserInput } from '../interfaces/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -32,5 +32,13 @@ export const UseAuth = () => {
             toast.error("Lỗi đăng nhập");
         }
     };
-    return { Register, Login };
+    const Comment = async ( value: CommentInput) => {
+        try {
+            const { data } = await axios.post('/api/comment/add', value)
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    return { Register, Login, Comment };
 };
