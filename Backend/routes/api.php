@@ -16,22 +16,12 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PaymentController;
 
-
-
-
-
-
-
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::middleware('auth:sanctum')->group(function () {
     // API để lấy giỏ hàng
     Route::get('/cart', [CartController::class, 'cart_detail']);
-
-
-
     // API thêm sản phẩm vào giỏ hàng
     Route::post('/cart/add', [CartController::class, 'store']);
 
@@ -51,6 +41,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // API xóa sản phẩm khỏi giỏ hàng
     Route::delete('/cart/{id}/delete', [CartController::class, 'destroy']);
+    //Sản phẩm gần đây
+ Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed']);
+ Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed']);
+
+   
 });
 // lấy sản phẩm product
 Route::resource('/products', ProductController::class);
@@ -59,10 +54,17 @@ Route::resource('/categorys', CategoryController::class);
 // lấy sản phẩm promotion
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
 // Payment
-
+Route::post('/payment/momo', [PaymentController::class, 'payment_momo']);
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 // banner
 Route::get('/banner', [ApiProductController::class,'Banner']);
+// Tìm sản phẩm theo danh mục
+Route::get('/category/{name}/products', [ProductController::class, 'getProductsByCategory']);
+// Lọc sản phẩm theo color và size
+Route::get('/filter-products', [ProductController::class, 'filter']);
+// Lọc sản phẩm theo giá min và max
+Route::get('/products/filter-by-price', [ProductController::class, 'filterByPrice']);
+
 
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
@@ -94,14 +96,13 @@ Route::post('contas', [ApiProductController::class, 'contasUs']);
 
 // Tìm sản phẩm
 Route::get('/search', [ProductController::class, 'search']);
-
-
+ 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/add', [ApiWishlistController::class, 'addProductToWishlist']);
     Route::delete('wishlist/remove/{productId}', [ApiWishlistController::class, 'removeProductFromWishlist']);
     Route::get('wishlist', [ApiWishlistController::class, 'getWishlist']);
 });
-
+Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
 
 
 
