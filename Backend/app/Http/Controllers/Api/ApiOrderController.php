@@ -26,45 +26,45 @@ class ApiOrderController extends Controller
     // đây là đơn hàng của tôi khi mua hàng rồi
     public function index()
     {
-        $donHangs = Auth::user()->order()->orderBy('id', 'desc')->paginate(5);
-        $arrayDonHang = [];
-        $arrayChitietDonHang = [];
-        foreach ($donHangs as $donHang) {
-            $arrayDonHang[]=[
-                'code_order'=>$donHang->code_order,
-                'username'=>$donHang->username,
-                'phone'=>$donHang->phone,
-                'address'=>$donHang->address,
-                'email'=>$donHang->email,
-                'note'=>$donHang->note,
-                'total_amount'=>$donHang->total_amount,
-                'id'=>$donHang->id,
-              
-
-            ];
-            foreach ($donHang->orderDetail as $detail) {
-                $arrayChitietDonHang[] = [
-                    'image' => $detail->productDetail->product->image , 
-                    'product_name' => $detail->productDetail->product->name , 
-                    'quantity' => $detail->quantity,
-                    'price' => $detail->price,
-                    'order_id'=>$detail->id
-                ];
-            }
-        }
-    
         $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
-        $typeChoXacNhan = Order::CHO_XAC_NHA;
-        $typeDangVanChuyen = Order::DANG_VAN_CHUYEN;
-    
-        return response()->json([
-            // 'donHangs' => $donHangs,
-            'arrayDonHang'=>$arrayDonHang,
-            'chitietDonHang' => $arrayChitietDonHang,
-            'trangThaiDonHang' => $trangThaiDonHang,
-            'typeChoXacNhan' => $typeChoXacNhan,
-            'typeDangVanChuyen' => $typeDangVanChuyen,
-        ]);
+    $donHangs = Auth::user()->order()->orderBy('id', 'desc')->paginate(5);
+
+    $arrayDonHang = $donHangs->map(function($donHang) use ($trangThaiDonHang) {
+        return [
+            'code_order' => $donHang->code_order,
+            'username' => $donHang->username,
+            'phone' => $donHang->phone,
+            'address' => $donHang->address,
+            'email' => $donHang->email,
+            'note' => $donHang->note,
+            'total_amount' => $donHang->total_amount,
+            'id' => $donHang->id,
+            'orderStatus' => $trangThaiDonHang[$donHang->order_status]
+        ];
+    });
+
+    $arrayChitietDonHang = $donHangs->flatMap(function($donHang) {
+        return $donHang->orderDetail->map(function($detail) {
+            return [
+                'image' => $detail->productDetail->product->image,
+                'product_name' => $detail->productDetail->product->name ,
+                'quantity' => $detail->quantity,
+                'price' => $detail->price,
+                'order_id' => $detail->id
+            ];
+        });
+    });
+
+    $typeChoXacNhan = Order::CHO_XAC_NHA;
+    $typeDangVanChuyen = Order::DANG_VAN_CHUYEN;
+
+    return response()->json([
+        'arrayDonHang' => $arrayDonHang,
+        'chitietDonHang' => $arrayChitietDonHang,
+        'trangThaiDonHang' => $trangThaiDonHang,
+        'typeChoXacNhan' => $typeChoXacNhan,
+        'typeDangVanChuyen' => $typeDangVanChuyen,
+    ]);
     }
     // đây là hiện gia trang mua hàng
     public function create()

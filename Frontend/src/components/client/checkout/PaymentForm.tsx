@@ -26,6 +26,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ paymentMethod, setPaymentMeth
         }
     
         try {
+            
             const response = await axios.post('http://127.0.0.1:8000/api/payment/momo', {
                 orderInfo: 'Thông tin đơn hàng',
                 amount: totalPayment,  
@@ -56,9 +57,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ paymentMethod, setPaymentMeth
                 >
                     <FormControlLabel value="Momo" control={<Radio />} label="Momo" />
                 </RadioGroup>
-                {/* <button onClick={handlePayment} className='bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded'>
+                <button onClick={handlePayment} className='bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded'>
                     Thanh toán với Momo
-                </button> */}
+                </button>
             </FormControl>
         </div>
     );

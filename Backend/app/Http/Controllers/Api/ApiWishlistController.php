@@ -62,13 +62,14 @@ class ApiWishlistController extends Controller
     {
         $wishlist = Wishlist::where('user_id', Auth::id())->first();
 
-        if ($wishlist) {
-            $wishlistDetails = WishlistsDetail::where('wishlist_id', $wishlist->id)
-                                             ->with('product') // Load thông tin sản phẩm
-                                             ->get();
-            return response()->json($wishlistDetails, 200);
-        }
+if (!$wishlist) {
+    return response()->json(['message' => 'No wishlist found'], 404);
+}
 
-        return response()->json(['message' => 'Không có sản phẩm yêu thích'], 404);
+$wishlistDetails = WishlistsDetail::where('wishlist_id', $wishlist->id)
+                                   ->with('product')
+                                   ->get();
+
+return response()->json($wishlistDetails, 200);
     }
 }

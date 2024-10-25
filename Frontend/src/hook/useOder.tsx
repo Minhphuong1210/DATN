@@ -3,8 +3,15 @@ import { useEffect, useState } from "react";
 import { OderProducts, OderTotal, Order } from "../interfaces/oder";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
-import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
-
+// import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
+interface DataType {
+    order_id: string;
+    product_name: string;
+    image: string;
+    quantity: number;
+    price: number;
+    orderStatus: string;
+}
 export const useOder = () => {
     const [oders, serOders] = useState<OderProducts[]>([]);
     const [total, serTotal] = useState<OderTotal>();
@@ -14,6 +21,8 @@ export const useOder = () => {
     const [isConfirmVisible, setConfirmVisible] = useState(false); // State cho modal confirm
     const [shippingInfo, setShippingInfo] = useState<any>(null); // State cho thông tin vận chuyển
     const [apply, setApply] = useState()
+    const [myOrder, setMyOrder] = useState<DataType[]>([]);
+
 
     const getAllOder = async () => {
         try {
@@ -27,7 +36,6 @@ export const useOder = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         getAllOder();
     }, []);
@@ -68,7 +76,7 @@ export const useOder = () => {
                 total_amount: (total?.subtotal ?? 0) + shippingCost,
                 shipping_id: info.shippingMethod,
             };
-
+            console.log("Order Data:", orderData);
             setLoading(true);
             await axios.post('/api/donhangs/store', orderData);
             toast.success("Đặt hàng thành công");
@@ -78,6 +86,7 @@ export const useOder = () => {
             setIsOffBtn(true);
         } catch (error) {
             console.error("Error submitting order:", error);
+            
             alert("Error submitting order");
         } finally {
             setLoading(false);
@@ -88,15 +97,26 @@ export const useOder = () => {
     const handleCloseModal = () => {
         setIsOrderSuccessful(false);
     };
-    const applyDiscount = async(value: any) =>{
+    const applyDiscount = async (value: any) => {
         try {
-             await axios.post('/api/applyPromotion', value) 
+            await axios.post('/api/applyPromotion', value)
         } catch (error) {
             console.log(error);
-            
+
         }
     }
+    const getMyOrder = async () => {
+        try {
+            const response = await axios.get('/api/donhangs')
+            setMyOrder(response.data.chitietDonHang)
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
+    useEffect(() => {
+        getMyOrder();
+    }, []);
     return {
         oders,
         total,
@@ -109,6 +129,9 @@ export const useOder = () => {
         confirmOrder,
         setConfirmVisible, // Cho phép đóng modal confirm
         apply,
-        applyDiscount
+        applyDiscount,
+        myOrder,
+        setMyOrder
+
     };
 };

@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PaymentController;
 
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -103,7 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('wishlist/remove/{productId}', [ApiWishlistController::class, 'removeProductFromWishlist']);
     Route::get('wishlist', [ApiWishlistController::class, 'getWishlist']);
 });
-
+Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
 
 
 
