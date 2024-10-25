@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { OderProducts, OderTotal, Order } from "../interfaces/oder";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
-import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
+// import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
 interface DataType {
     order_id: string;
     product_name: string;
@@ -76,7 +76,7 @@ export const useOder = () => {
                 total_amount: (total?.subtotal ?? 0) + shippingCost,
                 shipping_id: info.shippingMethod,
             };
-
+            console.log("Order Data:", orderData);
             setLoading(true);
             await axios.post('/api/donhangs/store', orderData);
             toast.success("Đặt hàng thành công");
@@ -86,6 +86,7 @@ export const useOder = () => {
             setIsOffBtn(true);
         } catch (error) {
             console.error("Error submitting order:", error);
+            
             alert("Error submitting order");
         } finally {
             setLoading(false);

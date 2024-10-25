@@ -1,16 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Eye, Heart, ShoppingCart } from 'lucide-react';
 import { Product } from '../../../interfaces/Product';
 import '../../../css/ProductCarousel.css'
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import useFavorites from '../../../hook/useFavorites';
+
 
 interface ProductCarouselProps {
     productsHot?: Product[];
 }
 
 const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) => {
+    // const { addToFavorites} = useFavorites();
+    const { favorites, addToFavorites, removeFromFavorites } = useFavorites();
+
+    // Hàm kiểm tra xem sản phẩm có trong danh sách yêu thích hay không
+    const isFavoriteProduct = (productId: string) => {
+        return favorites.some((fav) => fav.id === productId);
+    };
+
+    // Hàm xử lý sự kiện click thêm/xóa sản phẩm khỏi danh sách yêu thích
+    const handleFavoriteClick = async (productId: string, isFavorite: boolean) => {
+        if (isFavorite) {
+            await removeFromFavorites(productId);
+        } else {
+            await addToFavorites(productId);
+        }
+    };
     const settings = {
         dots: true,
         infinite: productsHot.length > 1,
@@ -36,32 +54,27 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
             },
         ],
     };
-    console.log(productsHot
-
-    );
-
 
     return (
-        <div className="relative mb-14  ">
+        <div className="relative mb-14">
             <div className="">
                 {productsHot.length > 1 ? (
-
                     <Slider {...settings}>
                         {productsHot.map((product) => (
                             <div
-                                className="group relative h-[80vw] w-[45vw] md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] p-2  "
+                                className="group relative h-[80vw] w-[45vw] md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] p-2"
                                 key={product.id}
                             >
                                 <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
                                     <img
                                         src={product.image}
-                                        alt={product.image}
+                                        alt={product.name}
                                         className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                                     />
                                     <div className='absolute top-0 right-0 my-3 mx-3 py-1 px-2 rounded-md bg-red-500 text-white sale-badge'>100%</div>
                                 </div>
                                 <div className="relative">
-                                    <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                    <div className="absolute bottom-[30px] left-0 right-0 z-10 flex justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:opacity-100">
                                         <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
                                             <Eye
                                                 color="currentColor"
@@ -81,6 +94,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
                                                 color="currentColor"
                                                 strokeWidth="1.5"
                                                 className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                onClick={() => addToFavorites(product.id)}
                                             />
                                         </div>
                                     </div>
@@ -102,19 +116,19 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
                         ))}
                     </Slider>
                 ) : (
-                    // Nếu chỉ có 1 sản PHẨM
+                    // Nếu chỉ có 1 sản phẩm
                     <div className='flex'>
-                        <div className="group relative mb-4 h-[80vw] w-[45vw] md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] p-2 mx-auto ">
+                        <div className="group relative mb-4 h-[80vw] w-[45vw] md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw] p-2 mx-auto">
                             <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
                                 <img
                                     src={productsHot[0]?.image}
-                                    alt={productsHot[0]?.image}
+                                    alt={productsHot[0]?.name}
                                     className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                                 />
                                 <div className="absolute top-0 right-0 my-2 mx-1 py-1 px-2 rounded-md bg-red-500 text-white sale-badge">100%</div>
                             </div>
                             <div className="relative">
-                                <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                <div className="absolute bottom-[30px] left-0 right-0 z-10 flex justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:opacity-100">
                                     <a href={`productdetail/${productsHot[0]?.id}/subcate/${productsHot[0]?.sub_category_id}`} className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
                                         <Eye
                                             color="currentColor"
@@ -134,6 +148,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
                                             color="currentColor"
                                             strokeWidth="1.5"
                                             className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                            onClick={() => addToFavorites(productsHot[0]?.id)}
                                         />
                                     </div>
                                 </div>
@@ -152,16 +167,12 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
                                 </div>
                             </a>
                         </div>
-                        <div className='w-1/4'></div>
-                        <div className='w-1/4'></div>
-                        <div className='w-1/4'></div>
-
                     </div>
                 )}
-
             </div>
         </div>
     );
+    
 };
 
 export default ProductCarousel;

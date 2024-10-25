@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { Profiler, useState } from 'react'
 import './App.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,6 +15,7 @@ import PaymentMomo from './pages/client/PaymentMomo';
 import Contact from './pages/client/Contact';
 import AllProducts from './pages/client/AllProducts';
 import Order from './pages/client/Order';
+import ProductWishlist from './pages/client/ProductWishlist';
 
 
 function App() {
@@ -31,7 +32,11 @@ function App() {
           <Route path="payment" element={<PaymentMomo />} />
           <Route path="contact" element={<Contact />} />
           <Route path="allproduct" element={<AllProducts />} />
+
           <Route path="order" element={<Order />} />
+
+          <Route path="wishlist" element={<ProductWishlist />} />
+
         </Route>
       </Routes>
       <ToastContainer />

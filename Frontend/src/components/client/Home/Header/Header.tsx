@@ -45,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           </div>
 
           {/* Menu cho màn hình desktop */}
-          <div className="hidden flex-grow md:flex ml-10">
+          <div className="hidden flex-grow md:flex ml-10 text-sm">
             <ul className="flex space-x-5">
               <li
                 className="relative hovermenuNav"
@@ -85,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
                 </a>
               </li>
               <li className="hovermenuNav">
-                <a href="#" className="hover:text-slate-600">
+                <a href="contact" className="hover:text-slate-600">
                   LIÊN HỆ
                 </a>
               </li>
@@ -146,7 +146,9 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             />
           </div>
           <div className="mr-1 flex space-x-2">
-            <Heart className="cursor-pointer text-slate-500 hover:text-black" size={30} />
+            <a href="/wishlist">
+              <Heart className="cursor-pointer text-slate-500 hover:text-black" size={30} />
+            </a>
             <a
               href="/login"
               onMouseEnter={() => setIsOpenUser(true)}
