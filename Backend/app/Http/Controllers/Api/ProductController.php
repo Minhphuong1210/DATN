@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Discount;
 use App\Models\Product;
 use App\Models\ProductDetail;
+use App\Models\ProductView;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -194,11 +195,108 @@ class ProductController extends Controller
     return response()->json($products);
 }
 
-    
-    
-    
-    
-    
+// Lọc sản phẩm theo giá tiền
+public function filterByPrice(Request $request)
+{
+    // Lấy giá trị min và max từ request
+    $minPrice = $request->input('min_price');
+    $maxPrice = $request->input('max_price');
 
+    // Kiểm tra nếu không có giá trị min_price hoặc max_price
+    if (is_null($minPrice) || is_null($maxPrice)) {
+        return response()->json([
+            'error' => 'Vui lòng nhập giá trị min_price và max_price.'
+        ], 400); // Trả về mã lỗi 400 Bad Request
+    }
+
+    // Kiểm tra giá trị min_price và max_price có phải là số hợp lệ hay không
+    if (!is_numeric($minPrice) || !is_numeric($maxPrice)) {
+        return response()->json([
+            'error' => 'Giá trị min_price và max_price phải là số hợp lệ.'
+        ], 400); // Trả về mã lỗi 400 Bad Request
+    }
+
+    // Kiểm tra giá trị âm
+    if ($minPrice < 0 || $maxPrice < 0) {
+        return response()->json([
+            'error' => 'Giá trị không được là số âm.'
+        ], 400); // Trả về mã lỗi 400 Bad Request
+    }
+
+    // Kiểm tra khoảng giá trị hợp lệ (min không lớn hơn max)
+    if ($minPrice > $maxPrice) {
+        return response()->json([
+            'error' => 'Giá trị min_price không được lớn hơn max_price.'
+        ], 400); // Trả về mã lỗi 400 Bad Request
+    }
+
+    // Truy vấn sản phẩm theo khoảng giá
+    $products = Product::whereBetween('price', [$minPrice, $maxPrice])->get();
+
+    // Nếu không có sản phẩm nào, trả về thông báo
+    if ($products->isEmpty()) {
+        return response()->json([
+            'message' => 'Không có sản phẩm nào trong khoảng giá đã chọn.'
+        ], 404); // Trả về mã lỗi 404 Not Found nếu không có sản phẩm
+    }
+
+    // Trả về danh sách sản phẩm
+    return response()->json($products);
+}
+// Sản phẩm đã xem gần đây
+public function addRecentlyViewed(Request $request)
+{
+    $user = $request->user(); // Lấy người dùng hiện tại
+    $productId = $request->input('product_id');
+
+    // Kiểm tra sản phẩm có tồn tại không
+    $product = Product::find($productId);
+    if (!$product) {
+        return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
+    }
+    // $user = $request->user();
+    // if (!$user) {
+    //     return response()->json(['error' => 'Người dùng không xác định'], 401);
+    // }
+    
+    // Xóa bản ghi cũ nếu sản phẩm này đã có trong danh sách
+    ProductView::where('user_id', $user->id)
+        ->where('product_id', $productId)
+        ->delete();
+
+    // Tạo bản ghi mới
+    ProductView::create([
+        'user_id' => $user->id,
+        'product_id' => $productId,
+    ]);
+
+    // Giới hạn danh sách sản phẩm đã xem gần đây (ví dụ: chỉ giữ lại 5 sản phẩm gần nhất)
+    $recentlyViewed = ProductView::where('user_id', $user->id)
+        ->orderBy('viewed_at', 'desc')
+        ->take(5)
+        ->pluck('id');
+
+    // Xóa các sản phẩm cũ hơn ngoài giới hạn
+    ProductView::where('user_id', $user->id)
+        ->whereNotIn('id', $recentlyViewed)
+        ->delete();
+
+    return response()->json(['message' => 'Đã thêm vào danh sách đã xem gần đây']);
+}
+
+// Hàm để lấy danh sách sản phẩm đã xem gần đây
+public function getRecentlyViewed(Request $request)
+{
+    $user = $request->user(); // Lấy người dùng hiện tại
+
+    // Lấy danh sách sản phẩm đã xem gần đây của người dùng
+    $products = ProductView::where('user_id', $user->id)
+        ->orderBy('viewed_at', 'desc')
+        ->take(5) // Lấy 5 sản phẩm gần nhất
+        ->with('product') // Eager load chi tiết sản phẩm
+        ->get();
+
+    return response()->json($products);
+}
 
 }
