@@ -3,30 +3,35 @@
 </div>
 @extends('Layout.master')
 @section('title')
-    thêm banner
+    Thêm banner
 @endsection
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="card">
-
+                @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                 <div class="card-header">
                     <h5 class="card-title mb-0">Input Type</h5>
                 </div><!-- end card header -->
 
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-12 ">
+                        <div class="col-lg-12">
                             <form action="{{ route('admins.banner.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="simpleinput" class="form-label">Titel</label>
-                                            <input type="text" id="simpleinput"
-                                                class="form-control  @error('title') is-invalid @enderror"
-                                                name="title" value="{{ old('title') }}"
-                                                placeholder="Title ">
+                                            <label for="title" class="form-label">Tiêu đề</label>
+                                            <input type="text" id="title" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}" placeholder="Title">
                                             @error('title')
                                                 <p class="text-danger">{{ $message }}</p>
                                             @enderror
@@ -34,23 +39,20 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="simpleinput" class="form-label">Hình ảnh </label>
-                                            <input type="file" id="simpleinput" class="form-control" name="image"
-                                                onchange="showImage(event)" id="hinh_anh">
-                                            <img src="" alt="Hình ảnh sản phẩm" style="width:150px; display:none"
-                                                id="img_danh_muc">
+                                            <label for="image" class="form-label">Hình ảnh</label>
+                                            <input type="file" id="image" class="form-control @error('image') is-invalid @enderror" name="image" onchange="showImage(event)">
+                                            @error('image')
+                                                <p class="text-danger">{{ $message }}</p>
+                                            @enderror
+                                            <img src="" alt="Hình ảnh sản phẩm" style="width:150px; display:none" id="img_danh_muc">
                                         </div>
                                     </div>
                                 </div>
-
-
 
                                 <button type="submit" class="btn btn-primary justify-content-center">Gửi</button>
 
                             </form>
                         </div>
-
-
                     </div>
                 </div>
 
@@ -62,7 +64,6 @@
     <script>
         function showImage(event) {
             const img_danh_muc = document.getElementById('img_danh_muc');
-            console.log(img_danh_muc)
             const file = event.target.files[0];
             const reader = new FileReader();
             reader.onload = function() {

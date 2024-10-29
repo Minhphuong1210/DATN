@@ -21,10 +21,23 @@ class ApiProductController extends Controller
 {
     public function productDetail(string $id, string $sub_category_id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::query()->with('discount')->findOrFail($id);
+        if(!$product){
+            return response()->json([
+                'message' => 'không có sản phẩm',
+            ], 404);
+        }
+        // số lượng sản phẩm ở trong productDetail
+        $stock = $product->ProductDetail->Sum('quantity');
+        $product['stock'] = $stock;
+        // số lượng sản phẩm đã bán 
+        $soldQuantity = $product->ProductDetail->flatMap(function ($productDetail) {
+            return $productDetail->orderDetail->pluck('quantity');
+        })->sum();
+        $product['soldQuantity'] = $soldQuantity;
         $product->imageUrl = 'http://127.0.0.1:8000/storage/' . $product->image;
         $subCategory = SubCategory::findOrFail($sub_category_id);
-        $productSubCategory = $subCategory->product;
+        $productSubCategory = $subCategory->product()->with('discount')->get();
         foreach ($productSubCategory as $key => $productSubCategorys) {
             $productSubCategorys->imageUrl = 'http://127.0.0.1:8000/storage/' . $productSubCategorys->image;
         }
@@ -63,6 +76,7 @@ class ApiProductController extends Controller
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
             'comments' => $commentsArray,
+           
         ], 200);
 
     }

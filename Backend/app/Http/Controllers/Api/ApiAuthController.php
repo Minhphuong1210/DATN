@@ -22,18 +22,33 @@ class ApiAuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
+    
         $user = User::where('email', $request->email)->first();
+        
+        // Kiểm tra người dùng và mật khẩu
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Thông tin đăng nhập không chính xác'],
             ]);
         }
+    
+        // Kiểm tra trạng thái tài khoản
+        if ($user->is_active == 0) {
+            return response()->json([
+                'message' => 'Tài khoản đã bị khóa'
+            ], 403); // Sử dụng mã lỗi 403 cho Forbidden
+        }
+    
+        // Đăng nhập người dùng
+        Auth::login($user);
+    
+        // Tạo token
         $token = $user->createToken('Access Token')->plainTextToken;
-        // dd($token);
+    
         return response()->json([
             'token' => $token,
             'user' => $user,
-            'message' => 'dang nhập thanh cong',
+            'message' => 'Đăng nhập thành công',
         ]);
     }
     public function logout()
