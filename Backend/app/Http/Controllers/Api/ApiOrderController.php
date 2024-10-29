@@ -224,6 +224,7 @@ class ApiOrderController extends Controller
                 }
                 CartDetail::where('cart_id', $cart->id)->delete();
                 $cart->delete();
+                
                 DB::commit();
                 Mail::to($order->email)->queue(new OrderConfirm($order));
                 return response()->json([
