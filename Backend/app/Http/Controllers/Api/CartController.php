@@ -85,30 +85,30 @@ class CartController extends Controller
 
                 foreach ($cartDetails as $detail) {
                     $productDetail = ProductDetail::find($detail->product_detail_id);
-                    $colorName= $productDetail->productColor->name;
-                    $sizeName= $productDetail->productSize->name;
-                    $NameProduct=$productDetail->product->name;
-                    $ImageProduct=$productDetail->product->image;
+                    $colorName = $productDetail->productColor->name;
+                    $sizeName = $productDetail->productSize->name;
+                    $NameProduct = $productDetail->product->name;
+                    $ImageProduct = $productDetail->product->image;
                     $imageUrl = 'http://127.0.0.1:8000/storage/' . $ImageProduct;
-                    if($productDetail->product->price_sale){
+                    if ($productDetail->product->price_sale) {
 
-                        $PriceProduct=$productDetail->product->price_sale;
-                    }else{
-                        $PriceProduct=$productDetail->product->price;
+                        $PriceProduct = $productDetail->product->price_sale;
+                    } else {
+                        $PriceProduct = $productDetail->product->price;
                     }
                     $id = $detail->id;
                     if ($productDetail) {
                         $productsDetails[] = [
-                            'colorName'=>$colorName,
-                            'sizeName'=>$sizeName,
-                            'NameProduct'=>$NameProduct,
-                            'PriceProduct'=>$PriceProduct,
-                            'id'=>$id,
-                            'ImageProduct'=>$ImageProduct,
+                            'colorName' => $colorName,
+                            'sizeName' => $sizeName,
+                            'NameProduct' => $NameProduct,
+                            'PriceProduct' => $PriceProduct,
+                            'id' => $id,
+                            'ImageProduct' => $ImageProduct,
                             'product_detail' => $productDetail,
                             'quantity' => $detail->quantity,
                             'total_price' => $detail->price * $detail->quantity,
-                            'imageUrl'=>$imageUrl,
+                            'imageUrl' => $imageUrl,
                         ];
                     }
                 }
@@ -143,10 +143,13 @@ class CartController extends Controller
     // Xoa gio hang
     public function destroy(string $id)
     {
-        $cartDetail = CartDetail::findOrFail($id);
-        $cartDetail->delete();
-
-        return response()->json(['message' => 'Product removed from cart successfully'], 200);
+        $cartDetail = CartDetail::find($id);
+        if ($cartDetail) {
+            $cartDetail->delete();
+            return response()->json(['message' => 'Xóa thành công'], 200);
+        } else {
+            return response()->json(['message' => 'Giỏ hàng không có sản phẩm này'], 404);
+        }
     }
 
 

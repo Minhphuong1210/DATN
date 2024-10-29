@@ -140,7 +140,7 @@ const Order: React.FC = () => {
                                 {myOrder.map((item, index) => (
                                     <tr key={index} className="border-b">
                                         <td className="w-1/6 px-6 py-4">
-                                            <img className="w-10" src={item.image} alt="" />
+                                            <img className="w-10" src={item.imageUrl} alt="" />
                                         </td>
                                         <td className="w-1/6 px-6 py-4">{item.product_name}</td>
                                         <td className="w-1/6 px-6 py-4">{item.price}</td>
