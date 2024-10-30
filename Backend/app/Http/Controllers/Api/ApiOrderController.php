@@ -225,9 +225,6 @@ class ApiOrderController extends Controller
                 }
                 CartDetail::where('cart_id', $cart->id)->delete();
                 $cart->delete();
-                // nếu người chọn thanh toán onl check resultCode =0 thông báo thanh toán onl thành công 
-                // chuyển trạng thái
-                // thanh toán onl không thành công 
                 DB::commit();
                 Mail::to($order->email)->queue(new OrderConfirm($order));
                 return response()->json([

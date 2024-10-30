@@ -55,6 +55,7 @@ Route::resource('/categorys', CategoryController::class);
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
 // Payment
 Route::post('/payment/momo', [PaymentController::class, 'payment_momo']);
+
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 // banner
 Route::get('/banner', [ApiProductController::class,'Banner']);
