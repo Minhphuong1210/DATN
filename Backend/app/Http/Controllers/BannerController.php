@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BannerRequest;
 use App\Models\Banner;
 use Auth;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class BannerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BannerRequest $request)
     {
         if ($request->isMethod('POST')) {
             // dd($request->hinh_anh);

@@ -20,6 +20,7 @@ class Order extends Model
 
     const TRANG_THAI_THANH_TOAN = [
         'chua_thanh_toan' => 'Chưa thanh toán',
+        
         'da_thanh_toan' => 'Đã thanh toán',
     ];
 
@@ -55,5 +56,8 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function shipping(){
+        return $this->hasOne(Shipping::class,'id','shipping_id');
     }
 }

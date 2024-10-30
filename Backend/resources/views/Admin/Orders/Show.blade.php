@@ -39,15 +39,16 @@
                                             </td>
                                             <td>
                                                 <ul>
-                                                    <li>Tên tài khoản: {{$donHang->ten_nguoi_nhan}}</li>
+                                                    <li>Tên tài khoản: {{$donHang->username}}</li>
                                                     <li>Email: {{$donHang->email}}</li>
-                                                    <li>Số điện thoại: {{$donHang->sđt}}</li>
-                                                    <li>Địa chỉ: {{$donHang->dia_chi}}</li>
+                                                    <li>Số điện thoại: {{$donHang->phone}}</li>
+                                                    <li>Địa chỉ: {{$donHang->address}}</li>
                                                     {{-- <li>Tài khoản: {{$donHang->user->role}}</li> --}}
                                                     <li>Trạng thái đơn hàng : {{ $trangThaiDonHang[$donHang->order_status] ?? 'Không xác định' }}</li>
                                                     <li>Tiền hàng: {{number_format($donHang->commodity_money)}}</li>
-                                                    <li>Tiền ship: {{number_format($donHang->tien_ship)}}</li>  
+                                                    <li>Tiền ship: {{number_format($donHang->shipping->cost)}}</li>  
                                                     <li>Tổng tiền: {{number_format($donHang->total_amount)}}</li>
+                                                   
                                                 </ul>
                                             </td>
                                           </tr>

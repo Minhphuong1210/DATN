@@ -75,9 +75,13 @@
                                             <label for="simpleinput" class="form-label">Danh mục sản phẩm</label>
                                             <select class="form-select" aria-label="Default select example"
                                                 name="sub_category_id">
-                                                @foreach ($subcategory as $subcategorys)
-                                                    <option value="{{ $subcategorys->id }}">{{ $subcategorys->name }}
-                                                    </option>
+                                                @foreach ($categories as $cat)
+                                                    <optgroup label="{{ $cat->name }}">
+                                                        @foreach ($cat->subcategories as $subcat)
+                                                            <option value="{{ $subcat->id }}">{{ $subcat->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </optgroup>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -105,34 +109,46 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="simpleinput" class="form-label">Sản phẩm biến thế</label>
-                                            <i class="mdi mdi-plus text-muted fs-18 rounded-2 border p-1 ms-3" style="cursor: pointer" id="add-variant"></i>
+                                            <i class="mdi mdi-plus text-muted fs-18 rounded-2 border p-1 ms-3"
+                                                style="cursor: pointer" id="add-variant"></i>
                                             <table class="table align-middle table-nowrap mb-0">
                                                 <tbody id="variant-table-body">
                                                     <tr class="">
                                                         <td class="d-flex align-items-center">
                                                             <div class="mb-3 mx-3">
-                                                                <label for="simpleinput" class="form-label">Màu sắc</label>
-                                                                <select class="form-select" aria-label="Default select example" name="products[0][color_id]">
+                                                                <label for="simpleinput" class="form-label">Màu
+                                                                    sắc</label>
+                                                                <select class="form-select"
+                                                                    aria-label="Default select example"
+                                                                    name="products[0][color_id]">
                                                                     @foreach ($color as $colors)
-                                                                        <option value="{{ $colors->id }}">{{ $colors->name }}</option>
+                                                                        <option value="{{ $colors->id }}">
+                                                                            {{ $colors->name }}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3 mx-3">
-                                                                <label for="simpleinput" class="form-label">Kích thước</label>
-                                                                <select class="form-select" aria-label="Default select example" name="products[0][size_id]">
+                                                                <label for="simpleinput" class="form-label">Kích
+                                                                    thước</label>
+                                                                <select class="form-select"
+                                                                    aria-label="Default select example"
+                                                                    name="products[0][size_id]">
                                                                     @foreach ($size as $sizes)
-                                                                        <option value="{{ $sizes->id }}">{{ $sizes->name }}</option>
+                                                                        <option value="{{ $sizes->id }}">
+                                                                            {{ $sizes->name }}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">
-                                                                <label for="simpleinput" class="form-label">Số lượng</label>
-                                                                <input type="text" name="products[0][quantity]" class="form-control">
+                                                                <label for="simpleinput" class="form-label">Số
+                                                                    lượng</label>
+                                                                <input type="text" name="products[0][quantity]"
+                                                                    class="form-control">
                                                             </div>
                                                         </td>
                                                         <td>
-                                                            <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1 remove-variant" style="cursor: pointer"></i>
+                                                            <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1 remove-variant"
+                                                                style="cursor: pointer"></i>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -222,11 +238,11 @@
         }
     </script>
 
-<script>
-    document.getElementById('add-variant').addEventListener('click', function() {
-        var rowCount = 1;
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
+    <script>
+        document.getElementById('add-variant').addEventListener('click', function() {
+            var rowCount = 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
             <td class="d-flex align-items-center">
                 <div class="mb-3 mx-3">
                     <label for="simpleinput" class="form-label">Màu sắc</label>
@@ -253,15 +269,15 @@
                 <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1 remove-variant" style="cursor: pointer"></i>
             </td>
         `;
-        document.getElementById('variant-table-body').appendChild(newRow);
-    });
+            document.getElementById('variant-table-body').appendChild(newRow);
+        });
 
-  
-    document.getElementById('variant-table-body').addEventListener('click', function(event) {
-        if (event.target.classList.contains('remove-variant')) {
-        
-            event.target.closest('tr').remove();
-        }
-    });
-</script>
+
+        document.getElementById('variant-table-body').addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-variant')) {
+
+                event.target.closest('tr').remove();
+            }
+        });
+    </script>
 @endsection

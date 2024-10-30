@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Product\ProductStoreRequest;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
@@ -34,64 +35,70 @@ class ProductController extends Controller
     public function create()
     {
         $subcategory = SubCategory::all();
+        $categories = Category::all();
         $color = ProductColor::all();
         $size = ProductSize::all();
-        return view('Admin.Product.create', compact('subcategory', 'color', 'size'));
+        return view('Admin.Product.create', compact('subcategory', 'categories', 'color', 'size'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductStoreRequest $request)
     {
-        // dd($request->all());
         $category = Category::query()->orderBy('id', 'desc')->first();
         $category_id = $category->id;
-        if ($request->isMethod('POST')) {
-            try {
-                $params = $request->except('_token');
-                $params['is_sale'] = $request->has('is_sale') ? 1 : 0;
-                $params['is_hot'] = $request->has('is_hot') ? 1 : 0;
-                $params['is_show_home'] = $request->has('is_show_home') ? 1 : 0;
-                $params['is_active'] = $request->has('is_active') ? 1 : 0;
-                $params['product_code'] = $request->name . '-' . $category_id . '-' . Str::random(3);
-                if ($request->hasFile('image')) {
-                    $params['image'] = $request->file('image')->store('uploads/products', 'public');
-                    $product = Product::create($params);
-                    $product_id = $product->id;
-                    if ($request->hasFile('list_hinh_anh')) {
-                        foreach ($request->file('list_hinh_anh') as $image) {
-                            if ($image) {
-                                $path = $image->store('uploads/products/id_' . $product_id, 'public');
-                                $product->images()->create([
-                                    'product_image_id ' => $product_id,
-                                    'image' => $path
-                                ]);
-                            }
-                        }
-                    }
-                    $products = $request->input('products');
-                    foreach ($products as $key => $productVariant) {
-                        $product->ProductDetail()->create([
-                            'product_id' => $product_id,
-                            'size_id' => $productVariant['size_id'],
-                            'color_id' => $productVariant['color_id'],
-                            'quantity' => $productVariant['quantity'],
+    
+        DB::beginTransaction();
+    
+        try {
+            $params = $request->except('_token');
+            $params['is_sale'] = $request->has('is_sale') ? 1 : 0;
+            $params['is_hot'] = $request->has('is_hot') ? 1 : 0;
+            $params['is_show_home'] = $request->has('is_show_home') ? 1 : 0;
+            $params['is_active'] = $request->has('is_active') ? 1 : 0;
+            $params['product_code'] = $request->name . '-' . $category_id . '-' . Str::random(3);
+            
+            // Lưu hình ảnh chính
+            $params['image'] = $request->file('image')->store('uploads/products', 'public');
+            $product = Product::create($params);
+            $product_id = $product->id;
+    
+            // Xử lý hình ảnh bổ sung
+            if ($request->hasFile('list_hinh_anh')) {
+                foreach ($request->file('list_hinh_anh') as $image) {
+                    if ($image) {
+                        $path = $image->store('uploads/products/id_' . $product_id, 'public');
+                        $product->images()->create([
+                            'product_image_id' => $product_id,
+                            'image' => $path
                         ]);
                     }
-                    DB::commit();
-                    return redirect()->route('admins.product.index')->with('success', 'thêm sản phẩm thành công');
                 }
-            } catch (\Exception $e) {
-                DB::rollBack(); // Rollback transaction on error
-
-                // Log the error message
-                Log::error('Error in store method: ');
-
-                return redirect()->back()->with('error', 'Đã xảy ra lỗi: ');
             }
+    
+            $products = $request->input('products');
+    
+            foreach ($products as $productVariant) {
+                // Thêm chi tiết sản phẩm
+                $product->ProductDetail()->create([
+                    'product_id' => $product_id,
+                    'size_id' => $productVariant['size_id'],
+                    'color_id' => $productVariant['color_id'],
+                    'quantity' => $productVariant['quantity'],
+                ]);
+            }
+    
+            DB::commit();
+            return redirect()->route('admins.product.index')->with('success', 'Thêm sản phẩm thành công');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in store method: ' . $e->getMessage());
+            return redirect()->route('admins.product.create')->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
         }
     }
+    
+
 
     /**
      * Display the specified resource.
@@ -239,7 +246,7 @@ class ProductController extends Controller
     {
         // Tìm sản phẩm theo id, nếu không có trả lỗi 404
         $product = Product::findOrFail($id);
-        
+
         // Xóa từng hình ảnh của sản phẩm
         foreach ($product->images as $image) {  // $product->images nếu là một collection
             if ($image && Storage::disk('public')->exists($image->image)) {
@@ -247,21 +254,21 @@ class ProductController extends Controller
             }
             $image->delete(); // Xóa bản ghi hình ảnh trong database
         }
-    
+
         // Xóa thư mục chứa hình ảnh của sản phẩm
         $path = 'uploads/products/id_' . $id;
         if (Storage::disk('public')->exists($path)) {
             Storage::disk('public')->deleteDirectory($path); // Xóa toàn bộ thư mục
         }
-    
+
         // Xóa tất cả các biến thể của sản phẩm
         foreach ($product->ProductDetail as $ProductDetail) {
             $ProductDetail->delete(); // Xóa biến thể sản phẩm
         }
-    
+
         // Xóa sản phẩm chính
         $product->delete();
-    
+
         return redirect()->route('admins.product.index')->with('success', 'Xóa sản phẩm thành công');
     }
 

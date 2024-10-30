@@ -6,9 +6,8 @@ use App\Models\Wishlist;
 
 use App\Models\WishlistsDetail;
 use App\Http\Controllers\Controller;
-
+use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ApiWishlistController extends Controller
 {
@@ -62,14 +61,19 @@ class ApiWishlistController extends Controller
     {
         $wishlist = Wishlist::where('user_id', Auth::id())->first();
 
-if (!$wishlist) {
-    return response()->json(['message' => 'No wishlist found'], 404);
-}
+        if ($wishlist) {
+            $wishlistDetails = WishlistsDetail::where('wishlist_id', $wishlist->id)
+                                               ->with('product')
+                                               ->with('product.discount') // Load thông tin sản phẩm
+                                               ->get();
+        
+            foreach ($wishlistDetails as $key => $wishlistDetail) {
+                // Sử dụng sản phẩm liên kết với wishlistDetail
+                $wishlistDetail->imageUrl = 'http://127.0.0.1:8000/storage/' . $wishlistDetail->product->image;
+            }        
+            return response()->json($wishlistDetails, 200);
+        }
 
-$wishlistDetails = WishlistsDetail::where('wishlist_id', $wishlist->id)
-                                   ->with('product')
-                                   ->get();
-
-return response()->json($wishlistDetails, 200);
+        return response()->json(['message' => 'Không có sản phẩm yêu thích'], 404);
     }
 }
