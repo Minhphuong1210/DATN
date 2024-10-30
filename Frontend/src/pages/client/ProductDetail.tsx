@@ -129,6 +129,10 @@ const ProductDetail: React.FC = () => {
                 toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
                 nav('/login')
             }
+            if (!color_id || !size_id) {
+                toast.error("Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng");
+                return; // Dừng hàm nếu thiếu thông tin
+            }
             await axios.post('/api/cart/add', {
                 id: product.id,
                 color_id,
@@ -139,7 +143,7 @@ const ProductDetail: React.FC = () => {
             toast.success('Thêm sản phẩm vào giỏ hàng thành công');
             nav('/cart');
         } catch (error) {
-            console.error('Error adding to cart:', error);
+            toast.error('Sản phẩm đã hết hàng :');
         }
 
     };
@@ -187,11 +191,16 @@ const ProductDetail: React.FC = () => {
                                     <FontAwesomeIcon icon={faStarSolid} />
                                     <FontAwesomeIcon icon={faStarRegular} />
                                 </span>
-                                <span className="text-xs">| Đã bán: 1490</span>
+                                <span className="text-xs">| Đã bán: {product.soldQuantity}</span>
                             </div>
                             <div className="text-xs">
                                 Tình trạng:
-                                <span className="text-sm font-bold text-green-500">Còn hàng</span>
+                              {product.stock>0 ?(
+                                  <span className="text-sm font-bold text-green-500">Còn hàng</span>
+                              ):(
+                                <span className="text-sm font-bold text-green-500">Hết hàng</span>
+                              )
+                              }
                             </div>
                             <div className="text-lg font-bold">
                                 {product.price_sale !== null ? (
@@ -449,10 +458,15 @@ const ProductDetail: React.FC = () => {
                                         <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[30vw] lg:w-[17vw] xl:w-[18vw]">
                                             <div className="mb-3 h-[80%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
                                                 <img
-                                                    src={ProductBycategory.image || 'default-image-url.jpg'}
+                                                    src={ProductBycategory.imageUrl || 'default-image-url.jpg'}
                                                     alt={ProductBycategory.name}
                                                     className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                                                 />
+                                                 {ProductBycategory.discount_id !== null && (
+                                        <div className='absolute top-0 right-0 my-3 mx-3 py-1 px-2 rounded-md bg-red-500 text-white sale-badge'>
+                                            {ProductBycategory.discount.discount_percent}%
+                                        </div>
+                                    )}
                                             </div>
                                             <div className="relative">
                                                 <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
@@ -484,12 +498,20 @@ const ProductDetail: React.FC = () => {
                                                     {ProductBycategory.name}
                                                 </div>
                                                 <div className="text-center block">
-                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(399000)} {/* Giá cũ */}
-                                                    </span>
-                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ProductBycategory.price)} {/* Giá hiện tại */}
-                                                    </span>
+                                                    {ProductBycategory.price_sale !== null ? (
+                                                        <>
+                                                            <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                {formatPrice(ProductBycategory.price)}
+                                                            </span>
+                                                            <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                {formatPrice(ProductBycategory.price_sale)}
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                            {formatPrice(ProductBycategory.price)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </a>
                                         </div>

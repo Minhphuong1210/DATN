@@ -27,45 +27,46 @@ class ApiOrderController extends Controller
     public function index()
     {
         $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
-    $donHangs = Auth::user()->order()->orderBy('id', 'desc')->paginate(5);
+        $donHangs = Auth::user()->order()->orderBy('id', 'desc')->paginate(5);
 
-    $arrayDonHang = $donHangs->map(function($donHang) use ($trangThaiDonHang) {
-        return [
-            'code_order' => $donHang->code_order,
-            'username' => $donHang->username,
-            'phone' => $donHang->phone,
-            'address' => $donHang->address,
-            'email' => $donHang->email,
-            'note' => $donHang->note,
-            'total_amount' => $donHang->total_amount,
-            'id' => $donHang->id,
-            'orderStatus' => $trangThaiDonHang[$donHang->order_status]
-        ];
-    });
-
-    $arrayChitietDonHang = $donHangs->flatMap(function($donHang) use ($trangThaiDonHang) {
-        return $donHang->orderDetail->map(function($detail) use ($donHang, $trangThaiDonHang) {
+        $arrayDonHang = $donHangs->map(function ($donHang) use ($trangThaiDonHang) {
             return [
-                'image' => $detail->productDetail->product->image, 
-                'product_name' => $detail->productDetail->product->name, 
-                'quantity' => $detail->quantity, 
-                'price' => $detail->price, 
-                'order_id' => $detail->id, 
-                'orderStatus' => $trangThaiDonHang[$donHang->order_status] 
+                'code_order' => $donHang->code_order,
+                'username' => $donHang->username,
+                'phone' => $donHang->phone,
+                'address' => $donHang->address,
+                'email' => $donHang->email,
+                'note' => $donHang->note,
+                'total_amount' => $donHang->total_amount,
+                'id' => $donHang->id,
+                'orderStatus' => $trangThaiDonHang[$donHang->order_status]
             ];
         });
-    });
 
-    $typeChoXacNhan = Order::CHO_XAC_NHA;
-    $typeDangVanChuyen = Order::DANG_VAN_CHUYEN;
+        $arrayChitietDonHang = $donHangs->flatMap(function ($donHang) use ($trangThaiDonHang) {
+            return $donHang->orderDetail->map(function ($detail) use ($donHang, $trangThaiDonHang) {
+                return [
+                    'image' => $detail->productDetail->product->image,
+                    'product_name' => $detail->productDetail->product->name,
+                    'quantity' => $detail->quantity,
+                    'price' => $detail->price,
+                    'order_id' => $detail->id,
+                    'orderStatus' => $trangThaiDonHang[$donHang->order_status],
+                    'imageUrl' => 'http://127.0.0.1:8000/storage/' . $detail->productDetail->product->image,
+                ];
+            });
+        });
 
-    return response()->json([
-        'arrayDonHang' => $arrayDonHang,
-        'chitietDonHang' => $arrayChitietDonHang,
-        'trangThaiDonHang' => $trangThaiDonHang,
-        'typeChoXacNhan' => $typeChoXacNhan,
-        'typeDangVanChuyen' => $typeDangVanChuyen,
-    ]);
+        $typeChoXacNhan = Order::CHO_XAC_NHA;
+        $typeDangVanChuyen = Order::DANG_VAN_CHUYEN;
+
+        return response()->json([
+            'arrayDonHang' => $arrayDonHang,
+            'chitietDonHang' => $arrayChitietDonHang,
+            'trangThaiDonHang' => $trangThaiDonHang,
+            'typeChoXacNhan' => $typeChoXacNhan,
+            'typeDangVanChuyen' => $typeDangVanChuyen,
+        ]);
     }
     // đây là hiện gia trang mua hàng
     public function create()
@@ -87,7 +88,6 @@ class ApiOrderController extends Controller
                 // Tạo giỏ hàng mới từ session nếu người dùng đăng nhập nhưng chưa có giỏ hàng
                 $cart = Cart::create([
                     'user_id' => $userId,
-                    'status' => 'pending',
                 ]);
 
                 // Chuyển sản phẩm từ session vào giỏ hàng cơ sở dữ liệu
@@ -189,6 +189,7 @@ class ApiOrderController extends Controller
                 $params = $request->except('_token');
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
+
                 $order = Order::create($params);
                 $order_id = $order->id;
                 $cart = Cart::where('user_id', $user_id)->first();
@@ -224,7 +225,6 @@ class ApiOrderController extends Controller
                 }
                 CartDetail::where('cart_id', $cart->id)->delete();
                 $cart->delete();
-                
                 DB::commit();
                 Mail::to($order->email)->queue(new OrderConfirm($order));
                 return response()->json([
@@ -252,23 +252,23 @@ class ApiOrderController extends Controller
         //
     }
 
-//    đây là trang sản phẩm khi người dùng click vào nút cập nhật đơn hàng
+    //    đây là trang sản phẩm khi người dùng click vào nút cập nhật đơn hàng
     public function update(Request $request, string $id)
     {
         $donHang = Order::query()->findOrFail($id);
         DB::beginTransaction();
         try {
             if ($request->has('huy_don_hang')) {
-                $donHang['order_status'] =Order::HUY_HANG;
+                $donHang['order_status'] = Order::HUY_HANG;
                 $donHang->save();
-             
+
                 DB::commit();
                 return response()->json([
                     'success' => true,
                     'message' => 'Đơn hàng đã được hủy thành công.'
                 ], 200);
             } else if ($request->has('da_nhan_hang')) {
-                $donHang['order_status'] =Order::DA_NHAN_HANG;
+                $donHang['order_status'] = Order::DA_NHAN_HANG;
                 $donHang->save();
                 DB::commit();
                 return response()->json([

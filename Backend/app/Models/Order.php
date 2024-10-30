@@ -20,6 +20,7 @@ class Order extends Model
 
     const TRANG_THAI_THANH_TOAN = [
         'chua_thanh_toan' => 'Chưa thanh toán',
+        
         'da_thanh_toan' => 'Đã thanh toán',
     ];
 
