@@ -37,7 +37,7 @@ const ProductDetail: React.FC = () => {
             product_id: product ? product.id : '',
         }));
     }, [product]);
-
+    //lưu giá trị từ form vào đây
     const handleChangeComment = (e) => {
         const { name, value } = e.target;
         setAddcomment({
@@ -69,7 +69,7 @@ const ProductDetail: React.FC = () => {
                 parent_id: '',
                 product_id: product ? product.id : '',
             });
-            // window.location.reload();
+            window.location.reload();
         } catch (error) {
             toast.error("bạn cần mua sản phẩm mới được bình luận");
         } finally {
