@@ -16,7 +16,7 @@ import { Collapse } from 'antd';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-const steps = ['Thông tin giao hàng', 'Phương thức thanh toán', 'Xác nhận đơn hàng'];
+const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng', ' Phương thức thanh toán'];
 
 
 
@@ -43,16 +43,16 @@ const Checkout = () => {
         total_price: number
     }
     const [apply, setApply] = useState()
-    
 
-    const handleChange = (e:any) =>{
+
+    const handleChange = (e: any) => {
         setApply(e.target.value)
 
     }
-    const Apply = async()=>{
+    const Apply = async () => {
         try {
-             await axios.post('/api/applyPromotion', {code:apply,totalPayment: totalPayment})
-            toast.success('Áp dụng thành công')            
+            await axios.post('/api/applyPromotion', { code: apply, totalPayment: totalPayment })
+            toast.success('Áp dụng thành công')
         } catch (error) {
             toast.error('Phiếu khuyến mại hết hạn')
         }
@@ -131,20 +131,21 @@ const Checkout = () => {
                 );
             case 1:
                 return (
-                    <PaymentForm
-                        paymentMethod={paymentMethod}
-                        setPaymentMethod={setPaymentMethod}
-                        totalPayment={totalPayment}  
-                    />
-                );
-            case 2:
-                return (
                     <Confirmation
                         shippingInfo={shippingInfo}
                         paymentMethod={paymentMethod}
                         shippings={shippings}
                     />
                 );
+            case 2:
+                return (
+                    <PaymentForm
+                        paymentMethod={paymentMethod}
+                        setPaymentMethod={setPaymentMethod}
+                        totalPayment={totalPayment}
+                    />
+                );
+
             default:
                 return 'Unknown step';
         }
