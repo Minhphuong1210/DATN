@@ -12,6 +12,8 @@ use App\Models\Product;
 use App\Models\ProductDetail;
 use App\Models\SubCategory;
 
+use App\Models\vnpay;
+use App\Models\Vnpayy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -174,44 +176,7 @@ class ApiOrderController extends Controller
     // đây là khi kích vào nút mua hàng
     public function store(Request $request)
     {
-
-        // Kiểm tra trạng thái thanh toán online
-        if ($request->has('resultCode')) {
-            if ($request->resultCode == 0) {
-                DB::beginTransaction();
-    
-                try {
-                    $user_id = Auth::id();
-                    if (!$user_id) {
-                        return response()->json([
-                            'error' => 'Người dùng chưa đăng nhập'
-                        ], 401);
-                    }
-    
-                    $params = $request->except('_token', 'resultCode');
-                    $params['user_id'] = $user_id;
-                    $params['username'] = Auth::user()->username ?? 'Guest';
-                    $params['code_order'] = $this->generateUniqueOrderCode();
-                    $order = Order::create($params);
-                    $order_id = $order->id;
-    
-                    $cart = Cart::where('user_id', $user_id)->first();
-                    if (!$cart) {
-                        return response()->json([
-                            'error' => 'Không có sản phẩm cần mua'
-                        ], 404);
-                    }
-    
-                    $cartDetails = CartDetail::where('cart_id', $cart->id)->get();
-                    if ($cartDetails->isEmpty()) {
-                        return response()->json([
-                            'error' => 'Giỏ hàng của bạn hiện đang trống'
-                        ], 404);
-
-
-
         if ($request->isMethod('post')) {
-
             DB::beginTransaction();
 
             try {
@@ -221,18 +186,26 @@ class ApiOrderController extends Controller
                         'error' => 'Người dùng chưa đăng nhập'
                     ], 401);
                 }
-                $params = $request->except('_token');
+
+
+                $params = $request->input('orderData');
+                $paymentData = $request->input('paymentData');
+                $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
+                $vnPay->update($paymentData);
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
 
                 $order = Order::create($params);
                 $order_id = $order->id;
+
+                // Xử lý giỏ hàng và tạo OrderDetail như trước
                 $cart = Cart::where('user_id', $user_id)->first();
                 if (!$cart) {
                     return response()->json([
                         'error' => 'Không có sản phẩm cần mua'
                     ], 404);
                 }
+
                 $cartDetails = CartDetail::where('cart_id', $cart->id)->get();
                 if ($cartDetails->isEmpty()) {
                     return response()->json([
@@ -257,50 +230,29 @@ class ApiOrderController extends Controller
                         $detail->quantity -= $item->quantity;
                         $detail->save();
                     }
-    
-                    foreach ($cartDetails as $item) {
-                        $total = $item->price * $item->quantity;
-                        OrderDetail::create([
-                            'order_id' => $order_id,
-                            'product_detail_id' => $item->product_detail_id,
-                            'total' => $total,
-                            'total_amount' => $total,
-                            'quantity' => $item->quantity,
-                            'price' => $item->price
-                        ]);
-    
-                        $detail = ProductDetail::query()->where('id', $item->product_detail_id)->first();
-                        if ($detail) {
-                            $detail->quantity -= $item->quantity;
-                            $detail->save();
-                        }
-                    }
-    
-                    CartDetail::where('cart_id', $cart->id)->delete();
-                    $cart->delete();
-                    DB::commit();
-    
-                    // Gửi email 
-                    Mail::to($order->email)->queue(new OrderConfirm($order));
-    
-                    return response()->json([
-                        'success' => 'Thanh toán online thành công, đơn hàng đã được mua thành công và email xác nhận đã được gửi.'
-                    ], 201);
-    
-                } catch (\Exception $exception) {
-                    DB::rollBack();
-return response()->json([
-                        'error' => 'Có lỗi khi tạo đơn hàng, vui lòng thử lại sau: ' . $exception->getMessage()
-                    ], 500);
                 }
-            } else {
-                // Thanh toán không thành công
+
+                CartDetail::where('cart_id', $cart->id)->delete();
+                $cart->delete();
+
+                // Lưu thông tin thanh toán nếu cần, ví dụ:
+                // Payment::create(array_merge(['order_id' => $order_id], $paymentData));
+
+                DB::commit();
+                Mail::to($order->email)->queue(new OrderConfirm($order));
+
                 return response()->json([
-                    'error' => 'Thanh toán không thành công'
-                ], 400);
+                    'success' => 'Mua hàng thành công'
+                ], 201);
+
+            } catch (\Exception $exception) {
+                DB::rollBack();
+                return response()->json([
+                    'error' => 'Có lỗi khi tạo đơn hàng, vui lòng thử lại sau: ' . $exception->getMessage()
+                ], 500);
             }
         }
-    
+
     }
 
     /**

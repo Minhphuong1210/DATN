@@ -33,11 +33,11 @@ class ApiAuthController extends Controller
         }
     
         // Kiểm tra trạng thái tài khoản
-        if ($user->is_active == 0) {
-            return response()->json([
-                'message' => 'Tài khoản đã bị khóa'
-            ], 403); // Sử dụng mã lỗi 403 cho Forbidden
-        }
+        // if ($user->is_active == 0) {
+        //     return response()->json([
+        //         'message' => 'Tài khoản đã bị khóa'
+        //     ], 403); // Sử dụng mã lỗi 403 cho Forbidden
+        // }
     
         // Đăng nhập người dùng
         Auth::login($user);
