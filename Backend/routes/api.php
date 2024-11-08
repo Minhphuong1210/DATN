@@ -106,7 +106,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
 // thanh toán onl bằng vn_pay
 Route::post('/vnpay/payment',[PaymentController::class,'vn_pay'])->name('vn_pay');
-
-
+Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
 
 
