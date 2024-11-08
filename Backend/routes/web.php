@@ -5,6 +5,7 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductColorController;
 use App\Http\Controllers\ProductController;
@@ -27,9 +28,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('dashboard');
-});
+Route::get('/',[DashboardController::class,'dashboard'])->name('dashboard');
 // Route::get('/showLogin',[AuthController::class,'showLogin'])->name('showLogin');
 
 // Route::post('/login',[AuthController::class,'login'])->name('login');

@@ -55,6 +55,7 @@ Route::resource('/categorys', CategoryController::class);
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
 // Payment
 Route::post('/payment/momo', [PaymentController::class, 'payment_momo']);
+
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 // banner
 Route::get('/banner', [ApiProductController::class,'Banner']);
@@ -65,7 +66,7 @@ Route::get('/filter-products', [ProductController::class, 'filter']);
 // Lọc sản phẩm theo giá min và max
 Route::get('/products/filter-by-price', [ProductController::class, 'filterByPrice']);
 
-
+ 
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
@@ -103,8 +104,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('wishlist', [ApiWishlistController::class, 'getWishlist']);
 });
 Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
+
 Route::put('/userEdit/{id}',[ApiAuthController::class,'update'])->middleware('auth:sanctum');
 
+
+
+// thanh toán onl bằng vn_pay
+Route::post('/vnpay/payment',[PaymentController::class,'vn_pay'])->name('vn_pay');
+Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
 
 
 

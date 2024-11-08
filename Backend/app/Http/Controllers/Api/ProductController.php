@@ -19,47 +19,52 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::query()
-        ->where('is_active', '1')
-        ->with('discount') // Eager load the related discount
-        ->orderBy('created_at', 'desc')
-        ->limit(8)
-        ->get();
+            ->where('is_active', '1')
+            ->with('discount')
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get();
 
-    $products_sale = Product::query()
-        ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
-        ->where('is_active', '1')
-        ->where('is_sale', '1')
-        ->with('discount') // Eager load the related discount
-        ->orderBy('created_at', 'desc')
-        ->limit(8)
-        ->get();
-
-    $products_showhome = Product::query()
-        ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
-        ->where('is_active', '1')
-        ->where('is_show_home', '1')
-        ->with('discount') // Eager load the related discount
-        ->orderBy('created_at', 'desc')
-        ->limit(8)
-        ->get();
-
-    $products_hot = Product::query()
-        ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
-        ->where('is_active', '1')
-        ->where('is_hot', '1')
-        ->with('discount') // Eager load the related discount
-        ->orderBy('created_at', 'desc')
-        ->limit(8)
-        ->get();
-
-    // Format the data for the API response
-    $data = [
-        'status' => 'success',
-        'products' => $products,
-        'products_sale' => $products_sale,
-        'products_hot' => $products_hot,
-        'products_showhome' => $products_showhome,
-    ];
+        $products_sale = Product::query()
+            ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
+            ->where('is_active', '1')
+            ->where('is_sale', '1')
+            ->with('discount')
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get();
+        foreach ($products_sale as $products_sales) {
+            $products_sales->imageUrl = 'http://127.0.0.1:8000/storage/' . $products_sales->image;
+        }
+        $products_showhome = Product::query()
+            ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
+            ->where('is_active', '1')
+            ->where('is_show_home', '1')
+            ->with('discount')
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get();
+        foreach ($products_showhome as $products_showhomes) {
+            $products_showhomes->imageUrl = 'http://127.0.0.1:8000/storage/' . $products_showhomes->image;
+        }
+        $products_hot = Product::query()
+            ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
+            ->where('is_active', '1')
+            ->where('is_hot', '1')
+            ->with('discount')
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get();
+        foreach ($products_hot as $products_hots) {
+            $products_hots->imageUrl = 'http://127.0.0.1:8000/storage/' . $products_hots->image;
+        }
+        $data = [
+            'status' => 'success',
+            'products' => $products,
+            'products_sale' => $products_sale,
+            'products_hot' => $products_hot,
+            'products_showhome' => $products_showhome,
+        ];
         $discounts = Discount::with('subCategory')->orderBy('created_at', 'desc')->get();
         $sub_category_ids = $discounts->pluck('sub_category_id');
         $products = Product::query()->whereIn('sub_category_id', $sub_category_ids)->get();
@@ -71,7 +76,7 @@ class ProductController extends Controller
                 $expires_at = Carbon::parse($discount->expires_at);
                 foreach ($discounts as $key => $value) {
                     if ($now->lessThan($expires_at)) {
-                        $sale = $product->price *$value->discount_percent / 100;
+                        $sale = $product->price * $value->discount_percent / 100;
                         $product->discount_id = $discount->id;
                         $product->price_sale = $product->price - $sale;
                     } else {
@@ -123,7 +128,7 @@ class ProductController extends Controller
     }
     public function search(Request $request)
     {
-        $query = $request->input('q');
+        $query = $request->input('q', '');
 
         // Thêm logic tìm kiếm sản phẩm của bạn
         $products = Product::where('name', 'like', '%' . $query . '%')
@@ -195,54 +200,6 @@ class ProductController extends Controller
     return response()->json($products);
 }
 
-// Lọc sản phẩm theo giá tiền
-public function filterByPrice(Request $request)
-{
-    // Lấy giá trị min và max từ request
-    $minPrice = $request->input('min_price');
-    $maxPrice = $request->input('max_price');
-
-    // Kiểm tra nếu không có giá trị min_price hoặc max_price
-    if (is_null($minPrice) || is_null($maxPrice)) {
-        return response()->json([
-            'error' => 'Vui lòng nhập giá trị min_price và max_price.'
-        ], 400); // Trả về mã lỗi 400 Bad Request
-    }
-
-    // Kiểm tra giá trị min_price và max_price có phải là số hợp lệ hay không
-    if (!is_numeric($minPrice) || !is_numeric($maxPrice)) {
-        return response()->json([
-            'error' => 'Giá trị min_price và max_price phải là số hợp lệ.'
-        ], 400); // Trả về mã lỗi 400 Bad Request
-    }
-
-    // Kiểm tra giá trị âm
-    if ($minPrice < 0 || $maxPrice < 0) {
-        return response()->json([
-            'error' => 'Giá trị không được là số âm.'
-        ], 400); // Trả về mã lỗi 400 Bad Request
-    }
-
-    // Kiểm tra khoảng giá trị hợp lệ (min không lớn hơn max)
-    if ($minPrice > $maxPrice) {
-        return response()->json([
-            'error' => 'Giá trị min_price không được lớn hơn max_price.'
-        ], 400); // Trả về mã lỗi 400 Bad Request
-    }
-
-    // Truy vấn sản phẩm theo khoảng giá
-    $products = Product::whereBetween('price', [$minPrice, $maxPrice])->get();
-
-    // Nếu không có sản phẩm nào, trả về thông báo
-    if ($products->isEmpty()) {
-        return response()->json([
-            'message' => 'Không có sản phẩm nào trong khoảng giá đã chọn.'
-        ], 404); // Trả về mã lỗi 404 Not Found nếu không có sản phẩm
-    }
-
-    // Trả về danh sách sản phẩm
-    return response()->json($products);
-}
 // Sản phẩm đã xem gần đây
 public function addRecentlyViewed(Request $request)
 {
@@ -298,5 +255,6 @@ public function getRecentlyViewed(Request $request)
 
     return response()->json($products);
 }
+
 
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { OderProducts, OderTotal, Order } from "../interfaces/oder";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
+import { useLocation, useParams } from "react-router-dom";
 // import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
 interface DataType {
     order_id: string;
@@ -22,7 +23,24 @@ export const useOder = () => {
     const [shippingInfo, setShippingInfo] = useState<any>(null); // State cho thông tin vận chuyển
     const [apply, setApply] = useState()
     const [myOrder, setMyOrder] = useState<DataType[]>([]);
+    const location = useLocation(); // Lấy đối tượng location
+    const queryParams = new URLSearchParams(location.search); // Tạo URLSearchParams từ location.search
+    // const vnpAmount = queryParams.get('vnp_Amount');
 
+    const paymentInfo = {
+        vnp_Amount: queryParams.get('vnp_Amount'),
+        vnp_BankCode: queryParams.get('vnp_BankCode'),
+        vnp_BankTranNo: queryParams.get('vnp_BankTranNo'),
+        vnp_CardType: queryParams.get('vnp_CardType'),
+        vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
+        vnp_PayDate: queryParams.get('vnp_PayDate'),
+        vnp_ResponseCode: queryParams.get('vnp_ResponseCode'),
+        vnp_TmnCode: queryParams.get('vnp_TmnCode'),
+        vnp_TransactionNo: queryParams.get('vnp_TransactionNo'),
+        vnp_TransactionStatus: queryParams.get('vnp_TransactionStatus'),
+        vnp_TxnRef: queryParams.get('vnp_TxnRef')
+    };
+    // console.log(paymentInfo);
 
     const getAllOder = async () => {
         try {
@@ -76,9 +94,37 @@ export const useOder = () => {
                 total_amount: (total?.subtotal ?? 0) + shippingCost,
                 shipping_id: info.shippingMethod,
             };
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentData = {
+                vnp_Amount: urlParams.get("vnp_Amount"),
+                vnp_BankCode: urlParams.get("vnp_BankCode"),
+                vnp_BankTranNo: urlParams.get("vnp_BankTranNo"),
+                vnp_CardType: urlParams.get("vnp_CardType"),
+                vnp_OrderInfo: urlParams.get("vnp_OrderInfo"),
+                vnp_PayDate: urlParams.get("vnp_PayDate"),
+                vnp_ResponseCode: urlParams.get("vnp_ResponseCode"),
+                vnp_TmnCode: urlParams.get("vnp_TmnCode"),
+                vnp_TransactionNo: urlParams.get("vnp_TransactionNo"),
+                vnp_TransactionStatus: urlParams.get("vnp_TransactionStatus"),
+                vnp_TxnRef: urlParams.get("vnp_TxnRef"),
+                vnp_SecureHash: urlParams.get("vnp_SecureHash"),
+            };
+
+            console.log("Order Data:", orderData);
+            console.log("Payment Data:", paymentData);
+
+            setLoading(true);
+
+            const requestData = {
+                orderData,
+                paymentData,
+            };
+
             console.log("Order Data:", orderData);
             setLoading(true);
-            await axios.post('/api/donhangs/store', orderData);
+            await axios.post('/api/donhangs/store', requestData);
+
             toast.success("Đặt hàng thành công");
             setIsOrderSuccessful(true);
             localStorage.removeItem('activeStep');
@@ -86,7 +132,7 @@ export const useOder = () => {
             setIsOffBtn(true);
         } catch (error) {
             console.error("Error submitting order:", error);
-            
+
             alert("Error submitting order");
         } finally {
             setLoading(false);

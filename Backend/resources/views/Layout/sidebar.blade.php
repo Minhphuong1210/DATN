@@ -33,8 +33,7 @@
             <ul class="navbar-nav" id="navbar-nav">
                 <li class="menu-title"><span data-key="t-menu">Menu</span></li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarDashboards">
+                    <a class="nav-link menu-link" href="{{route('dashboard')}}" >
                         <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                     </a>
                 </li> <!-- end Dashboard Menu -->
@@ -82,10 +81,10 @@
                                 <a href="{{ route('admins.product_sizes.index') }}" class="nav-link"> <span
                                         data-key="t-file-manager">ProductSize</span></a>
                             </li>
-                            {{-- <li class="nav-item">
+                            <li class="nav-item">
                                 <a href="{{ route('admins.product_colors.index') }}" class="nav-link"> <span
                                         data-key="t-file-manager">ProductColor</span></a>
-                            </li> --}}
+                            </li>
                             <li class="nav-item">
                                 <a href="{{ route('admins.product.index') }}" class="nav-link"> <span
                                         data-key="t-file-manager">Product</span></a>
