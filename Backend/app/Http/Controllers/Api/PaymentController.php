@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Momo;
-use App\Models\vnpay;
 use App\Models\Vnpayy;
 use Illuminate\Http\Request;
 

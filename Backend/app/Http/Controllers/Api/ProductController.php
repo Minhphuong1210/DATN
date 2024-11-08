@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Discount;
 use App\Models\Product;
+use App\Models\ProductDetail;
+use App\Models\ProductView;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -139,6 +142,119 @@ class ProductController extends Controller
 
         return response()->json($products);
     }
+    public function getProductsByCategory($name)
+    {
+        // Tìm category theo name
+        $category = Category::where('name', $name)->first();
+    
+        if (!$category) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
+    
+        // Lấy tất cả các sản phẩm thông qua các sub-category của category này
+        $products = $category->products()->get();
+    
+        // Kiểm tra nếu không có sản phẩm nào trong danh mục
+        if ($products->isEmpty()) {
+            return response()->json(['message' => 'Không có sản phẩm nào trong danh mục này'], 404);
+        }
+    
+        // Trả về danh sách sản phẩm nếu có
+        return response()->json($products);
+    }
+    
+    public function filter(Request $request)
+{
+    // Nhận tham số từ request (tên màu sắc và kích thước)
+    $colorName = $request->input('color_name');
+    $sizeName = $request->input('size_name');
+    
+    // Tạo query ban đầu
+    $query = ProductDetail::query();
+
+    // Lọc theo tên màu sắc nếu có
+    if ($colorName) {
+        $query->whereHas('color', function ($q) use ($colorName) {
+            $q->where('name', '=', $colorName); // Tìm kiếm chính xác màu sắc
+        });
+    }
+
+    // Lọc theo tên kích thước nếu có
+    if ($sizeName) {
+        $query->whereHas('size', function ($q) use ($sizeName) {
+            $q->where('name', '=', $sizeName); // Tìm kiếm chính xác kích thước
+        });
+    }
+
+    // Thực hiện truy vấn sau khi áp dụng các điều kiện
+    $products = $query->with(['product', 'color', 'size'])->get();
+
+    // Kiểm tra xem có sản phẩm nào không
+    if ($products->isEmpty()) {
+        return response()->json([
+            'message' => 'Không tìm thấy sản phẩm nào phù hợp với màu sắc và kích thước bạn đã chọn.'
+        ], 404);
+    }
+
+    // Trả về kết quả
+    return response()->json($products);
+}
+
+// Sản phẩm đã xem gần đây
+public function addRecentlyViewed(Request $request)
+{
+    $user = $request->user(); // Lấy người dùng hiện tại
+    $productId = $request->input('product_id');
+
+    // Kiểm tra sản phẩm có tồn tại không
+    $product = Product::find($productId);
+    if (!$product) {
+        return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
+    }
+    // $user = $request->user();
+    // if (!$user) {
+    //     return response()->json(['error' => 'Người dùng không xác định'], 401);
+    // }
+    
+    // Xóa bản ghi cũ nếu sản phẩm này đã có trong danh sách
+    ProductView::where('user_id', $user->id)
+        ->where('product_id', $productId)
+        ->delete();
+
+    // Tạo bản ghi mới
+    ProductView::create([
+        'user_id' => $user->id,
+        'product_id' => $productId,
+    ]);
+
+    // Giới hạn danh sách sản phẩm đã xem gần đây (ví dụ: chỉ giữ lại 5 sản phẩm gần nhất)
+    $recentlyViewed = ProductView::where('user_id', $user->id)
+        ->orderBy('viewed_at', 'desc')
+        ->take(5)
+        ->pluck('id');
+
+    // Xóa các sản phẩm cũ hơn ngoài giới hạn
+    ProductView::where('user_id', $user->id)
+        ->whereNotIn('id', $recentlyViewed)
+        ->delete();
+
+    return response()->json(['message' => 'Đã thêm vào danh sách đã xem gần đây']);
+}
+
+// Hàm để lấy danh sách sản phẩm đã xem gần đây
+public function getRecentlyViewed(Request $request)
+{
+    $user = $request->user(); // Lấy người dùng hiện tại
+
+    // Lấy danh sách sản phẩm đã xem gần đây của người dùng
+    $products = ProductView::where('user_id', $user->id)
+        ->orderBy('viewed_at', 'desc')
+        ->take(5) // Lấy 5 sản phẩm gần nhất
+        ->with('product') // Eager load chi tiết sản phẩm
+        ->get();
+
+    return response()->json($products);
+}
 
 
 }
