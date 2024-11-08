@@ -20,6 +20,12 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpenUser, setIsOpenUser }
                     Tài khoản của tôi
                 </a>
                 <a
+                    href="/account"
+                    className="block px-4 py-2 text-slate-500 hover:text-black hover:bg-gray-100"
+                >
+                    Cập nhật tài khoản 
+                </a>
+                <a
                     href="/order"
                     className="block px-4 py-2 text-slate-500 hover:text-black hover:bg-gray-100"
                 >

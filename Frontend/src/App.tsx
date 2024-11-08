@@ -16,6 +16,7 @@ import Contact from './pages/client/Contact';
 import AllProducts from './pages/client/AllProducts';
 import Order from './pages/client/Order';
 import ProductWishlist from './pages/client/ProductWishlist';
+import AccountUpdate from './pages/client/AccountUpdate';
 
 
 function App() {
@@ -32,10 +33,9 @@ function App() {
           <Route path="payment" element={<PaymentMomo />} />
           <Route path="contact" element={<Contact />} />
           <Route path="allproduct" element={<AllProducts />} />
-
           <Route path="order" element={<Order />} />
-
           <Route path="wishlist" element={<ProductWishlist />} />
+          <Route path="account" element={<AccountUpdate  />} />
 
         </Route>
       </Routes>

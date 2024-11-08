@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
  Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed']);
  Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed']);
 
-   
+
 });
 // lấy sản phẩm product
 Route::resource('/products', ProductController::class);
@@ -97,15 +97,21 @@ Route::post('contas', [ApiProductController::class, 'contasUs']);
 
 // Tìm sản phẩm
 Route::get('/search', [ProductController::class, 'search']);
- 
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/add', [ApiWishlistController::class, 'addProductToWishlist']);
     Route::delete('wishlist/remove/{productId}', [ApiWishlistController::class, 'removeProductFromWishlist']);
     Route::get('wishlist', [ApiWishlistController::class, 'getWishlist']);
 });
 Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
+
+Route::put('/userEdit/{id}',[ApiAuthController::class,'update'])->middleware('auth:sanctum');
+
+
+
 // thanh toán onl bằng vn_pay
 Route::post('/vnpay/payment',[PaymentController::class,'vn_pay'])->name('vn_pay');
 Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
+
 
 
