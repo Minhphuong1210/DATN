@@ -39,6 +39,7 @@ class CategoryController extends Controller
             Category::query()->create($param);
           
             return redirect()->route('admins.category.index')->with('success', 'thêm danh mục thành công');
+            
         }
     }
 

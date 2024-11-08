@@ -11,11 +11,14 @@ class ProductDetail extends Model
     protected $table = 'product_details';
     protected $fillable = ['size_id', 'color_id', 'product_id', 'quantity'];
 
-    public function productColor(){
-        return $this->belongsTo(ProductColor::class, 'color_id');
-    }
-    public function productSize(){
+    public function size()
+    {
         return $this->belongsTo(ProductSize::class, 'size_id');
+    }
+
+    public function color()
+    {
+        return $this->belongsTo(ProductColor::class, 'color_id');
     }
 
     public function product()
