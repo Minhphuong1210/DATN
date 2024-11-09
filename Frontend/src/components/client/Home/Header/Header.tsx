@@ -1,9 +1,18 @@
-import React, { useState } from "react";
-import yourImage from "../../../../public/images/logofix.png"
-import { AlignJustify, Heart, Search, ShoppingCart, User, X } from "lucide-react";
-import '../../../../css/tableHeader.css'
+import React, { useEffect, useState } from "react";
+import yourImage from "../../../../public/images/logofix.png";
+import {
+  AlignJustify,
+  Heart,
+  Search,
+  ShoppingCart,
+  User,
+  X,
+} from "lucide-react";
+import "../../../../css/tableHeader.css";
 import MenuHeader from "./MenuHeader";
 import DropdownMenu from "./DropdowUser";
+import axios from "axios";
+import { Navigate, useNavigate } from "react-router-dom";
 interface HeaderProps {
   isMobile: boolean;
 }
@@ -11,8 +20,12 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [openMenu, setOpenMenu] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
   const [isOpenUser, setIsOpenUser] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const handleMenu = () => {
     setOpenMenu(!openMenu);
   };
@@ -24,13 +37,51 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
     setIsOpen(false);
   };
 
-  return (
+  //CHỨC NĂNG TÌM KIẾM SẢN PHẨM
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log(searchTerm);
+    e.preventDefault();
 
+    // kiểm tra điều kiện trước khi điều hướng
+        navigate(`/search?q=${searchTerm}`);
+    
+
+    // try {
+    //   setError(null);
+    // console.log(searchTerm);
+    //   const search= await axios.post(`http://127.0.0.1:8000/api/search?q=${searchTerm}`)
+    //   setSearchResults(search.data)
+    //   console.log(search);
+      
+    //   if (!search.ok) {
+    //     throw new Error("Không thể tải dữ liệu sản phẩm");
+    //   }
+
+     
+    // } catch (error) {
+    //   // console.log(error);
+    // }
+  };
+
+  // Gọi API lần đầu khi component mount
+  // useEffect(() => {
+  //   searchProduct();
+  // }, []);
+  // Debounce search để tránh gọi API quá nhiều
+  // useEffect(() => {
+  //   const timeoutId = setTimeout(() => {
+  //     searchProduct(searchTerm);
+  //   }, 500);
+
+  //   return () => clearTimeout(timeoutId);
+  // }, [searchTerm]);
+
+  return (
     <div className={`sticky top-0 z-50 w-full bg-white p-2`}>
       <div>
         <div className="relative mt-2 flex items-center justify-between md:mx-[60px] md:mt-0 lg:mx-[150px] xl:mx-[150px]">
           {/* Logo */}
-          <div className=" z-50">
+          <div className="z-50">
             <a
               href="/"
               className="flex items-center justify-center md:justify-start"
@@ -45,18 +96,16 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           </div>
 
           {/* Menu cho màn hình desktop */}
-          <div className="hidden flex-grow md:flex ml-10 text-sm">
+          <div className="ml-10 hidden flex-grow text-sm md:flex">
             <ul className="flex space-x-5">
-              <li
-                className="relative hovermenuNav"
-
-              >
+              <li className="hovermenuNav relative">
                 <a href="allproduct" className="hover:text-slate-600">
                   TẤT CẢ SẢN PHẨM
                 </a>
               </li>
 
-              <li className={`hovermenuNav ${isOpen ? 'text-yellow-500' : ''}`}
+              <li
+                className={`hovermenuNav ${isOpen ? "text-yellow-500" : ""}`}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
@@ -90,7 +139,6 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
                 </a>
               </li>
             </ul>
-
           </div>
 
           {/* Menu di động */}
@@ -138,16 +186,37 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           )}
 
           {/* Biểu tượng menu */}
-          <div className=" flex  border-2 py-2 rounded-full px-2 mr-2">
-            <input type="text" placeholder="Tìm kiếm" className="outline-none pl-6 " />
+          <div className="mr-2 flex rounded-full border-2 px-2 py-2">
+           <form action="" method="get" onSubmit={handleSearch}>
+           <input
+              type="text"
+              placeholder="Tìm kiếm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-6 outline-none"
+            />
+           </form>
+
             <Search
               size={25}
               className="hidden cursor-pointer text-slate-500 hover:text-black md:block lg:block"
             />
+
+
           </div>
+          {/* No results */}
+          {!loading && searchTerm && searchResults.length === 0 && !error && (
+            <div className="mt-4 text-center text-gray-500">
+              Không tìm thấy sản phẩm nào phù hợp
+            </div>
+          )}
+
           <div className="mr-1 flex space-x-2">
             <a href="/wishlist">
-              <Heart className="cursor-pointer text-slate-500 hover:text-black" size={30} />
+              <Heart
+                className="cursor-pointer text-slate-500 hover:text-black"
+                size={30}
+              />
             </a>
             <a
               href="/login"
@@ -157,7 +226,10 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             >
               <User size={30} />
             </a>
-            <DropdownMenu isOpenUser={isOpenUser} setIsOpenUser={setIsOpenUser} />
+            <DropdownMenu
+              isOpenUser={isOpenUser}
+              setIsOpenUser={setIsOpenUser}
+            />
 
             <a href="/cart">
               <ShoppingCart
@@ -165,7 +237,6 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
                 className="cursor-pointer text-slate-500 hover:text-black"
               />
             </a>
-
 
             {/* Nút mở/đóng menu di động */}
             {isMobile && (
@@ -186,13 +257,15 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               </div>
             )}
           </div>
-
         </div>
         {isOpen && (
-          <MenuHeader handleMouseEnter={handleMouseEnter} handleMouseLeave={handleMouseLeave} isOpen={isOpen} />
+          <MenuHeader
+            handleMouseEnter={handleMouseEnter}
+            handleMouseLeave={handleMouseLeave}
+            isOpen={isOpen}
+          />
         )}
       </div>
-
     </div>
   );
 };

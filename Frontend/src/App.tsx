@@ -16,6 +16,7 @@ import Contact from './pages/client/Contact';
 import AllProducts from './pages/client/AllProducts';
 import Order from './pages/client/Order';
 import ProductWishlist from './pages/client/ProductWishlist';
+import SearchProduct from './pages/client/search';
 
 
 function App() {
@@ -32,6 +33,8 @@ function App() {
           <Route path="payment" element={<PaymentMomo />} />
           <Route path="contact" element={<Contact />} />
           <Route path="allproduct" element={<AllProducts />} />
+          <Route path="/search" element={<SearchProduct />} />
+          
 
           <Route path="order" element={<Order />} />
 
