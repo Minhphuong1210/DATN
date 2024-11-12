@@ -62,11 +62,11 @@ Route::get('/banner', [ApiProductController::class,'Banner']);
 // Tìm sản phẩm theo danh mục
 Route::get('/category/{name}/products', [ProductController::class, 'getProductsByCategory']);
 // Lọc sản phẩm theo color và size
-Route::get('/filter-products', [ProductController::class, 'filter']);
-// Lọc sản phẩm theo giá min và max
-Route::get('/products/filter-by-price', [ProductController::class, 'filterByPrice']);
+Route::post('/filter-products', [ProductController::class, 'filter']);
+// Lọc sản phẩm theo giá min và max  oke
+Route::post('/products/filter-by-price', [ProductController::class, 'filterByPrice']);
 
- 
+
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
