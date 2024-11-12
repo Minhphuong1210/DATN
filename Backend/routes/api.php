@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
  Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed']);
  Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed']);
 
-   
+
 });
 // lấy sản phẩm product
 Route::resource('/products', ProductController::class);
@@ -55,17 +55,18 @@ Route::resource('/categorys', CategoryController::class);
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
 // Payment
 Route::post('/payment/momo', [PaymentController::class, 'payment_momo']);
+
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 // banner
 Route::get('/banner', [ApiProductController::class,'Banner']);
 // Tìm sản phẩm theo danh mục
 Route::get('/category/{name}/products', [ProductController::class, 'getProductsByCategory']);
 // Lọc sản phẩm theo color và size
-Route::get('/filter-products', [ProductController::class, 'filter']);
-// Lọc sản phẩm theo giá min và max
-Route::get('/products/filter-by-price', [ProductController::class, 'filterByPrice']);
+Route::post('/filter-products', [ProductController::class, 'filter']);
+// Lọc sản phẩm theo giá min và max  oke
+Route::post('/products/filter-by-price', [ProductController::class, 'filterByPrice']);
 
- 
+
 Route::post('login',[ApiAuthController::class,'login']);
 Route::post('register',[ApiAuthController::class,'register']);
 Route::post('logout',[ApiAuthController::class,'logout'])->middleware('auth:sanctum');
@@ -96,16 +97,21 @@ Route::post('contas', [ApiProductController::class, 'contasUs']);
 
 // Tìm sản phẩm
 Route::get('/search', [ProductController::class, 'search']);
- 
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/add', [ApiWishlistController::class, 'addProductToWishlist']);
     Route::delete('wishlist/remove/{productId}', [ApiWishlistController::class, 'removeProductFromWishlist']);
     Route::get('wishlist', [ApiWishlistController::class, 'getWishlist']);
 });
 Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
+
+Route::put('/userEdit/{id}',[ApiAuthController::class,'update'])->middleware('auth:sanctum');
+
+
+
 // thanh toán onl bằng vn_pay
 Route::post('/vnpay/payment',[PaymentController::class,'vn_pay'])->name('vn_pay');
-
+Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
 
 
 

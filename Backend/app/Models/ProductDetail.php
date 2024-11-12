@@ -26,4 +26,3 @@ class ProductDetail extends Model
         return $this->hasMany(OrderDetail::class);
     }
 }
-
