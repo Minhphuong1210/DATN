@@ -25,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+
   const handleMenu = () => {
     setOpenMenu(!openMenu);
   };
@@ -38,29 +38,20 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   };
 
   //CHỨC NĂNG TÌM KIẾM SẢN PHẨM
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     console.log(searchTerm);
     e.preventDefault();
-
     // kiểm tra điều kiện trước khi điều hướng
-        navigate(`/search?q=${searchTerm}`);
-    
-
-    // try {
-    //   setError(null);
-    // console.log(searchTerm);
-    //   const search= await axios.post(`http://127.0.0.1:8000/api/search?q=${searchTerm}`)
-    //   setSearchResults(search.data)
-    //   console.log(search);
-      
-    //   if (!search.ok) {
-    //     throw new Error("Không thể tải dữ liệu sản phẩm");
-    //   }
-
-     
-    // } catch (error) {
-    //   // console.log(error);
-    // }
+    // navigate(`/search?q=${searchTerm}`);
+    try {
+      setError(null);
+      console.log(searchTerm);
+      const search = await axios.post(`http://127.0.0.1:8000/api/search?q=${searchTerm}`)
+      setSearchResults(search.data)
+      console.log(search);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Gọi API lần đầu khi component mount
@@ -187,15 +178,15 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
           {/* Biểu tượng menu */}
           <div className="mr-2 flex rounded-full border-2 px-2 py-2">
-           <form action="" method="get" onSubmit={handleSearch}>
-           <input
-              type="text"
-              placeholder="Tìm kiếm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-6 outline-none"
-            />
-           </form>
+            <form action="" method="get" onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder="Tìm kiếm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-6 outline-none"
+              />
+            </form>
 
             <Search
               size={25}

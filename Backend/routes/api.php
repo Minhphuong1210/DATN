@@ -96,7 +96,7 @@ Route::post('applyPromotion',[PromotionController::class,'applyPromotion']);
 Route::post('contas', [ApiProductController::class, 'contasUs']);
 
 // Tìm sản phẩm
-Route::get('/search', [ProductController::class, 'search']);
+Route::post('/search', [ProductController::class, 'search']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/add', [ApiWishlistController::class, 'addProductToWishlist']);

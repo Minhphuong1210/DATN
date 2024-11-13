@@ -1,46 +1,52 @@
-import React from "react";
-import { useOder } from "../../hook/useOder";
+import React, { useState } from "react";
 import axios from "axios";
+import { useOder } from "../../hook/useOder";
+import CancelMyOrder from "../../modalConfirm/CancelMyoOrder";
+import { PenLine } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Order: React.FC = () => {
     const { myOrder, setMyOrder } = useOder();
     console.log(myOrder);
 
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
     const getStatusColor = (status: string) => {
+
         switch (status) {
             case "Đang chuẩn bị":
-                return "bg-yellow-300 py-2";
+            case "Đã xác nhận":
+                return "bg-yellow-300 rounded-full px-2";
             case "Đã giao hàng":
-                return "bg-green-300";
-            case "Hủy hàng":
-                return "bg-red-300";
-            case "Chờ xác nhận":
-                return "bg-blue-300  py-2 px-2";
             case "Đang vận chuyển":
-                return "bg-green-300  py-2 px-2";
+            case "Đã nhận hàng":
+                return "bg-green-300 rounded-full px-2";
+            case "Hủy hàng":
+                return "bg-red-300 rounded-full px-2";
+            case "Chờ xác nhận":
+                return "bg-blue-300 rounded-full px-2";
             default:
                 return "bg-gray-300";
         }
+
     };
 
-
-    const handleCancelOrder = async (orderId: string, action: "confirm" | "cancel") => {
+    const handleCancelOrder = async (id: string, action: "confirm" | "cancel") => {
         try {
-            // Tạo payload dựa trên hành động
             const payload = action === "confirm"
                 ? { da_nhan_hang: "1" }
                 : { huy_don_hang: "1" };
 
-            const response = await axios.put(`/api/donhangs/${orderId}/update`, payload);
+            const response = await axios.put(`/api/donhangs/${id}/update`, payload);
 
             if (response.status === 200) {
-                // Cập nhật trạng thái đơn hàng trong state
                 setMyOrder((prevOrders) =>
                     prevOrders.map((order) =>
-                        order.order_id === orderId
+                        order.id === id
                             ? {
                                 ...order,
-                                orderStatus: action === "confirm" ? "Nhận" : "Hủy hàng",
+                                orderStatus: action === "confirm" ? "Đã nhận hàng" : "Hủy hàng",
                             }
                             : order
                     )
@@ -51,33 +57,59 @@ const Order: React.FC = () => {
         }
     };
 
+    const openCancelModal = (orderId: string) => {
+        setSelectedOrderId(orderId);
+        setModalVisible(true);
+    };
+
+    const confirmCancelOrder = () => {
+        if (selectedOrderId) {
+            handleCancelOrder(selectedOrderId, "cancel");
+        }
+        setModalVisible(false);
+    };
 
     const getStatusButton = (status: string, orderId: string) => {
         if (status === "Đang vận chuyển") {
             return (
-                <td className="px-6 py-4">
-                    <button
-                        className="rounded bg-green-300 px-3 py-2 text-white"
-                        onClick={() => handleCancelOrder(orderId, "confirm")}
-                    >
-                        Đã nhận hàng
-                    </button>
-                </td>
+
+                <button
+                    className="rounded bg-green-300 px-3 py-2 text-white"
+                    onClick={() => handleCancelOrder(orderId, "confirm")}
+                >
+                    Đã nhận hàng
+                </button>
+
             );
-        } else {
+        } else if (status === "Chờ xác nhận" || status === "Đã xác nhận") {
             return (
-                <td className="px-6 py-4">
-                    <button
-                        className="rounded bg-red-500 px-3 py-2 text-white"
-                        onClick={() => handleCancelOrder(orderId, "cancel")}
-                    >
-                        Hủy đơn
-                    </button>
-                </td>
+
+                <button
+                    className="px-4 py-2 bg-red-500 text-white  rounded"
+                    onClick={() => openCancelModal(orderId)}
+                >
+                    Hủy đơn
+                </button>
+
             );
         }
+        else if (status === "Đã nhận hàng") {
+            return (
+                <button
+                    className="px-4 py-2 bg-yellow-400 text-black  rounded hover:bg-yellow-300 "
+                >
+                    Mua lại
+                </button>
+            )
+        }
     };
-
+    const getStatusTop = (status: string) => {
+        if (status === "Đã nhận hàng") {
+            return (
+                <span className="text-sm text-red-600 ">Hoàn thành</span>
+            )
+        }
+    }
 
     return (
         <div className="mx-[150px] mb-96">
@@ -89,77 +121,98 @@ const Order: React.FC = () => {
                     / <span className="text-gray-600">Đơn hàng của tôi</span>
                 </div>
             </div>
-            <div className="mt-16 grid grid-cols-4">
-                <div className="col-span-1 border-2">
+            <div className=" grid grid-cols-4">
+                <div className="col-span-1 border-2 h-96 text-[14px]">
                     <div className="m-4">
                         <div className="mt-2">
                             <div className="flex flex-col items-center justify-center gap-2">
                                 <img
-                                    className="w-40 rounded-full"
-                                    src="https://scontent.fhan2-5.fna.fbcdn.net/v/t1.30497-1/453178253_471506465671661_2781666950760530985_n.png?stp=dst-png_s200x200&_nc_cat=1&ccb=1-7&_nc_sid=136b72&_nc_ohc=rm10Cw5r5BUQ7kNvgEDkTjm&_nc_ht=scontent.fhan2-5.fna&_nc_gid=AlMZXeReeoxLcOTBF9vF00a&oh=00_AYCA4Sbnfij30_RKqe8Ob3cEK3OvUBcVc4kmGdmd1SGt7g&oe=672A4DBA"
-                                    alt=""
+                                    className="w-32 rounded-full"
+                                    src="https://inkythuatso.com/uploads/thumbnails/800/2023/03/9-anh-dai-dien-trang-inkythuatso-03-15-27-03.jpg"
+                                    alt="Profile"
                                 />
-                                <div className="text-xl">Hoàng Hùng</div>
+                                <div className="flex items-center gap-2">
+                                    <div className="text-xl">Hoàng Hùng</div>
+                                    <Link to={"/account"} className="opacity-45 flex gap-2"> <PenLine size={20} />Sửa hồ sơ</Link>
+                                </div>
                             </div>
                             <div className="text-lg">Thông tin tài khoản</div>
-                            <div className="ml-3">
+                            <div className="ml-3 text-[14px]">
                                 <div>Số điện thoại: 0987654321</div>
                                 <div>Email: hung@gmail.com</div>
                                 <div>Địa chỉ: Foresa 3, Đ.Xuân Phương, Nam Từ Liêm, Hà Nội</div>
-                                <div></div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="col-span-3">
                     <div className="overflow-hidden">
-                        <table className="min-w-full border border-gray-200 bg-white">
-                            <thead>
-                                <tr className="w-full border-b border-gray-200 bg-gray-100">
-                                    <th className="w-1/6 px-6 py-4 text-left font-semibold text-gray-600">
-                                        Ảnh
-                                    </th>
-                                    <th className="w-1/5 px-6 py-4 text-left font-semibold text-gray-600">
-                                        Tên sản phẩm
-                                    </th>
-                                    <th className="w-1/6 px-6 py-4 text-left font-semibold text-gray-600">
-                                        Giá
-                                    </th>
-                                    <th className="w-1/6 px-6 py-4 text-left font-semibold text-gray-600">
-                                        Số lượng
-                                    </th>
-                                    <th className="w-1/6 px-6 py-4 text-left font-semibold text-gray-600">
-                                        Trạng thái
-                                    </th>
-                                    <th className="w-1/6 px-6 py-4 text-left font-semibold text-gray-600">
-                                        Hành động
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {myOrder.map((item, index) => (
-                                    <tr key={index} className="border-b">
-                                        <td className="w-1/6 px-6 py-4">
-                                            <img className="w-10" src={item.imageUrl} alt="" />
-                                        </td>
-                                        <td className="w-1/6 px-6 py-4">{item.product_name}</td>
-                                        <td className="w-1/6 px-6 py-4">{item.price}</td>
-                                        <td className="w-1/6 px-6 py-4">{item.quantity}</td>
-                                        <td className={`w-1/6 px-2`}>
+
+                        <div className=" mx-auto px-4">
+                            {/* Search Bar */}
+                            <div className="mb-4">
+                                <input type="text" placeholder="Bạn có thể tìm kiếm theo ID đơn hàng hoặc Tên Sản phẩm" className=" text-[15px] w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            </div>
+                            {/* Order Item */}
+                            {myOrder.map((item, index) => (
+                                <div className="border border-gray-300 rounded-md p-4 mb-4">
+                                    <div className="flex justify-end items-center mb-2">
+
+                                        <div className="flex space-x-2 ">
                                             <span
-                                                className={`rounded text-white ${getStatusColor(item.orderStatus)}`}
+                                                className={`rounded text-sm text-white ${getStatusColor(item.orderStatus)}`}
                                             >
                                                 {item.orderStatus}
                                             </span>
-                                        </td>
-                                        {getStatusButton(item.orderStatus, item.order_id)} {/* Truyền item.id */}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                            {getStatusTop(item.orderStatus)}
+
+                                        </div>
+                                    </div>
+                                    <hr className="mb-2" />
+                                    <div key={index} className="">
+                                        <div className="flex">
+                                            <img src={item.image} alt="Product Image" className="w-20 h-20 object-cover mr-4" />
+                                            <div className="flex-1">
+                                                <p className="text-gray-800">{item.product_name}</p>
+                                                <div className="text-sm text-gray-500">Phân loại hàng: Dài 33cm</div>
+                                                <div className="text-sm text-gray-500">x1</div>
+                                                {/* <span
+                                                    className={`rounded text-sm text-white ${getStatusColor(item.orderStatus)}`}
+                                                >
+                                                    {item.orderStatus}
+                                                </span> */}
+                                            </div>
+                                        </div>
+                                        <hr className="my-2" />
+                                        <div >
+                                            <div className="flex justify-end">
+                                                <p className="mr-2">Thành tiền:</p>
+
+                                                <p className="text-xl   text-red-600"> {item.price}đ</p>
+                                            </div>
+                                            <div className="flex space-x-2 mt-2 justify-end text-[15px]">
+                                                {getStatusButton(item.orderStatus, item.id)}
+                                                <button className="px-4 py-2  text-gray-700  rounded border-2 hover:bg-gray-100">Liên Hệ Shop</button>
+                                                <button className="px-4 py-2  text-gray-700  rounded border-2 hover:bg-gray-100">Đánh Giá Sản Phẩm</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            ))}
+                        </div>
+
                     </div>
                 </div>
             </div>
+
+            <CancelMyOrder
+                isVisible={isModalVisible}
+                onConfirm={confirmCancelOrder}
+                onCancel={() => setModalVisible(false)}
+            />
+
+
         </div>
     );
 };
