@@ -1,3 +1,4 @@
+
 <?php
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiOrderController;
@@ -81,9 +82,6 @@ Route::middleware('auth:sanctum')
         Route::put('/{id}/update', [ApiOrderController::class, 'update'])->name('update');
 
 });
-
-
-
 
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
 Route::get('color',[ApiProductController::class,'color']);
