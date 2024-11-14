@@ -9,19 +9,16 @@
                 <div class="card-header">
                     <h5 class="card-title align-content-center mb-2">Danh sách danh mục</h5>
                     <a href="{{ route('admins.category.create') }}" class="btn btn-success">Thêm danh mục</a>
-                </div>
+
+                </div> 
+
 
                 @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
 
                 <div class="card-body">
                     <div class="table-responsive">

@@ -1,3 +1,4 @@
+
 <?php
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiOrderController;
@@ -45,7 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
  Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed']);
  Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed']);
 
-   
+
 });
 // lấy sản phẩm product
 Route::resource('/products', ProductController::class);
@@ -55,6 +56,7 @@ Route::resource('/categorys', CategoryController::class);
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
 // Payment
 Route::post('/payment/momo', [PaymentController::class, 'payment_momo']);
+
 Route::get('/subcategory', [ApiProductController::class,'subcategory']);
 // banner
 Route::get('/banner', [ApiProductController::class,'Banner']);
@@ -81,9 +83,6 @@ Route::middleware('auth:sanctum')
 
 });
 
-
-
-
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
 Route::get('color',[ApiProductController::class,'color']);
 Route::get('size',[ApiProductController::class,'size']);
@@ -96,16 +95,21 @@ Route::post('contas', [ApiProductController::class, 'contasUs']);
 
 // Tìm sản phẩm
 Route::get('/search', [ProductController::class, 'search']);
- 
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/add', [ApiWishlistController::class, 'addProductToWishlist']);
     Route::delete('wishlist/remove/{productId}', [ApiWishlistController::class, 'removeProductFromWishlist']);
     Route::get('wishlist', [ApiWishlistController::class, 'getWishlist']);
 });
 Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
+
+Route::put('/userEdit/{id}',[ApiAuthController::class,'update'])->middleware('auth:sanctum');
+
+
+
 // thanh toán onl bằng vn_pay
 Route::post('/vnpay/payment',[PaymentController::class,'vn_pay'])->name('vn_pay');
-
+Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
 
 
 

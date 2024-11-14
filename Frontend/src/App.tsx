@@ -17,6 +17,8 @@ import AllProducts from './pages/client/AllProducts';
 import Order from './pages/client/Order';
 import ProductWishlist from './pages/client/ProductWishlist';
 import SearchProduct from './pages/client/search';
+import AccountUpdate from './pages/client/AccountUpdate';
+import LogoutInterface from './pages/client/LogOut';
 
 
 function App() {
@@ -25,6 +27,7 @@ function App() {
       <Routes>
         <Route path='register' element={<Register />} />
         <Route path='login' element={<Login />} />
+        <Route path='logout' element={<LogoutInterface />} />
         <Route path='/' element={<LayoutClient />} >
           <Route index element={<Home />} />
           <Route path='productdetail/:id/subcate/:idd' element={<ProductDetail />} />
@@ -33,12 +36,14 @@ function App() {
           <Route path="payment" element={<PaymentMomo />} />
           <Route path="contact" element={<Contact />} />
           <Route path="allproduct" element={<AllProducts />} />
+
           <Route path="/search" element={<SearchProduct />} />
           
 
+=======
           <Route path="order" element={<Order />} />
-
           <Route path="wishlist" element={<ProductWishlist />} />
+          <Route path="account" element={<AccountUpdate  />} />
 
         </Route>
       </Routes>
