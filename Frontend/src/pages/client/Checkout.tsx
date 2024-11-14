@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import '../../css/Checkout.css'
 import { Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
 import ShippingForm from '../../components/client/checkout/ShippingForm';
@@ -11,16 +11,11 @@ import { useShipping } from '../../hook/useShipping';
 import { validateShippingInfo } from '../../validation/validateInfoOder';
 import ConfirmModal from '../../modalConfirm/ConfirmOder';
 import { ChevronLeft, ChevronRight, PackageX } from 'lucide-react';
-import type { CollapseProps } from 'antd';
-import { Collapse } from 'antd';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng', ' Phương thức thanh toán'];
-
-
-
-
+import { useLocation } from 'react-router-dom';
+import MessagePayment from '../../components/client/checkout/MessagePayment';
+const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng ', 'Phương thức thanh toán', "Xác nhận"];
 const Checkout = () => {
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
@@ -29,7 +24,7 @@ const Checkout = () => {
     const { oders, total, isOrderSuccessful, handleSubmitOrder, handleCloseModal, isOfBtn, isConfirmVisible, confirmOrder, setConfirmVisible } = useOder();
 
     const [shippingCost, setShippingCost] = useState<number>(0);
-    const [shippingMethod, setShippingMethod] = useState('standard');
+    // const [shippingMethod, setShippingMethod] = useState('standard');
     const [paymentMethod, setPaymentMethod] = useState('');
     const totalPayment = (total?.subtotal || 0) + (shippingCost || 0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -38,6 +33,47 @@ const Checkout = () => {
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = oders.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(oders.length / productsPerPage);
+    const location = useLocation();
+    const responseCodeRef = useRef<string | null>(null);
+    const responseCodeRefMomo = useRef<string | null>(null);
+    const [vnpResponseCode, setVnpResponseCode] = useState<string | null>(null);
+    const [MomoResponseCode, setMomoResponseCode] = useState<string | null>(null);
+    useEffect(() => {
+        const checkResponseCode = () => {
+            const queryString = location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const code = urlParams.get('vnp_ResponseCode');
+            if (code && code !== responseCodeRef.current) {
+                responseCodeRef.current = code;
+                setVnpResponseCode(code);
+                if (code === '00') {
+                    toast.success('Thanh toán thành công');
+                    setActiveStep(3); // Chuyển đến bước 3 nếu thanh toán thành công
+                } else {
+                    toast.error('Thanh toán không thành công');
+                }
+            }
+        };
+        checkResponseCode();
+    }, [location]);
+    useEffect(() => {
+        const checkResponseCodeMomo = () => {
+            const queryString = location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const code = urlParams.get('resultCode');
+            if (code && code !== responseCodeRef.current) {
+                responseCodeRef.current = code;
+                setMomoResponseCode(code);
+                if (code === '0') {
+                    toast.success('Thanh toán thành công');
+                    setActiveStep(3); // Chuyển đến bước 3 nếu thanh toán thành công
+                } else {
+                    toast.error('Thanh toán không thành công');
+                }
+            }
+        };
+        checkResponseCodeMomo();
+    }, [location]);
     interface appLy {
         code: string
         total_price: number
@@ -76,7 +112,9 @@ const Checkout = () => {
     useEffect(() => {
         localStorage.setItem('activeStep', JSON.stringify(activeStep));
     }, [activeStep]);
+
     const handleNext = async () => {
+        // Kiểm tra điều kiện cho activeStep = 0
         if (activeStep === 0) {
             const errorMessage = validateShippingInfo(shippingInfo);
             if (errorMessage) {
@@ -88,22 +126,38 @@ const Checkout = () => {
                 localStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
             }
         }
+
+        // Nếu activeStep = 1 và vnpResponseCode = '00', bỏ qua bước 2 và chuyển đến bước 3
+        if (activeStep === 1 && vnpResponseCode === '00') {
+            setActiveStep(3); // Bỏ qua bước 2, chuyển thẳng đến bước 3
+            return;
+        }
+
+        // Nếu activeStep chưa phải là bước cuối cùng, tăng activeStep bình thường
+        if (activeStep < steps.length - 1) {
+            setActiveStep((prevStep) => prevStep + 1); // Tăng bước bình thường
+        }
+
+        // Kiểm tra điều kiện cho bước cuối cùng
         if (activeStep === steps.length - 1) {
-
-            const savedShippingInfo = JSON.parse(localStorage.getItem('shippingInfo')); // hoặc một giá trị mặc định nếu không có thông tin
-
+            const savedShippingInfo = JSON.parse(localStorage.getItem('shippingInfo'));
             handleSubmitOrder(savedShippingInfo || shippingInfo, total, shippingCost);
-        } else {
-            setActiveStep((prevStep) => prevStep + 1);
         }
     };
+
+
 
     const handleBack = () => {
-        // Chỉ giảm activeStep nếu không ở bước đầu tiên
-        if (activeStep > 0) {
-            setActiveStep((prevStep) => prevStep - 1);
+        // Nếu mã phản hồi tồn tại và là '00' và đang ở bước 3, quay lại trực tiếp bước 1
+        if (activeStep === 3 && vnpResponseCode === '00') {
+            setActiveStep(1); // Trở về bước 1, bỏ qua bước 2
+        }
+        // Nếu mã phản hồi không tồn tại hoặc khác '00', quay lại từng bước theo thứ tự thông thường
+        else if (activeStep > 0) {
+            setActiveStep((prevStep) => prevStep - 1); // Giảm activeStep theo thứ tự thông thường
         }
     };
+
 
     const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShippingInfo({
@@ -131,9 +185,10 @@ const Checkout = () => {
                 );
             case 1:
                 return (
+
                     <Confirmation
                         shippingInfo={shippingInfo}
-                        paymentMethod={paymentMethod}
+                        // paymentMethod={paymentMethod}
                         shippings={shippings}
                     />
                 );
@@ -145,7 +200,13 @@ const Checkout = () => {
                         totalPayment={totalPayment}
                     />
                 );
+            case 3:
+                return (
+                    <MessagePayment
 
+
+                    />
+                );
             default:
                 return 'Unknown step';
         }
@@ -154,8 +215,6 @@ const Checkout = () => {
 
     return (
         <>
-
-
             <div className="min-w-screen min-h-screen bg-gray-50 py-5 md:mx-[150px] lg:mx-[150px]">
                 <div className="px-5">
                     <div className="mb-2">
@@ -187,7 +246,7 @@ const Checkout = () => {
                                         <div key={index} className="w-full mx-auto text-gray-800 font-light mb-6 border-b border-gray-200 pb-6">
                                             <div className="w-full flex items-center">
                                                 <div className="overflow-hidden rounded-lg w-16 h-16 bg-gray-50 border border-gray-200">
-                                                    <img src={oder.imageUrl} />
+                                                    <img src={oder.ImageProduct} />
                                                 </div>
                                                 <div className="flex-grow pl-3">
                                                     <h6 className="font-semibold uppercase text-gray-600">{oder.NameProduct}</h6>
@@ -292,7 +351,7 @@ const Checkout = () => {
 
                                                         <Confirmation
                                                             shippingInfo={shippingInfo}
-                                                            paymentMethod={paymentMethod}
+                                                            // paymentMethod={paymentMethod}
                                                             shippings={shippings}
                                                         />
 
@@ -309,14 +368,14 @@ const Checkout = () => {
                                                                 Quay lại
                                                             </button>
 
-                                                            {!isOfBtn && (
+                                                            {activeStep !== 2 || (activeStep === 2 && vnpResponseCode === '00') ? (
                                                                 <button
                                                                     onClick={handleNext}
-                                                                    className="max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300   rounded-md px-5 py-2"
+                                                                    className="max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300 rounded-md px-5 py-2"
                                                                 >
                                                                     {activeStep === steps.length - 1 ? 'Hoàn tất' : 'Tiếp theo'}
                                                                 </button>
-                                                            )}
+                                                            ) : null}
                                                         </div>
                                                     </div>
                                                 )}

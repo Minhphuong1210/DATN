@@ -56,6 +56,7 @@ class ApiOrderController extends Controller
                     'order_id' => $detail->id,
                     'orderStatus' => $trangThaiDonHang[$donHang->order_status],
                     'imageUrl' => 'http://127.0.0.1:8000/storage/' . $detail->productDetail->product->image,
+                    'id' => $donHang->id,
                 ];
             });
         });
