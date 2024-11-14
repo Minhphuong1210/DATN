@@ -2,6 +2,7 @@
 import { ChevronDown, ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart, X } from 'lucide-react';
 import React, { useState } from 'react'
 import '../../css/AllProduct.css'
+import { useFilterProducts } from '../../hook/UseFilterProduct';
 
 const AllProducts = () => {
     const [isOpenSex, setIsOpenSex] = useState(false);
@@ -10,6 +11,7 @@ const AllProducts = () => {
     const [isOpenPrice, setIsOpenPrice] = useState(false);
     const [isOpenArrange, setIsOpenArrange] = useState(false);
     // const [selectedOptions, setSelectedOptions] = useState([]);
+    
 
     const toggleCollapseSex = () => {
         setIsOpenSex(!isOpenSex);

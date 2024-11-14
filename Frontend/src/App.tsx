@@ -18,7 +18,11 @@ import Order from './pages/client/Order';
 import ProductWishlist from './pages/client/ProductWishlist';
 import SearchProduct from './pages/client/search';
 import AccountUpdate from './pages/client/AccountUpdate';
+
 import LogoutInterface from './pages/client/LogOut';
+
+
+
 
 
 function App() {
@@ -38,9 +42,6 @@ function App() {
           <Route path="allproduct" element={<AllProducts />} />
 
           <Route path="/search" element={<SearchProduct />} />
-          
-
-=======
           <Route path="order" element={<Order />} />
           <Route path="wishlist" element={<ProductWishlist />} />
           <Route path="account" element={<AccountUpdate  />} />

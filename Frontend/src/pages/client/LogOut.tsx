@@ -87,7 +87,7 @@ const LogoutInterface = () => {
             className={`flex w-full items-center justify-center rounded-md bg-red-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-red-700 ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
           >
             {isLoading ? (
-              <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+<div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
             ) : (
               <LogOut className="mr-2 h-5 w-5" />
             )}

@@ -146,59 +146,63 @@ class ProductController extends Controller
     {
         // Tìm category theo name
         $category = Category::where('name', $name)->first();
-    
+
         if (!$category) {
             return response()->json(['message' => 'Category not found'], 404);
         }
-    
+
         // Lấy tất cả các sản phẩm thông qua các sub-category của category này
         $products = $category->products()->get();
-    
+
         // Kiểm tra nếu không có sản phẩm nào trong danh mục
         if ($products->isEmpty()) {
             return response()->json(['message' => 'Không có sản phẩm nào trong danh mục này'], 404);
         }
-    
+
         // Trả về danh sách sản phẩm nếu có
         return response()->json($products);
     }
-    
+
     public function filter(Request $request)
-{
-    // Nhận tham số từ request (tên màu sắc và kích thước)
-    $colorName = $request->input('color_name');
-    $sizeName = $request->input('size_name');
-    
-    // Tạo query ban đầu
-    $query = ProductDetail::query();
+    {
 
-    // Lọc theo tên màu sắc nếu có
-    if ($colorName) {
-        $query->whereHas('color', function ($q) use ($colorName) {
-            $q->where('name', '=', $colorName); // Tìm kiếm chính xác màu sắc
-        });
+        $color_id = $request->input('color_id');
+        $size_id = $request->input('size_id');
+        $query = ProductDetail::query();
+        if ($color_id) {
+            $query->where('color_id', $color_id);
+        }
+
+        if ($size_id) {
+            $query->where('size_id', $size_id);
+        }
+        $products = $query->with(['product', 'productColor', 'productSize'])->get();
+        if ($products->isNotEmpty()) {
+            return response()->json([
+                'message' => 'Đã tìm thấy sản phẩm',
+                'products' => $products,
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Không tìm thấy sản phẩm',
+            ], 404);
+        }
     }
-
-    // Lọc theo tên kích thước nếu có
-    if ($sizeName) {
-        $query->whereHas('size', function ($q) use ($sizeName) {
-            $q->where('name', '=', $sizeName); // Tìm kiếm chính xác kích thước
-        });
+    public function filterByPrice(Request $request){
+        $min_price = $request->input('min_price');
+        $max_price = $request->input('max_price');
+        $productPrice = Product::query()->whereBetween('price', [$min_price, $max_price])->get();
+        if ($productPrice->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy sản phẩm',
+            ], 404);
+        } else {
+            return response()->json([
+                'message' => 'Đã tìm thấy sản phẩm',
+                'productPrice' => $productPrice,
+            ], 200);
+        }
     }
-
-    // Thực hiện truy vấn sau khi áp dụng các điều kiện
-    $products = $query->with(['product', 'color', 'size'])->get();
-
-    // Kiểm tra xem có sản phẩm nào không
-    if ($products->isEmpty()) {
-        return response()->json([
-            'message' => 'Không tìm thấy sản phẩm nào phù hợp với màu sắc và kích thước bạn đã chọn.'
-        ], 404);
-    }
-
-    // Trả về kết quả
-    return response()->json($products);
-}
 
 // Sản phẩm đã xem gần đây
 public function addRecentlyViewed(Request $request)
@@ -215,7 +219,7 @@ public function addRecentlyViewed(Request $request)
     // if (!$user) {
     //     return response()->json(['error' => 'Người dùng không xác định'], 401);
     // }
-    
+
     // Xóa bản ghi cũ nếu sản phẩm này đã có trong danh sách
     ProductView::where('user_id', $user->id)
         ->where('product_id', $productId)
