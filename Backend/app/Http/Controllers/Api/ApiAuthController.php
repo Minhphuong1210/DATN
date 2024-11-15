@@ -23,8 +23,13 @@ class ApiAuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-    
+        
         $user = User::where('email', $request->email)->first();
+        if(!$user){
+            return response()->json([
+                'message' => 'Tài khoản không tồn tại',
+            ],404); 
+        }
         
         // Kiểm tra người dùng và mật khẩu
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -53,14 +58,24 @@ class ApiAuthController extends Controller
         ]);
     }
     public function logout()
-    {
-        $user = Auth::user();
-        $user->tokens()->delete();
+{
+    $user = Auth::user();
+
+    if (!$user) {
         return response()->json([
-            'message' => 'dang xuat thanh cong',
-            'user' => $user,
-        ]);
+            'message' => 'Tài Khoản không tồn tại',
+        ], 404);
     }
+
+    // Delete all tokens associated with the user
+    $user->tokens()->delete();
+
+    return response()->json([
+        'message' => 'Đăng xuất thành công',
+        'user' => $user,
+    ]);
+}
+
 
     public function register(Request $request)
     {
@@ -76,16 +91,18 @@ class ApiAuthController extends Controller
             'user' => $user,
             'message' => 'Đăng ký thành công',
         ]);
+        
     }
 
     public function show(string $id)
     {
         $user = User::find($id);
+        
 
         if ($user) {
             return response()->json($user, 200);
         }
-
+        
         return response()->json(['error' => 'User not found'], 404);
     }
     public function update(Request $request, string $id)
@@ -111,7 +128,7 @@ class ApiAuthController extends Controller
                 'success' => "Cập nhật thành công",
             ], 200);
         } else {
-            return response()->json(['error' => 'Cập nhật thất bại'], 500);
+            return response()->json(['message' => 'Cập nhật thất bại'], 404);
         }
     }
 
@@ -119,7 +136,7 @@ class ApiAuthController extends Controller
     {
         // ý tưởng là trả về 1 trang bên front
         return response()->json([
-            'message' => 'truy cập vào trang quên mật khẩu'
+            'message' => 'Truy cập vào trang quên mật khẩu'
         ]);
     }
     public function check_forgot_password(Request $request)
@@ -136,11 +153,11 @@ class ApiAuthController extends Controller
         if (password_reset_token::create($tokenData)) {
             Mail::to($request->email)->send(new ForgotpasswordMail($user, $token));
             return response()->json([
-                'message' => 'đã kiểm tra thành công vui lòng kiểm tra email'
+                'message' => 'Đã kiểm tra thành công vui lòng kiểm tra email'
             ]);
         }
         return response()->json([
-            'message' => 'vui lòng kiểm tra lại email'
+            'message' => 'Vui lòng kiểm tra lại email'
         ]);
     }
     public function reset_password($token)
@@ -152,8 +169,9 @@ class ApiAuthController extends Controller
         // $user = $tokenData->user;
         //
         return response()->json([
-            'message' => 'đã trả về trang'
+            'message' => 'Đã trả về trang'
         ]);
+        
     }
     public function check_reset_password($token)
     {
@@ -165,11 +183,11 @@ class ApiAuthController extends Controller
         $check = $user->update($data);
         if($check){
             return response()->json([
-                'message' => 'đã cập nhật mật khẩu'
+                'message' => 'Đã cập nhật mật khẩu'
             ]);
         }else{
             return response()->json([
-                'message' => 'chưa cập nhật mật khẩu'
+                'message' => 'Chưa cập nhật mật khẩu'
             ]);
         }
     }

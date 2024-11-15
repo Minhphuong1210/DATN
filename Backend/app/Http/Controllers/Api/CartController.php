@@ -33,6 +33,31 @@ class CartController extends Controller
         $quantity = $request->quantity;
         $price = $request->price;
 
+        if(!$product_id){
+            return response()->json([
+                'message' => 'Không tìm thấy sản phẩm',
+            ],404);
+        }
+        if(!$size_id){
+            return response()->json([
+                'message' => 'Không tìm thấy kích cỡ sản phẩm',
+            ],404);
+        }
+        if(!$color_id){
+            return response()->json([
+                'message' => 'Không tìm thấy màu sắc sản phẩm',
+            ],404);
+        }
+        if(!$quantity){
+            return response()->json([
+                'message' => 'Không tìm thấy số lượng sản phẩm',
+            ],404);
+        }
+        if(!$price){
+            return response()->json([
+                'message' => 'Không tìm thấy giá sản phẩm',
+            ],404);
+        }
         if (Auth::check()) {
             $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
             $productDetail = ProductDetail::where('product_id', $product_id)
@@ -59,7 +84,7 @@ class CartController extends Controller
                     ]);
                 }
 
-                return response()->json(['message' => 'Product added to cart successfully'], 200);
+                return response()->json(['message' => 'Sản phẩm đã được thêm vào giỏ hàng'], 200);
             } else {
                 return response()->json(['error' => 'Product not found'], 404);
             }
@@ -77,6 +102,11 @@ class CartController extends Controller
     {
         if (Auth::check()) {
             $user_id = Auth::user()->id;
+            if(!$user_id){
+                return response()->json([
+                    'message'=>'Tài Khoản không tồn tại',
+                ],404);
+            }
             $cart = Cart::where('user_id', $user_id)->first();
 
             if ($cart) {

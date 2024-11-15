@@ -23,7 +23,8 @@ class Vnpayy extends Model
         'vnp_TmnCode',
         'vnp_TransactionStatus',
         'vnp_TxnRef',
-        'vnp_SecureHash'
+        'vnp_SecureHash',
+        'user_id'
     ];
 
 
