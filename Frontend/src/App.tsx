@@ -20,6 +20,7 @@ import SearchProduct from './pages/client/search';
 import AccountUpdate from './pages/client/AccountUpdate';
 
 import LogoutInterface from './pages/client/LogOut';
+import Profile from './pages/client/Profile';
 
 
 
@@ -44,7 +45,12 @@ function App() {
           <Route path="/search" element={<SearchProduct />} />
           <Route path="order" element={<Order />} />
           <Route path="wishlist" element={<ProductWishlist />} />
-          <Route path="account" element={<AccountUpdate  />} />
+          <Route path="profile" element={<Profile />} >
+            <Route path="order" element={<Order />} />
+            <Route index element={<AccountUpdate />} />
+          </Route>
+
+
 
         </Route>
       </Routes>

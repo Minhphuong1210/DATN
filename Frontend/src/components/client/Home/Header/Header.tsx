@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   };
   const token = localStorage.getItem('token');
   // console.log(token);
-  
+
   //CHỨC NĂNG TÌM KIẾM SẢN PHẨM
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     console.log(searchTerm);
@@ -92,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           <div className="ml-10 hidden flex-grow text-sm md:flex">
             <ul className="flex space-x-5">
               <li className="hovermenuNav relative">
-                <a href="allproduct" className="hover:text-slate-600">
+                <a href="/allproduct" className="hover:text-slate-600">
                   TẤT CẢ SẢN PHẨM
                 </a>
               </li>
@@ -217,12 +217,12 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             >
               <User size={30} />
             </a>
-            { token ?(
-               <DropdownMenu
-               isOpenUser={isOpenUser}
-               setIsOpenUser={setIsOpenUser}
-             />
-            ):null
+            {token ? (
+              <DropdownMenu
+                isOpenUser={isOpenUser}
+                setIsOpenUser={setIsOpenUser}
+              />
+            ) : null
 
             }
             {/* <DropdownMenu

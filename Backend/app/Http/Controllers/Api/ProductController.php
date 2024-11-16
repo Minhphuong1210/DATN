@@ -260,5 +260,54 @@ public function getRecentlyViewed(Request $request)
     return response()->json($products);
 }
 
+public function filterProduct(Request $request)
+    {
+        // explode là để tách nó ra ví dụ : color đẩy dữ liệu là 2 màu thì nó tách ra thành mảng
+        $query = Product::query()
+        ->select('products.*')
+        ->distinct()
+        ->join('product_details', 'products.id', '=', 'product_details.product_id');
 
+        // Lọc theo danh mục
+        if ($request->filled('category')) {
+            $category = Category::where('name', 'like', '%' . $request->category . '%')->first();
+            if ($category) {
+                $subcategory_ids = $category->subCategories->pluck('id');
+                $query->whereIn('products.sub_category_id', $subcategory_ids); // Lọc theo sub_category_id của bảng Product
+            } else {
+                return response()->json([
+                    'message' => 'Danh mục không tồn tại!'
+                ], 400);
+            }
+        }
+        if ($request->filled('color_id')) {
+            $color_ids = explode(',', $request->color_id);
+            $query->whereIn('product_details.color_id', $color_ids);
+        }
+        if ($request->filled('size_id')) {
+            $size_ids = explode(',', $request->size_id);
+            $query->whereIn('product_details.size_id', $size_ids);
+        }
+        if ($request->filled('min_price') || $request->filled('max_price')) {
+            $min_price = $request->min_price ?? 0;
+            $max_price = $request->max_price ?? 9999999;
+            $query->whereBetween('products.price', [$min_price, $max_price]);
+        }
+
+        $products = $query->select('products.*')
+                          ->paginate(10);
+    if(!empty($products)){
+        return response()->json([
+            'message' => 'Lọc thành công',
+            'products' => $products
+        ], 200);
+    }else{
+        return response()->json([
+            'message' => 'không có sản phẩm',
+
+        ], 404);
+    }
+
+
+    }
 }

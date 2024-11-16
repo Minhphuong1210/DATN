@@ -63,9 +63,6 @@ const AllProducts = () => {
         setIsOpenArrange(!isOpenArrange);
     };
 
-
-
-
     return (
         <>
 
