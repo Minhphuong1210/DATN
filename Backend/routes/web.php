@@ -13,6 +13,7 @@ use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ProductSizeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -131,5 +132,16 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
             Route::put('/{id}/update', [ProductColorController::class, 'update'])->name('update');
             Route::delete('/{id}/destroy', [ProductColorController::class, 'destroy'])->name('destroy');
         });
+
+        Route::prefix('user')->as('user.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/store', [UserController::class, 'store'])->name('store');
+            Route::get('/show/{id}', [UserController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::put('/{id}/update', [UserController::class, 'update'])->name('update');
+            Route::delete('/{id}/destroy', [UserController::class, 'destroy'])->name('destroy');
+        });
     });
+    
 });
