@@ -177,7 +177,7 @@ export const useOder = () => {
         apply,
         applyDiscount,
         myOrder,
-        setMyOrder
+        setMyOrder,getMyOrder
 
     };
 };

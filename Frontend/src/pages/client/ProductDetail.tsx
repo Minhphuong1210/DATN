@@ -45,37 +45,37 @@ const ProductDetail: React.FC = () => {
             [name]: value,
         });
     };
-    const handleSubmitComment = async (e) => {
-        e.preventDefault();
-        console.log(addcomment);
-        const id = product.id;
-        try {
-            if (!token) {
-                toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
-                nav('/login')
-            }
-            setLoading(true);
-            const response = await axios.post(`/api/comment/${id}`, {
-                comment: addcomment.comment,
-                rating: addcomment.rating,
-                parent_id: addcomment.parent_id,
-                product_id: addcomment.product_id,
-            });
-            toast.success("Bình luận thành công");
-            // Reset form sau khi gửi thành công
-            setAddcomment({
-                comment: '',
-                rating: '',
-                parent_id: '',
-                product_id: product ? product.id : '',
-            });
-            window.location.reload();
-        } catch (error) {
-            toast.error("bạn cần mua sản phẩm mới được bình luận");
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const handleSubmitComment = async (e) => {
+    //     e.preventDefault();
+    //     console.log(addcomment);
+    //     const id = product.id;
+    //     try {
+    //         if (!token) {
+    //             toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
+    //             nav('/login')
+    //         }
+    //         setLoading(true);
+    //         const response = await axios.post(`/api/comment/${id}`, {
+    //             comment: addcomment.comment,
+    //             rating: addcomment.rating,
+    //             parent_id: addcomment.parent_id,
+    //             product_id: addcomment.product_id,
+    //         });
+    //         toast.success("Bình luận thành công");
+    //         // Reset form sau khi gửi thành công
+    //         setAddcomment({
+    //             comment: '',
+    //             rating: '',
+    //             parent_id: '',
+    //             product_id: product ? product.id : '',
+    //         });
+    //         window.location.reload();
+    //     } catch (error) {
+    //         toast.error("bạn cần mua sản phẩm mới được bình luận");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
@@ -195,12 +195,12 @@ const ProductDetail: React.FC = () => {
                             </div>
                             <div className="text-xs">
                                 Tình trạng:
-                              {product.stock>0 ?(
-                                  <span className="text-sm font-bold text-green-500">Còn hàng</span>
-                              ):(
-                                <span className="text-sm font-bold text-green-500">Hết hàng</span>
-                              )
-                              }
+                                {product.stock > 0 ? (
+                                    <span className="text-sm font-bold text-green-500">Còn hàng</span>
+                                ) : (
+                                    <span className="text-sm font-bold text-green-500">Hết hàng</span>
+                                )
+                                }
                             </div>
                             <div className="text-lg font-bold">
                                 {product.price_sale !== null ? (
@@ -462,11 +462,11 @@ const ProductDetail: React.FC = () => {
                                                     alt={ProductBycategory.name}
                                                     className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                                                 />
-                                                 {ProductBycategory.discount_id !== null && (
-                                        <div className='absolute top-0 right-0 my-3 mx-3 py-1 px-2 rounded-md bg-red-500 text-white sale-badge'>
-                                            {ProductBycategory.discount.discount_percent}%
-                                        </div>
-                                    )}
+                                                {ProductBycategory.discount_id !== null && (
+                                                    <div className='absolute top-0 right-0 my-3 mx-3 py-1 px-2 rounded-md bg-red-500 text-white sale-badge'>
+                                                        {ProductBycategory.discount.discount_percent}%
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="relative">
                                                 <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">

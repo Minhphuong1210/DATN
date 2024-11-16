@@ -74,6 +74,7 @@ const AllProducts = () => {
         setIsOpenArrange(!isOpenArrange);
     };
 
+
     // search 
     useEffect(() => {
         const params = new URLSearchParams(location.search);

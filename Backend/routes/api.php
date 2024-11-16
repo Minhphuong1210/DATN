@@ -112,4 +112,4 @@ Route::post('/vnpay/payment',[PaymentController::class,'vn_pay'])->name('vn_pay'
 Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
 
 
-
+Route::post('filterProduct',[ProductController::class,'filterProduct']);
