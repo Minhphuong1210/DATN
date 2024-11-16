@@ -24,7 +24,7 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(8)
             ->get();
-
+// ->paginate(5)
         $products_sale = Product::query()
             ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
             ->where('is_active', '1')
@@ -95,37 +95,7 @@ class ProductController extends Controller
         return response()->json($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
 
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
     public function search(Request $request)
     {
         $query = $request->input('q', '');
@@ -142,6 +112,8 @@ class ProductController extends Controller
 
         return response()->json($products);
     }
+
+
     public function getProductsByCategory($name)
     {
         // Tìm category theo name
@@ -188,7 +160,8 @@ class ProductController extends Controller
             ], 404);
         }
     }
-    public function filterByPrice(Request $request){
+    public function filterByPrice(Request $request)
+    {
         $min_price = $request->input('min_price');
         $max_price = $request->input('max_price');
         $productPrice = Product::query()->whereBetween('price', [$min_price, $max_price])->get();
@@ -204,61 +177,61 @@ class ProductController extends Controller
         }
     }
 
-// Sản phẩm đã xem gần đây
-public function addRecentlyViewed(Request $request)
-{
-    $user = $request->user(); // Lấy người dùng hiện tại
-    $productId = $request->input('product_id');
+    // Sản phẩm đã xem gần đây
+    public function addRecentlyViewed(Request $request)
+    {
+        $user = $request->user(); // Lấy người dùng hiện tại
+        $productId = $request->input('product_id');
 
-    // Kiểm tra sản phẩm có tồn tại không
-    $product = Product::find($productId);
-    if (!$product) {
-        return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
+        // Kiểm tra sản phẩm có tồn tại không
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json(['error' => 'Sản phẩm không tồn tại'], 404);
+        }
+        // $user = $request->user();
+        // if (!$user) {
+        //     return response()->json(['error' => 'Người dùng không xác định'], 401);
+        // }
+
+        // Xóa bản ghi cũ nếu sản phẩm này đã có trong danh sách
+        ProductView::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->delete();
+
+        // Tạo bản ghi mới
+        ProductView::create([
+            'user_id' => $user->id,
+            'product_id' => $productId,
+        ]);
+
+        // Giới hạn danh sách sản phẩm đã xem gần đây (ví dụ: chỉ giữ lại 5 sản phẩm gần nhất)
+        $recentlyViewed = ProductView::where('user_id', $user->id)
+            ->orderBy('viewed_at', 'desc')
+            ->take(5)
+            ->pluck('id');
+
+        // Xóa các sản phẩm cũ hơn ngoài giới hạn
+        ProductView::where('user_id', $user->id)
+            ->whereNotIn('id', $recentlyViewed)
+            ->delete();
+
+        return response()->json(['message' => 'Đã thêm vào danh sách đã xem gần đây']);
     }
-    // $user = $request->user();
-    // if (!$user) {
-    //     return response()->json(['error' => 'Người dùng không xác định'], 401);
-    // }
 
-    // Xóa bản ghi cũ nếu sản phẩm này đã có trong danh sách
-    ProductView::where('user_id', $user->id)
-        ->where('product_id', $productId)
-        ->delete();
+    // Hàm để lấy danh sách sản phẩm đã xem gần đây
+    public function getRecentlyViewed(Request $request)
+    {
+        $user = $request->user(); // Lấy người dùng hiện tại
 
-    // Tạo bản ghi mới
-    ProductView::create([
-        'user_id' => $user->id,
-        'product_id' => $productId,
-    ]);
+        // Lấy danh sách sản phẩm đã xem gần đây của người dùng
+        $products = ProductView::where('user_id', $user->id)
+            ->orderBy('viewed_at', 'desc')
+            ->take(5) // Lấy 5 sản phẩm gần nhất
+            ->with('product') // Eager load chi tiết sản phẩm
+            ->get();
 
-    // Giới hạn danh sách sản phẩm đã xem gần đây (ví dụ: chỉ giữ lại 5 sản phẩm gần nhất)
-    $recentlyViewed = ProductView::where('user_id', $user->id)
-        ->orderBy('viewed_at', 'desc')
-        ->take(5)
-        ->pluck('id');
-
-    // Xóa các sản phẩm cũ hơn ngoài giới hạn
-    ProductView::where('user_id', $user->id)
-        ->whereNotIn('id', $recentlyViewed)
-        ->delete();
-
-    return response()->json(['message' => 'Đã thêm vào danh sách đã xem gần đây']);
-}
-
-// Hàm để lấy danh sách sản phẩm đã xem gần đây
-public function getRecentlyViewed(Request $request)
-{
-    $user = $request->user(); // Lấy người dùng hiện tại
-
-    // Lấy danh sách sản phẩm đã xem gần đây của người dùng
-    $products = ProductView::where('user_id', $user->id)
-        ->orderBy('viewed_at', 'desc')
-        ->take(5) // Lấy 5 sản phẩm gần nhất
-        ->with('product') // Eager load chi tiết sản phẩm
-        ->get();
-
-    return response()->json($products);
-}
+        return response()->json($products);
+    }
 
 
 }

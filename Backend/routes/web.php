@@ -13,6 +13,7 @@ use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ProductSizeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
