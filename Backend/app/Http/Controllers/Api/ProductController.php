@@ -146,9 +146,10 @@ class ProductController extends Controller
     {
         // Tìm category theo name
         $category = Category::where('name', $name)->first();
+        
 
         if (!$category) {
-            return response()->json(['message' => 'Category not found'], 404);
+            return response()->json(['message' => 'Không tìm thấy danh mục sản phẩm'], 404);
         }
 
         // Lấy tất cả các sản phẩm thông qua các sub-category của category này
@@ -208,7 +209,17 @@ class ProductController extends Controller
 public function addRecentlyViewed(Request $request)
 {
     $user = $request->user(); // Lấy người dùng hiện tại
+    if(!$user){
+        return response()->json([
+            'message'=>'Bạn chưa đăng nhập vui lòng đăng nhập'
+        ],404);
+    }
     $productId = $request->input('product_id');
+    if(!$productId){
+        return response()->json([
+            'message'=>'Bạn chưa có sản phẩm xem gần đây'
+        ],404);
+    } 
 
     // Kiểm tra sản phẩm có tồn tại không
     $product = Product::find($productId);
@@ -249,6 +260,11 @@ public function addRecentlyViewed(Request $request)
 public function getRecentlyViewed(Request $request)
 {
     $user = $request->user(); // Lấy người dùng hiện tại
+    if(!$user){
+        return response()->json([
+            'message'=>'Bạn chưa đăng nhập vui lòng đăng nhập'
+        ]);
+    }
 
     // Lấy danh sách sản phẩm đã xem gần đây của người dùng
     $products = ProductView::where('user_id', $user->id)
