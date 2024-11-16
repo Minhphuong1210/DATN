@@ -15,6 +15,18 @@ class ApiWishlistController extends Controller
     public function addProductToWishlist(Request $request)
     {
         $userId = Auth::id();
+        
+        if(!$userId){
+            return response()->json([
+                'message'=>'Bạn chưa đăng nhập',
+            ],404);
+        }
+        $productId = $request->product_id;
+        if(!$productId){
+            return response()->json([
+                'message'=>'Sản phẩm không tồn tại',
+            ],404);
+        }
 
         // Kiểm tra nếu đã có wishlist cho user
         $wishlist = Wishlist::firstOrCreate(['user_id' => $userId]);
@@ -40,6 +52,12 @@ class ApiWishlistController extends Controller
     public function removeProductFromWishlist($productId)
     {
         $userId = Auth::id();
+        if(!$userId){
+            return response()->json([
+                'message'=>'Tài Khoản không tồn tại',
+            ],404);
+        }
+       
         $wishlist = Wishlist::where('user_id', $userId)->first();
 
         if ($wishlist) {

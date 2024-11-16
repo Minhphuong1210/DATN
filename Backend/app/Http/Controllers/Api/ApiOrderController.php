@@ -31,7 +31,11 @@ class ApiOrderController extends Controller
     {
         $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
         $donHangs = Auth::user()->order()->orderBy('id', 'desc')->paginate(5);
-
+        if(!$donHangs){
+            return response()->json([
+                'message' => 'Không có đơn hàng',
+            ],404);
+        }
         $arrayDonHang = $donHangs->map(function ($donHang) use ($trangThaiDonHang) {
             return [
                 'code_order' => $donHang->code_order,
@@ -80,6 +84,7 @@ class ApiOrderController extends Controller
         $total = 0;
         $tax = 30000;
         $cartDetailsFormatted = [];
+        
 
         if ($userId) {
             // Khi người dùng đã đăng nhập

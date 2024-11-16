@@ -11,6 +11,11 @@ class PromotionController extends Controller
     public function applyPromotion(Request $request)
     {
         $code = $request->input('code');
+        if(!$code){
+            return response()->json([
+                'message'=>'Không tìm thấy mã khuyến mãi',
+            ],404);
+        }
         $totalPrice = $request->input('total_price');
         // $totalPrice = 200;
     

@@ -30,6 +30,11 @@ class CommentController extends Controller
 
 
         $userId = Auth::id();
+        if(!$userId){
+            return response()->json([
+                'message'=>'Tài Khoản không tồn tại',
+            ],404);
+        }
         $hasPurchased = OrderDetail::whereIn('product_detail_id', $productDetails)
             ->whereHas('Order', function($query) use ($userId) {
                 $query->where('user_id', $userId);
