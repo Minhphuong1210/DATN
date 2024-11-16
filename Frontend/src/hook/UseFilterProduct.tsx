@@ -1,34 +1,42 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Product } from "../interfaces/Product";
+import { toast } from "react-toastify";
 
-interface PriceRange {
-    min: number;
-    max: number;
-}
 
-export const useFilterProducts = (priceRange: PriceRange | null) => {
+
+export const useFilterProducts = (min_price: number | null, max_price: number | null, color_id: string, size_id: string | null, subcate_id: string | null, category: string | null) => {
     const [filterProductsPrice, setFilterProductsPrice] = useState<Product[]>([]);
+    const [message, setMessage] = useState()
 
     const FilterProductsByPrice = async () => {
-        let url = "/api/products"; // URL mặc định để lấy tất cả sản phẩm
-
-        if (priceRange) {
-            // Nếu có khoảng giá, thêm tham số vào URL
-            url = `/api/products/filter-by-price?min_price=${priceRange.min}&max_price=${priceRange.max}`;
+        if (!min_price && !max_price && !color_id && !size_id && !subcate_id && !category) {
+            return;
         }
-
         try {
-            const response = await axios.post(url);
-            setFilterProductsPrice(response.data.productPrice || []); // Set giá trị mặc định nếu không có sản phẩm
-        } catch (error) {
-            console.error('Lỗi khi lấy sản phẩm theo khoảng giá:', error);
+            const response = await axios.post("/api/filterProduct", {
+                min_price,
+                max_price,
+                color_id,
+                size_id,
+                subcate_id,
+                category,
+            });
+
+
+            setFilterProductsPrice(response.data.products.data)
+            console.log(response.data.products.data);
+            setMessage(response.data.message)
+            // toast.success(message)
+        } catch (message) {
+            console.error(message);
         }
     };
 
+
     useEffect(() => {
         FilterProductsByPrice();
-    }, [priceRange]);
-
+    }, [min_price, max_price, category, color_id, size_id, subcate_id]);
     return { filterProductsPrice, FilterProductsByPrice };
+
 };
