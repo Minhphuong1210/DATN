@@ -102,11 +102,7 @@
                         <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Đơn hàng</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('admins.user.index') }}">
-                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Người dùng</span>
-                    </a>
-                </li>
+
             </ul>
         </div>
         <!-- Sidebar -->

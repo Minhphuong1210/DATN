@@ -13,7 +13,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $category = Category::all(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
+        $category = Category::query()->with('subCategories')->get(); // Hoặc sử dụng pagination nếu dữ liệu nhiều
         $data = [
             'status' => 'success',
             'data' => $category,

@@ -42,7 +42,6 @@ export const useOder = () => {
         vnp_TxnRef: queryParams.get('vnp_TxnRef')
     };
     // console.log(paymentInfo);
-
     const getAllOder = async () => {
         try {
             setLoading(true);
