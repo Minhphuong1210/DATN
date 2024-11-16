@@ -106,8 +106,8 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               {HeaderPage.map((HeaderPages) => (
                 <li
                   key={HeaderPages.id}
-                  className={`hovermenuNav ${hoveredCategoryId === HeaderPages.id ? "text-yellow-500" : ""}`}
-                  onMouseEnter={() => handleMouseEnter(HeaderPages.id)}
+                  className={`hovermenuNav ${isOpen ? "text-yellow-500" : ""}`}
+                  onMouseEnter={() => handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
                   <a

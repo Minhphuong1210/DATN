@@ -8,6 +8,8 @@ use App\Models\Discount;
 use App\Models\Product;
 use App\Models\ProductDetail;
 use App\Models\ProductView;
+use App\Models\SubCategory;
+
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -118,7 +120,7 @@ class ProductController extends Controller
     {
         // Tìm category theo name
         $category = Category::where('name', $name)->first();
-        
+
 
         if (!$category) {
             return response()->json(['message' => 'Không tìm thấy danh mục sản phẩm'], 404);
@@ -193,7 +195,7 @@ public function addRecentlyViewed(Request $request)
         return response()->json([
             'message'=>'Bạn chưa có sản phẩm xem gần đây'
         ],404);
-    } 
+    }
 
 
         // Kiểm tra sản phẩm có tồn tại không
@@ -269,6 +271,17 @@ public function filterProduct(Request $request)
             } else {
                 return response()->json([
                     'message' => 'Danh mục không tồn tại!'
+                ], 400);
+            }
+        }
+        if ($request->filled('subcate')) {
+            $subcate = SubCategory::where('id', 'like', '%' . $request->subcate . '%')->first();
+            if ($subcate) {
+                $subcategory_ids = $subcate->id;
+         $query->where('sub_category_id', 'like', '%' . $subcategory_ids . '%');
+            } else {
+                return response()->json([
+                    'message' => 'Danh mục con không tồn tại!'
                 ], 400);
             }
         }

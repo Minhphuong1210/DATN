@@ -18,7 +18,7 @@ class Checkadmin
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->hasRole('Admin')) {
-            // cái này trong model của role phải là Admin không là lỗi 403 luôn 
+            // cái này trong model của role phải là Admin không là lỗi 403 luôn
             return $next($request);
         }
         abort(403);
