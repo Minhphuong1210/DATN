@@ -3,6 +3,8 @@ import { ChevronDown, ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart, X } f
 import React, { useEffect, useState } from 'react'
 import '../../css/AllProduct.css'
 import { useFilterProducts } from '../../hook/UseFilterProduct';
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface PriceRange {
     min: number;
@@ -11,10 +13,19 @@ interface PriceRange {
 const AllProducts = () => {
 
     const [priceRange, setPriceRange] = useState<PriceRange | null>(null);
-
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 0,
+        }).format(price);
+    };
     const { filterProductsPrice } = useFilterProducts(priceRange);
     const [sortOrder, setSortOrder] = useState<string>(""); // trạng thái sắp xếp
-
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const navigate = useNavigate();
+    const location = useLocation();
     // Hàm xử lý khi người dùng chọn khoảng giá
     const handlePriceChange = (min: number, max: number, isChecked: boolean) => {
         if (isChecked) {
@@ -45,7 +56,7 @@ const AllProducts = () => {
     const [isOpenTrousers, setIsOpenTrousers] = useState(false);
     const [isOpenPrice, setIsOpenPrice] = useState(false);
     const [isOpenArrange, setIsOpenArrange] = useState(false);
-
+    const [productNew, setProductNew] = useState([]);
 
     const toggleCollapseSex = () => {
         setIsOpenSex(!isOpenSex);
@@ -62,6 +73,67 @@ const AllProducts = () => {
     const toggleCollapseArrange = () => {
         setIsOpenArrange(!isOpenArrange);
     };
+
+
+    // search 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const q = params.get("q");
+        setSearchQuery(q);
+        if (q) {
+            handleSearch(q);
+        }
+    }, [location.search]);
+
+    const handleSearch = async (searchTerm: string) => {
+        try {
+            //   setError(null);
+            console.log(searchTerm);
+            const search = await axios.post(
+                `http://127.0.0.1:8000/api/search?q=${searchTerm}`,
+            );
+            setSearchResults(search.data);
+            //   console.log(search);
+
+            if (!search.ok) {
+                throw new Error("Không thể tải dữ liệu sản phẩm");
+            }
+        } catch (error) {
+            // console.log(error);
+        }
+    };
+    // các sản phẩm mới nhất
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = 4;
+
+    const handlePageChange = (page: any) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+    const fetchProducts = async () => {
+        try {
+            const responst = await axios.get('http://127.0.0.1:8000/api/products?page=${currentPage}');
+           
+
+            if (Array.isArray(responst.data.products)) {
+                setProductNew(responst.data.products);
+                console.log(responst.data.products);
+                
+            } else {
+                console.error("Dữ liệu trả về không phải là mảng");
+                setProductNew([]);  // Nếu không phải mảng, đặt productNew là mảng rỗng
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+console.log(productNew);
 
     return (
         <>
@@ -261,8 +333,6 @@ const AllProducts = () => {
                                                     />
                                                     Trên 550.000
                                                 </label>
-
-
                                             </form>
                                         </div>
                                     </div>
@@ -450,73 +520,205 @@ const AllProducts = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className='grid grid-cols-3'>
-                            {getFilteredAndSortedProducts().length > 0 ? (
-                                getFilteredAndSortedProducts().map((item, index: number) => (
-                                    <div key={index} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3 ">
-                                        <div
-                                            className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
-                                        >
-                                            <div
-                                                className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw] "
-
-                                            >
-                                                <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
-                                                    <img
-                                                        src="https://m.yodycdn.com/fit-in/filters:format(webp)/100/438/408/products/ao-ba-lo-nu-bln6030-bee-cvn5148-nan-5-yodyvn-f885bf48-c73c-4fa7-b848-8105fb3cde79.jpg?v=1681107396047"
-                                                        alt=""
-                                                        className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
-                                                    />
-                                                </div>
-                                                <div className="relative">
-                                                    <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                        <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                            <Eye
-                                                                color="currentColor"
-                                                                strokeWidth="1.5"
-                                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                            />
-                                                        </a>
-                                                        <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                            <ShoppingCart
-                                                                color="currentColor"
-                                                                strokeWidth="1.5"
-                                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                            />
-                                                        </div>
-                                                        <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                            <Heart
-                                                                color="currentColor"
-                                                                strokeWidth="1.5"
-                                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <a className="block overflow-hidden">
-                                                    <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
-                                                        {item.name}
-                                                    </div>
-                                                    <div className="text-center block">
-                                                        <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-
-                                                        </span>
-                                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                            {item.price}.000đ
-                                                        </span>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
+                        <div className="grid grid-cols-3">
+    {
+        // Kiểm tra từng mảng có dữ liệu và chỉ hiển thị mảng có dữ liệu
+        (searchResults.length > 0) ? (
+            // Hiển thị searchResults nếu có dữ liệu
+            searchResults.map((item) => (
+                <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                    <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                        <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                            <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                <img
+                                    src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                    alt={item.name || "Product Image"}
+                                    className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                />
+                            </div>
+                            <div className="relative">
+                                <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                    <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <Eye
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </a>
+                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <ShoppingCart
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
                                     </div>
-                                ))
-                            ) : (
-                                <p></p>
-                            )}
-
-
-
+                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <Heart
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <a className="block overflow-hidden">
+                                <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                    {item.name}
+                                </div>
+                                <div className="text-center block">
+                                    {item.price_sale !== null ? (
+                                        <>
+                                            <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                {formatPrice(item.price)}
+                                            </span>
+                                            <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                {formatPrice(item.price_sale)}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                            {formatPrice(item.price)}
+                                        </span>
+                                    )}
+                                </div>
+                            </a>
                         </div>
+                    </div>
+                </div>
+            ))
+        ) : (getFilteredAndSortedProducts().length > 0) ? (
+            // Nếu productNew không có dữ liệu, kiểm tra và hiển thị getFilteredAndSortedProducts()
+            getFilteredAndSortedProducts().map((item) => (
+                <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                    <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                        <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                            <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                <img
+                                    src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                    alt={item.name || "Product Image"}
+                                    className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                />
+                            </div>
+                            <div className="relative">
+                                <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                    <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <Eye
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </a>
+                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <ShoppingCart
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </div>
+                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <Heart
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <a className="block overflow-hidden">
+                                <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                    {item.name}
+                                </div>
+                                <div className="text-center block">
+                                    {item.price_sale !== null ? (
+                                        <>
+                                            <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                {formatPrice(item.price)}
+                                            </span>
+                                            <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                {formatPrice(item.price_sale)}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                            {formatPrice(item.price)}
+                                        </span>
+                                    )}
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            ))
+        ) : (productNew.length > 0) ? (
+            // Nếu cả productNew và searchResults đều không có dữ liệu, hiển thị getFilteredAndSortedProducts
+            productNew.map((item) => (
+                <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                    <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                        <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                            <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                <img
+                                    src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                    alt={item.name || "Product Image"}
+                                    className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                />
+                            </div>
+                            <div className="relative">
+                                <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                    <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <Eye
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </a>
+                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <ShoppingCart
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </div>
+                                    <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <Heart
+                                            color="currentColor"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <a className="block overflow-hidden">
+                                <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                    {item.name}
+                                </div>
+                                <div className="text-center block">
+                                    {item.price_sale !== null ? (
+                                        <>
+                                            <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                {formatPrice(item.price)}
+                                            </span>
+                                            <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                {formatPrice(item.price_sale)}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                            {formatPrice(item.price)}
+                                        </span>
+                                    )}
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            ))
+        ) : (
+            <p>Chưa có sản phẩm</p> // Hiển thị khi không có dữ liệu từ tất cả các mảng
+        )
+    }
+</div>
+
+
                         <div className="flex justify-center mt-4">
                             {/* Nút Previous */}
                             <button

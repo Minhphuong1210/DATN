@@ -40,10 +40,8 @@ class ProductStoreRequest extends FormRequest
         $validator->after(function ($validator) {
             $products = $this->input('products');
             $existingVariants = [];
-
             foreach ($products as $productVariant) {
                 $variantKey = $productVariant['size_id'] . '-' . $productVariant['color_id'];
-
                 if (in_array($variantKey, $existingVariants)) {
                     $validator->errors()->add('products', 'Kích thước và màu sắc bị trùng: ' . $variantKey);
                 }

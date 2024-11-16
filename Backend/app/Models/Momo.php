@@ -10,7 +10,20 @@ class Momo extends Model
     use HasFactory;
     protected $table = 'momos';
     protected $fillable = [
-        'partnerCode','orderId','requestId','amount','orderInfo','orderType','transId','resultCode','massage','payType','responseTime','extraData','signature'
+        'partnerCode',
+        'orderId',
+        'requestId',
+        'amount',
+        'orderInfo',
+        'orderType',
+        'transId',
+        'resultCode',
+        'massage',
+        'payType',
+        'responseTime',
+        'extraData',
+        'signature',
+        'user_id'
 
     ];
 }
