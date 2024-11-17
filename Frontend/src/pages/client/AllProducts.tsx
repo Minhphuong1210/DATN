@@ -3,17 +3,43 @@ import { ChevronDown, ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart, X } f
 import React, { useEffect, useState } from 'react'
 import '../../css/AllProduct.css'
 import { useFilterProducts } from '../../hook/UseFilterProduct';
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useColor } from '../../hook/Color';
+import { useCategory } from '../../hook/useCategory';
 
 interface PriceRange {
     min: number;
     max: number;
 }
 const AllProducts = () => {
-
     const [priceRange, setPriceRange] = useState<PriceRange | null>(null);
-
-    const { filterProductsPrice } = useFilterProducts(priceRange);
+    const [category, setCate] = useState<string | null>(null);
+    const [color_id, setColorID] = useState<string | null>(null);
+    const [size_id, setSizeID] = useState<string | null>(null);
+    const [subcate_id, setSubcateID] = useState<string | null>(null);
+    const { color, size } = useColor();
+    const { subcategory } = useCategory();
     const [sortOrder, setSortOrder] = useState<string>(""); // trạng thái sắp xếp
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 0,
+        }).format(price);
+    };
+    const { filterProductsPrice, FilterProductsByPrice } = useFilterProducts(
+        priceRange?.min || null,
+        priceRange?.max || null,
+        color_id,
+        size_id,
+        subcate_id,
+        category ?? ""
+    );
 
     // Hàm xử lý khi người dùng chọn khoảng giá
     const handlePriceChange = (min: number, max: number, isChecked: boolean) => {
@@ -25,8 +51,47 @@ const AllProducts = () => {
             setPriceRange(null);
         }
     };
+
+    const handleCate = (category: string, isChecked: boolean) => {
+        if (isChecked) {
+            setCate(category); // Cập nhật cate khi checkbox được chọn
+        } else {
+            setCate(null); // Nếu checkbox bị bỏ chọn, set cate thành null
+        }
+    };
+
+    const handleColor = (color_id: string, isChecked: boolean) => {
+        if (isChecked) {
+            setColorID(color_id)
+
+        } else {
+            setColorID(null);
+        }
+    }
+    const handleSize = (size_id: string, isChecked: boolean) => {
+        if (isChecked) {
+            setSizeID(size_id)
+
+        } else {
+            setSizeID(null);
+        }
+    }
+    const handleSubCate = (subcate_id: string, isChecked: boolean) => {
+        if (isChecked) {
+            setSubcateID(subcate_id)
+        } else {
+            setSubcateID(null);
+        }
+    }
+
+
     const handleClearFilter = () => {
-        setPriceRange(null); // Đặt priceRange về null
+        setPriceRange(null);
+        setSubcateID(null);
+        setCate(null);
+        setColorID(null);
+        setSizeID(null);
+
     };
     // Hàm lấy sản phẩm sau khi lọc và sắp xếp
     const getFilteredAndSortedProducts = () => {
@@ -45,7 +110,7 @@ const AllProducts = () => {
     const [isOpenTrousers, setIsOpenTrousers] = useState(false);
     const [isOpenPrice, setIsOpenPrice] = useState(false);
     const [isOpenArrange, setIsOpenArrange] = useState(false);
-
+    const [productNew, setProductNew] = useState([]);
 
     const toggleCollapseSex = () => {
         setIsOpenSex(!isOpenSex);
@@ -64,11 +129,73 @@ const AllProducts = () => {
     };
 
 
+    // search 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const q = params.get("q");
+        setSearchQuery(q);
+        if (q) {
+            handleSearch(q);
+        }
+    }, [location.search]);
 
+    const handleSearch = async (searchTerm: string) => {
+        try {
+            //   setError(null);
+            // console.log(searchTerm);
+            const search = await axios.post(
+                `http://127.0.0.1:8000/api/search?q=${searchTerm}`,
+            );
+            setSearchResults(search.data);
+            //   console.log(search);
+
+            if (!search.ok) {
+                throw new Error("Không thể tải dữ liệu sản phẩm");
+            }
+        } catch (error) {
+            // console.log(error);
+        }
+    };
+    // các sản phẩm mới nhất
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = 4;
+
+    const handlePageChange = (page: any) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+    const fetchProducts = async () => {
+        try {
+            const responst = await axios.get('http://127.0.0.1:8000/api/products?page=${currentPage}');
+
+
+            if (Array.isArray(responst.data.products)) {
+                setProductNew(responst.data.products);
+                // console.log(responst.data.products);
+
+            } else {
+                console.error("Dữ liệu trả về không phải là mảng");
+                setProductNew([]);  // Nếu không phải mảng, đặt productNew là mảng rỗng
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    // console.log(filterProductsPrice);
 
     return (
         <>
-
+            {
+                filterProductsPrice.map((item, index) => (
+                    <div key={index}>{item.name}</div>
+                ))
+            }
 
             <div className='mx-[200px]'>
                 <div className="sticky top-24 z-30">
@@ -100,8 +227,11 @@ const AllProducts = () => {
                                             <label className="block mb-2">
                                                 <input
                                                     type="checkbox"
-                                                    value="option1"
-                                                    className="mr-2  "
+                                                    value="voluptas"
+                                                    className="mr-2"
+                                                    onChange={(e) => handleCate("voluptas", e.target.checked)} // Gọi handleCate với giá trị riêng cho radio này
+                                                    checked={category === "voluptas"} // Kiểm tra nếu cate có phải là "voluptas" không
+                                                    name="cate"
                                                 />
 
                                                 Nam
@@ -109,10 +239,11 @@ const AllProducts = () => {
                                             <label className="block mb-2">
                                                 <input
                                                     type="checkbox"
-                                                    value="option2"
-                                                    // checked={selectedOptions.includes('option2')}
-                                                    // onChange={handleCheckboxChange}
+                                                    value="et"
                                                     className="mr-2"
+                                                    onChange={(e) => handleCate("et", e.target.checked)} // Gọi handleCate với giá trị riêng cho radio này
+                                                    checked={category === "et"} // Kiểm tra nếu cate có phải là "voluptas" không
+                                                    name="cate"
                                                 />
                                                 Nữ
                                             </label>
@@ -134,38 +265,24 @@ const AllProducts = () => {
                                         className={`transition-max-height duration-500 ease-in-out overflow-hidden ${isOpenShirt ? 'max-h-40' : 'max-h-0'
                                             }`}
                                     >
+
+
+
                                         <div className="p-4">
-                                            <form>
-                                                <label className="block mb-2">
+                                            {subcategory.map((item, index) => (
+                                                <label key={index} className="block mb-2">
                                                     <input
                                                         type="checkbox"
-                                                        value="option1"
-
                                                         className="mr-2"
+                                                        onChange={(e) => handleSubCate(item.id, e.target.checked)}
+                                                        checked={subcate_id === item.id}
                                                     />
-                                                    Áo Polo
+                                                    {item.name}
                                                 </label>
-                                                <label className="block mb-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        value="option2"
+                                            ))}
 
-                                                        className="mr-2"
-                                                    />
-                                                    Áo sơ mi
-                                                </label>
-                                                <label className="block mb-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        value="option2"
-
-                                                        className="mr-2"
-                                                    />
-                                                    Áo phông
-                                                </label>
-
-                                            </form>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -236,7 +353,7 @@ const AllProducts = () => {
                                             <form>
                                                 <label className="block mb-2">
                                                     <input
-                                                        type="radio"
+                                                        type="checkbox"
                                                         name="price-range"
                                                         className="mr-2"
                                                         onChange={(e) => handlePriceChange(150000, 350000, e.target.checked)}
@@ -246,7 +363,7 @@ const AllProducts = () => {
                                                 </label>
                                                 <label className="block mb-2">
                                                     <input
-                                                        type="radio"
+                                                        type="checkbox"
                                                         name="price-range"
                                                         className="mr-2"
                                                         onChange={(e) => handlePriceChange(350000, 550000, e.target.checked)}
@@ -256,7 +373,7 @@ const AllProducts = () => {
                                                 </label>
                                                 <label className="block mb-2">
                                                     <input
-                                                        type="radio"
+                                                        type="checkbox"
                                                         name="price-range"
                                                         className="mr-2"
                                                         onChange={(e) => handlePriceChange(550000, Number.MAX_SAFE_INTEGER, e.target.checked)}
@@ -264,8 +381,6 @@ const AllProducts = () => {
                                                     />
                                                     Trên 550.000
                                                 </label>
-
-
                                             </form>
                                         </div>
                                     </div>
@@ -275,119 +390,47 @@ const AllProducts = () => {
                                 <div className="mb-2 mt-3 text-sm">
                                     <span>Màu Sắc: </span>
                                     <div className="mt-2 flex space-x-2">
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="radio"
-                                                    className=" focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
-                                                />
-                                            </label>
+                                        {color.map((item, index) => (
+                                            <div key={index} className="inline-flex items-center">
+                                                <label className="relative flex cursor-pointer items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className=" focus:outline-none focus:ring-2  focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
+                                                        onChange={(e) => handleColor(item.id, e.target.checked)}
+                                                        checked={color_id === item.id}
+                                                        style={{
+                                                            backgroundColor: item.color_code,
 
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="radio"
-                                                    className=" focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full bg-black"
-                                                />
-                                            </label>
+                                                        }}
 
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="radio"
-                                                    className=" focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full bg-yellow-400"
-                                                />
-                                            </label>
+                                                    />
+                                                </label>
 
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="radio"
-                                                    className=" focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full bg-blue-500"
-                                                />
-                                            </label>
-
-                                        </div>
-                                        <div className="inline-flex items-center">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="radio"
-                                                    className=" focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full bg-red-500"
-                                                />
-                                            </label>
-
-                                        </div>
-
+                                            </div>
+                                        )
+                                        )}
                                     </div>
                                 </div>
-
-
                                 <div className='mt-4 '>
                                     <h2 className='mb-2'>Kích Thước</h2>
                                     <div className="inline-flex items-center ">
-                                        <div className="flex space-x-2 mr-2">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
+                                        {size.map((item, index) => (
+                                            <div key={index} className="flex space-x-2 mr-2">
+                                                <label className="relative flex cursor-pointer items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
+                                                        onChange={(e) => handleSize(item.id, e.target.checked)} // Gọi handleSize khi thay đổi
+                                                        checked={size_id === item.id} // Kiểm tra nếu size_id trùng với item.id thì checkbox được chọn
+                                                    />
+                                                    <span className="uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                        {item.name}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        ))}
 
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    S
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="flex space-x-2 mr-2">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
 
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    M
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="flex space-x-2 mr-2">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    L
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="flex space-x-2 mr-2">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    XL
-                                                </span>
-                                            </label>
-                                        </div>
-                                        <div className="flex space-x-2 mr-2">
-                                            <label className="relative flex cursor-pointer items-center">
-                                                <input
-                                                    type="checkbox"
-
-                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                />
-                                                <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                    2XL
-                                                </span>
-                                            </label>
-                                        </div>
                                     </div>
                                 </div>
                                 {/* // */}
@@ -411,10 +454,6 @@ const AllProducts = () => {
                                                 : priceRange.max} <X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilter} />
                                         </div>
                                     )}
-
-                                    <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
-                                        ĐỎ <X className="ml-1" size={17} strokeWidth={1} />
-                                    </div>
                                 </div>
                                 <div >
                                     <div
@@ -448,78 +487,272 @@ const AllProducts = () => {
                                                 </button>
                                             </label>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className='grid grid-cols-3'>
-                            {getFilteredAndSortedProducts().length > 0 ? (
-                                getFilteredAndSortedProducts().map((item, index: number) => (
-                                    <div key={index} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3 ">
-                                        <div
-                                            className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:gap-7"
-                                        >
-                                            <div
-                                                className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw] "
+                        <div className="grid grid-cols-3">
+                            {
+                                // Kiểm tra từng mảng có dữ liệu và chỉ hiển thị mảng có dữ liệu
+                                (filterProductsPrice.length > 0) ? (
 
-                                            >
-                                                <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
-                                                    <img
-                                                        src="https://m.yodycdn.com/fit-in/filters:format(webp)/100/438/408/products/ao-ba-lo-nu-bln6030-bee-cvn5148-nan-5-yodyvn-f885bf48-c73c-4fa7-b848-8105fb3cde79.jpg?v=1681107396047"
-                                                        alt=""
-                                                        className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
-                                                    />
-                                                </div>
-                                                <div className="relative">
-                                                    <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                        <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                            <Eye
-                                                                color="currentColor"
-                                                                strokeWidth="1.5"
-                                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                            />
-                                                        </a>
-                                                        <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                            <ShoppingCart
-                                                                color="currentColor"
-                                                                strokeWidth="1.5"
-                                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                            />
+                                    filterProductsPrice.map((item, index) => (
+                                        <div key={index || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                                            <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                                    <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                                        <img
+                                                            src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                                            alt={item.name || "Product Image"}
+                                                            className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                                        />
+                                                    </div>
+                                                    <div className="relative">
+                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Eye
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </a>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <ShoppingCart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Heart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                        <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                            <Heart
-                                                                color="currentColor"
-                                                                strokeWidth="1.5"
-                                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                            />
+                                                    </div>
+                                                    <a className="block overflow-hidden">
+                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                            {item.name}
                                                         </div>
-                                                    </div>
+                                                        <div className="text-center block">
+                                                            {item.price_sale !== null ? (
+                                                                <>
+                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                        {formatPrice(item.price)}
+                                                                    </span>
+                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                        {formatPrice(item.price_sale)}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                    {formatPrice(item.price)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </a>
                                                 </div>
-                                                <a className="block overflow-hidden">
-                                                    <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
-                                                        {item.name}
-                                                    </div>
-                                                    <div className="text-center block">
-                                                        <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-
-                                                        </span>
-                                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                            {item.price}.000đ
-                                                        </span>
-                                                    </div>
-                                                </a>
                                             </div>
                                         </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p></p>
-                            )}
-
-
-
+                                    ))
+                                ) : (searchResults.length > 0) ? (
+                                    // Hiển thị searchResults nếu có dữ liệu
+                                    searchResults.map((item) => (
+                                        <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                                            <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                                    <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                                        <img
+                                                            src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                                            alt={item.name || "Product Image"}
+                                                            className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                                        />
+                                                    </div>
+                                                    <div className="relative">
+                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Eye
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </a>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <ShoppingCart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Heart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <a className="block overflow-hidden">
+                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                            {item.name}
+                                                        </div>
+                                                        <div className="text-center block">
+                                                            {item.price_sale !== null ? (
+                                                                <>
+                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                        {formatPrice(item.price)}
+                                                                    </span>
+                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                        {formatPrice(item.price_sale)}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                    {formatPrice(item.price)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (getFilteredAndSortedProducts().length > 0) ? (
+                                    // Nếu productNew không có dữ liệu, kiểm tra và hiển thị getFilteredAndSortedProducts()
+                                    getFilteredAndSortedProducts().map((item) => (
+                                        <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                                            <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                                    <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                                        <img
+                                                            src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                                            alt={item.name || "Product Image"}
+                                                            className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                                        />
+                                                    </div>
+                                                    <div className="relative">
+                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Eye
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </a>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <ShoppingCart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Heart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <a className="block overflow-hidden">
+                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                            {item.name}
+                                                        </div>
+                                                        <div className="text-center block">
+                                                            {item.price_sale !== null ? (
+                                                                <>
+                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                        {formatPrice(item.price)}
+                                                                    </span>
+                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                        {formatPrice(item.price_sale)}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                    {formatPrice(item.price)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (productNew.length > 0) ? (
+                                    // Nếu cả productNew và searchResults đều không có dữ liệu, hiển thị getFilteredAndSortedProducts
+                                    productNew.map((item) => (
+                                        <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                                            <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                                    <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                                        <img
+                                                            src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                                            alt={item.name || "Product Image"}
+                                                            className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                                        />
+                                                    </div>
+                                                    <div className="relative">
+                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Eye
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </a>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <ShoppingCart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
+                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                                <Heart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <a className="block overflow-hidden">
+                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                            {item.name}
+                                                        </div>
+                                                        <div className="text-center block">
+                                                            {item.price_sale !== null ? (
+                                                                <>
+                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                        {formatPrice(item.price)}
+                                                                    </span>
+                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                        {formatPrice(item.price_sale)}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                    {formatPrice(item.price)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Chưa có sản phẩm</p> // Hiển thị khi không có dữ liệu từ tất cả các mảng
+                                )
+                            }
                         </div>
+
+
                         <div className="flex justify-center mt-4">
                             {/* Nút Previous */}
                             <button

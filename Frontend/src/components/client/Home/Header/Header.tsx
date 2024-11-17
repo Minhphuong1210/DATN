@@ -26,55 +26,53 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [HeaderPage, setResponstHeader] = useState([]);
   const handleMenu = () => {
     setOpenMenu(!openMenu);
   };
-  const handleMouseEnter = () => {
-    setIsOpen(true);
+  // const handleMouseEnter = () => {
+  //   setIsOpen(true);
+  // };
+
+  // const handleMouseLeave = () => {
+  //   setIsOpen(false);
+  // };
+  const [hoveredCategoryId, setHoveredCategoryId] = useState(null); // Lưu ID danh mục cha đang được hover
+
+  const handleMouseEnter = (id) => {
+    setHoveredCategoryId(id); // Lưu ID vào state
   };
 
   const handleMouseLeave = () => {
-    setIsOpen(false);
+    setHoveredCategoryId(null); // Reset state khi rời chuột
   };
+  const token = localStorage.getItem('token');
+  // console.log(token);
 
   //CHỨC NĂNG TÌM KIẾM SẢN PHẨM
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(searchTerm);
-    e.preventDefault();
-
-    // kiểm tra điều kiện trước khi điều hướng
-        navigate(`/search?q=${searchTerm}`);
-    
-
-    // try {
-    //   setError(null);
     // console.log(searchTerm);
-    //   const search= await axios.post(`http://127.0.0.1:8000/api/search?q=${searchTerm}`)
-    //   setSearchResults(search.data)
-    //   console.log(search);
-      
-    //   if (!search.ok) {
-    //     throw new Error("Không thể tải dữ liệu sản phẩm");
-    //   }
-
-     
-    // } catch (error) {
-    //   // console.log(error);
-    // }
+    e.preventDefault();
+    // kiểm tra điều kiện trước khi điều hướng
+    navigate(`/allproduct/?q=${searchTerm}`);
   };
 
-  // Gọi API lần đầu khi component mount
-  // useEffect(() => {
-  //   searchProduct();
-  // }, []);
-  // Debounce search để tránh gọi API quá nhiều
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     searchProduct(searchTerm);
-  //   }, 500);
+  const category = async () => {
+    try {
+      const response = await axios.get(`/api/categorys`);
 
-  //   return () => clearTimeout(timeoutId);
-  // }, [searchTerm]);
+      setResponstHeader(response.data.data);
+      // console.log(responst);
+
+    } catch (error) {
+
+    }
+  }
+  useEffect(() => {
+    category();
+  }, []);
+
+  // console.log(HeaderPage);
 
   return (
     <div className={`sticky top-0 z-50 w-full bg-white p-2`}>
@@ -99,35 +97,29 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           <div className="ml-10 hidden flex-grow text-sm md:flex">
             <ul className="flex space-x-5">
               <li className="hovermenuNav relative">
-                <a href="allproduct" className="hover:text-slate-600">
+                <a href="/allproduct" className="hover:text-slate-600">
                   TẤT CẢ SẢN PHẨM
                 </a>
               </li>
 
-              <li
-                className={`hovermenuNav ${isOpen ? "text-yellow-500" : ""}`}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                <a href="#" className="hover:text-slate-600">
-                  ÁO NAM
-                </a>
-              </li>
-              <li className="hovermenuNav">
-                <a href="#" className="hover:text-slate-600">
-                  QUẦN
-                </a>
-              </li>
-              <li className="hovermenuNav">
-                <a href="#" className="hover:text-slate-600">
-                  BỘ VEST
-                </a>
-              </li>
-              <li className="hovermenuNav">
-                <a href="#" className="hover:text-slate-600">
-                  PHỤ KIỆN
-                </a>
-              </li>
+
+              {HeaderPage.map((HeaderPages) => (
+                <li
+                  key={HeaderPages.id}
+                  className={`hovermenuNav ${isOpen ? "text-yellow-500" : ""}`}
+                  onMouseEnter={() => handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <a
+                    key={HeaderPages.id} // Cung cấp key duy nhất cho mỗi phần tử
+                    href=""
+                    className="hover:text-slate-600"
+                  >
+                    {HeaderPages.name} {/* Hiển thị tên */}
+                  </a>
+                </li>
+              ))}
+
               <li className="hovermenuNav">
                 <a href="#" className="hover:text-slate-600">
                   TIN TỨC
@@ -187,30 +179,21 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
           {/* Biểu tượng menu */}
           <div className="mr-2 flex rounded-full border-2 px-2 py-2">
-           <form action="" method="get" onSubmit={handleSearch}>
-           <input
-              type="text"
-              placeholder="Tìm kiếm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-6 outline-none"
-            />
-           </form>
+            <form action="" method="get" onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder="Tìm kiếm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-6 outline-none"
+              />
+            </form>
 
             <Search
               size={25}
               className="hidden cursor-pointer text-slate-500 hover:text-black md:block lg:block"
             />
-
-
           </div>
-          {/* No results */}
-          {!loading && searchTerm && searchResults.length === 0 && !error && (
-            <div className="mt-4 text-center text-gray-500">
-              Không tìm thấy sản phẩm nào phù hợp
-            </div>
-          )}
-
           <div className="mr-1 flex space-x-2">
             <a href="/wishlist">
               <Heart
@@ -226,11 +209,14 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             >
               <User size={30} />
             </a>
-            <DropdownMenu
-              isOpenUser={isOpenUser}
-              setIsOpenUser={setIsOpenUser}
-            />
+            {token ? (
+              <DropdownMenu
+                isOpenUser={isOpenUser}
+                setIsOpenUser={setIsOpenUser}
+              />
+            ) : null
 
+            }
             <a href="/cart">
               <ShoppingCart
                 size={30}

@@ -22,8 +22,9 @@ const AccountUpdate = () => {
     };
 
     return (
-        <div className='w-full h-screen bg-gray-100 flex justify-center items-center'>
-            <div className='w-1/2 bg-white rounded-lg shadow-lg p-6 flex flex-col items-center'>
+
+        <div className='col-span-4'>
+            <div className=' bg-white ml-3 rounded-sm border-2 p-6 flex flex-col items-center'>
                 <h2 className='text-2xl font-semibold text-center'>Cập nhật tài khoản</h2>
                 <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-1/2 mx-auto mt-4 p-4'>
                     <div>
@@ -73,6 +74,7 @@ const AccountUpdate = () => {
                     <button className='bg-yellow-300 text-white px-4 py-2 rounded' type="submit">Cập nhật</button>
                 </form>
             </div>
+
         </div>
     );
 };

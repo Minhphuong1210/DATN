@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useLocation, useParams } from "react-router-dom";
 // import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
 interface DataType {
+    id: string;
     order_id: string;
     product_name: string;
     image: string;
@@ -41,7 +42,6 @@ export const useOder = () => {
         vnp_TxnRef: queryParams.get('vnp_TxnRef')
     };
     // console.log(paymentInfo);
-
     const getAllOder = async () => {
         try {
             setLoading(true);
@@ -177,7 +177,7 @@ export const useOder = () => {
         apply,
         applyDiscount,
         myOrder,
-        setMyOrder
+        setMyOrder, getMyOrder
 
     };
 };

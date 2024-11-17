@@ -1,3 +1,4 @@
+
 <?php
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiOrderController;
@@ -82,9 +83,6 @@ Route::middleware('auth:sanctum')
 
 });
 
-
-
-
 Route::get('productDetai/{id}/subcate/{sub_category_id}',[ApiProductController::class,'productdetail']);
 Route::get('color',[ApiProductController::class,'color']);
 Route::get('size',[ApiProductController::class,'size']);
@@ -96,7 +94,7 @@ Route::post('applyPromotion',[PromotionController::class,'applyPromotion']);
 Route::post('contas', [ApiProductController::class, 'contasUs']);
 
 // Tìm sản phẩm
-Route::get('/search', [ProductController::class, 'search']);
+Route::post('/search', [ProductController::class, 'search']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/add', [ApiWishlistController::class, 'addProductToWishlist']);
@@ -114,4 +112,4 @@ Route::post('/vnpay/payment',[PaymentController::class,'vn_pay'])->name('vn_pay'
 Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
 
 
-
+Route::post('filterProduct',[ProductController::class,'filterProduct']);
