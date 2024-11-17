@@ -4,19 +4,19 @@
         <!-- Dark Logo-->
         <a href="index.html" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="assets/images/logo-sm.png" alt="" height="22">
+                <img src="{{asset('assets/images/logo-sm.png')}}" alt="" height="22">
             </span>
             <span class="logo-lg">
-                <img src="assets/images/logo-dark.png" alt="" height="17">
+                <img src="{{asset('assets/images/logo-dark.png')}}" alt="" height="17">
             </span>
         </a>
         <!-- Light Logo-->
         <a href="index.html" class="logo logo-light">
             <span class="logo-sm">
-                <img src="assets/images/logo-sm.png" alt="" height="22">
+                <img src="{{asset('assets/images/logo-sm.png')}}" alt="" height="22">
             </span>
             <span class="logo-lg">
-                <img src="assets/images/logo-light.png" alt="" height="17">
+                <img src="{{asset('assets/images/logo-light.png')}}" alt="" height="17">
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
@@ -36,24 +36,7 @@
                     <a class="nav-link menu-link" href="{{route('dashboard')}}" >
                         <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                     </a>
-                </li> <!-- end Dashboard Menu -->
-                {{-- <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarApps" data-bs-toggle="collapse"
-                        role="button" aria-expanded="false" aria-controls="sidebarApps">
-                        <i class="ri-apps-2-line"></i> <span data-key="t-apps">Promotion</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarApps">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a href="{{route('admins.promotion.index')}}" class="nav-link" data-key="t-chat">List</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{route('admins.promotion.create')}}" class="nav-link"> <span
-                                        data-key="t-file-manager">Add</span></a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> --}}
+                </li> 
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarApps" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" aria-controls="sidebarApps">

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Header</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #95a5a6; /* Màu xám sáng */
+        }
+        .navbar .form-control {
+            max-width: 250px;
+        }
+        .navbar .nav-item .nav-link,
+        .navbar .dropdown .text-light {
+            color: #ecf0f1; /* Màu sáng để nổi bật trên nền xám */
+        }
+        .dropdown-menu {
+            min-width: 220px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark px-3">
+    <!-- Search Bar -->
+    <form class="d-flex me-auto">
+        <input class="form-control form-control-sm me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
+    </form>
+
+    <!-- Notification Icon -->
+    <div class="dropdown me-3">
+        <a class="text-light" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-bell fa-lg"></i>
+            <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle">5</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+            <li><a class="dropdown-item" href="#">New User Registered</a></li>
+            <li><a class="dropdown-item" href="#">System Update</a></li>
+            <li><a class="dropdown-item" href="#">Server Status</a></li>
+            <li><a class="dropdown-item" href="#">Security Alert</a></li>
+        </ul>
+    </div>
+
+    <!-- User Account Dropdown -->
+    <div class="dropdown">
+        <a class="d-flex align-items-center text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="User Avatar" style="width: 40px; height: 40px;">
+            <span>Admin</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Bootstrap JS and Popper.js (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+</body>
+</html>

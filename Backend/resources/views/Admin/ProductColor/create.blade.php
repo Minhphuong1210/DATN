@@ -11,17 +11,16 @@
             <div class="card">
 
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Input Type</h5>
+                    <h5 class="card-title mb-0">Thêm màu sắc mới</h5>
                 </div><!-- end card header -->
 
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6 ">
-                            <h1>Product Color</h1>
                             <form action="{{ route('admins.product_colors.store') }}" method="POST">
                                 @csrf
                                 <div>
-                                    <label for="Name" class="mt-2">Name Color</label>
+                                    <label for="Name" class="mt-2">Tên màu</label>
                                     <input type="text" id="discount_percent" name="name" class="form-control">
                                     @error('name')
                                         <span class="text-danger">{{ $message }}</span>
@@ -34,14 +33,11 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
-                                <button type="submit" class="btn btn-success mt-2">Create</button>
+                                <button type="submit" class="btn btn-success mt-2">Thêm mới</button>
                             </form>
                         </div>
-
-
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

@@ -14,7 +14,7 @@ Product Color
         @method('PUT') <!-- Phương thức cập nhật -->
         
         <div>
-            <label for="name" class="mt-2">Name color</label>
+            <label for="name" class="mt-2">Tên màu</label>
             <input type="text" id="name" name="name" class="form-control" value="{{ old('name', $productcolors->name) }}">
             @error('name')
                 <span class="text-danger">{{ $message }}</span>
@@ -28,6 +28,6 @@ Product Color
             @enderror
         </div>
 
-        <button type="submit" class="btn btn-success mt-2">Update</button> <!-- Đổi từ Create sang Update -->
+        <button type="submit" class="btn btn-success mt-2">Cập nhật</button> <!-- Đổi từ Create sang Update -->
     </form>
 @endsection

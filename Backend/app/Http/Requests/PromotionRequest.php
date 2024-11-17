@@ -25,7 +25,6 @@ class PromotionRequest extends FormRequest
             'code' => 'required|string|unique:promotions,code',
             'discount' => 'required|numeric',
             'discount_type' => 'required|string',
-            'minimum_spend' => 'required|numeric',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'usage_limit' => 'required|numeric',
@@ -36,15 +35,15 @@ class PromotionRequest extends FormRequest
     {
         return [
             'code.unique' => 'Mã code bị trùng vui lòng nhập mã code khác',
-            'code.required' => 'Không được để trống',
             'discount.required' => 'Không được để trống',
-            'discount_type.required' => 'Không được để trống',
+            'discount_type.required' => 'Loại giảm giá không được để trống',
             'minimum_spend.required' => 'Không được để trống',
-            'start_date.required' => 'Không được để trống',
-            'end_date.required' => 'Không được để trống',
+            'start_date.required' => 'Ngày bắt đầu không được để trống',
+            'end_date.required' => 'Ngày kết thúc không được để trống',
             'end_date.after' => 'Ngày kết thúc phải lớn hơn ngày bắt đầu',
-            'usage_limit.required' => 'Không được để trống',
-            'status.required' => 'Không được để trống',
+            'usage_limit.required' => 'Số lượng không được để trống',
+            'status.required' => 'Trạng thái Không được để trống',
+            'code.requied' => 'Mã code không được để trông', 
         ];
     }
 }

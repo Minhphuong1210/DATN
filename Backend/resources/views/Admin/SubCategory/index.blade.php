@@ -1,82 +1,77 @@
-<div>
-    <!-- You must be the change you wish to see in the world. - Mahatma Gandhi -->
-</div>
 @extends('Layout.master')
 @section('title')
-    List SubCategory
+    danh mục
 @endsection
 @section('content')
-    <div class="col-xl-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h5 class="card-title align-content-center mb-0">List SubCategory </h5>
-                <a href="{{route('admins.subcategory.create')}}" class="btn btn-primary">Add</a>
-            </div><!-- end card header -->
-
-            <div class="card-body">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-2">Tất cả danh mục</h5>
+                    <a  href="{{ route('admins.subcategory.create') }}" class="btn btn-success ml-auto">Thêm mới danh mục</a>
+                </div>
+                @if (session('success'))
+                <div class="alert alert-danger col-3 mt-2 ms-2"  id="success-alert">
+                    {{ session('success') }}
+                </div>
+            @endif
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
                     <div class="table-responsive">
-                        <table class="table table-striped mb-0">
-                          
+                        <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle"
+                            style="width:100%">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Image</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Category_id</th>
-                                    <th scope="col">Action</th>
-
-
-                                </tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Tên</th>
+                                    <th scope="col">Ảnh</th>
+                                    <th scope="col">Danh mục</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Thao tác</th>
+                                </tr> 
                             </thead>
                             <tbody>
                                 @foreach ($subcategory as $item)
                                     <tr>
-                                        <td>{{ $item->id }}</td>
+                                        <th scope="row">{{ $item->id }}</th>
                                         <td>{{ $item->name }}</td>
-                                        <td>
-                                            <img src="{{Storage::url($item->image)}}" alt="" height="100px" width="100px">
-                                        </td>
-                                        <td>{{ $item->status }}</td>
+                                        <td><img src="{{ Storage::url($item->image) }}" alt="" width="150px"></td>
                                         <td>{{ $item->category ? $item->category->name : 'N/A' }}</td>
-                                        
+                                        <td>{{ $item->status }}</td>
                                         <td>
-
-                                            <div class="d-flex ">
-                                               <form action="{{route('admins.subcategory.destroy',$item)}}" method="post">
+                                            <a href="{{ route('admins.subcategory.edit', $item->id) }}" class="btn btn-primary btn-sm">
+                                                <i class="fa fa-edit"></i> <!-- Icon Sửa -->
+                                            </a>
+                                            <form action="{{ route('admins.subcategory.destroy', $item->id) }}" method="post" class="d-inline" onsubmit="return confirm('Bạn có muốn xóa không?')">
                                                 @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn xóa không?') ">Delete</button>
-                                               </form>
-                                                <a href="{{route('admins.subcategory.edit',$item)}}" class="btn btn-success ms-2 ">Edit</a>
-                                            </div>
-
+                                                @method('delete')
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> <!-- Icon Xóa -->
+                                                </button>
+                                            </form>
                                         </td>
-
-
-
                                     </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 @endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const alert = document.getElementById('success-alert');
+    if (alert) {
+        setTimeout(() => {
+            alert.style.opacity = '1'; // Làm mờ dần
+            setTimeout(() => alert.remove(), 500); // Xóa thông báo sau 500ms
+        }, 3000); // Hiển thị trong 3 giây
+    }
+});
+
+</script>
 @section('script-libs')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
