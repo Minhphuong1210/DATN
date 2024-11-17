@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('image')->nullable();
-            $table->boolean('status');
+            $table->enum('status', ['active', 'inactive']);
             $table->foreignIdFor(Category::class)->constrained();
             $table->timestamps();
         });

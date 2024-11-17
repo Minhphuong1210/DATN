@@ -26,41 +26,50 @@
                     @endif
                     <form action="{{ route('admins.subcategory.store') }}" method="post" enctype="multipart/form-data">
                         @csrf
-                        <div class="">
-                            <label for="">Name</label>
-                            <input type="text" name="name" class="form-control mt-2" placeholder="Vui lòng nhập tên">
-                            @error('name')
-                                <span style="color:red">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mt-2">
-                            <label for="">Image</label>
-                            <input type="file" name="image" class="form-control mt-2">
-                            @error('image')
-                                <span style="color:red">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mt-2">
-                            <label for="">Status</label>
-                            <input type="text" name="status" class="form-control mt-2"
-                                placeholder="Vui lòng nhập trạng thái">
-                            @error('status')
-                                <span style="color:red">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mt-2">
-                            <label for="">Category_id</label>
-                            <select name="category_id" id="" class="form-select mt-2">
-                                @foreach ($category_id as $item)
-                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                @endforeach
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="">
+                                    <label for="">Name</label>
+                                    <input type="text" name="name" class="form-control mt-2 "
+                                        placeholder="Vui lòng nhập tên">
+                                    @error('name')
+                                        <span style="color:red">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="mt-2">
+                                    <label for="">Image</label>
+                                    <input type="file" name="image" class="form-control mt-2 col-6">
+                                    @error('image')
+                                        <span style="color:red">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="mt-2">
+                                    <label for="">Category_id</label>
+                                    <select name="category_id" id="" class="form-select mt-2">
+                                        @foreach ($category_id as $item)
+                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                        @endforeach
 
-                            </select>
-                            @error('category_id')
-                                <span style="color:red">{{ $message }}</span>
-                            @enderror
+                                    </select>
+                                    @error('category_id')
+                                        <span style="color:red">{{ $message }}</span>
+                                    @enderror
+                                    <div class="mt-2">
+                                        <label for="status">Trạng thái</label>
+                                        <select name="status" class="form-select">
+                                            <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Sử dụng
+                                            </option>
+                                            <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
+                                                Khóa</option>
+                                        </select>
+                                        @error('status')
+                                            <span style="color:red">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary mt-2">Thêm mới</button>
+                            </div>
                         </div>
-                        <button class="btn btn-primary mt-2">Add</button>
                     </form>
                 </div>
             </div>

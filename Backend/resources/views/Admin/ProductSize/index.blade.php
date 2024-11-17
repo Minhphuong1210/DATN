@@ -1,49 +1,70 @@
-<div>
-    <!-- You must be the change you wish to see in the world. - Mahatma Gandhi -->
-</div>
 @extends('Layout.master')
 @section('title')
-ProductSize
+    danh mục
 @endsection
 @section('content')
-<h1>Product Size</h1>
-    <a href="{{ route('admins.product_sizes.create') }}" class="btn btn-success">Create New Product Size</a>
-
-    @if(session('success'))
-        <div class="alert alert-success"> {{ session('success') }}</div>
-    @endif
-    
-    
-
-    <table class="table table-striped mt-2"> 
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th> 
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($productSize as $productSizes)
-                <tr>
-                    <td>{{ $productSizes->id }}</td>
-                    <td>{{ $productSizes->name }}</td> 
-                    <td>
-                        <a href="{{ route('admins.product_sizes.edit', $productSizes->id) }}" class="btn btn-primary">Edit</a>
-                        <form action="{{ route('admins.product_sizes.destroy', $productSizes->id) }}" method="POST" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE') <!-- Sử dụng phương thức DELETE -->
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this discount?');">
-                                Delete
-                            </button>
-                        </form>
-                        
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-2">Tất cả kích thước</h5>
+                    <a  href="{{ route('admins.product_sizes.create') }}" class="btn btn-success ml-auto">Thêm kích thước mới</a>
+                </div>
+                @if (session('success'))
+                <div class="alert alert-danger col-3 mt-2 ms-2"  id="success-alert">
+                    {{ session('success') }}
+                </div>
+            @endif
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle"
+                            style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Size</th> 
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($productSize as $productSizes)
+                                    <tr>
+                                        <td>{{ $productSizes->id }}</td>
+                                        <td>{{ $productSizes->name }}</td> 
+                                        <td>
+                                            <a href="{{ route('admins.product_sizes.edit', $productSizes->id) }}" class="btn btn-primary"><i class="fa fa-edit"></i></a>
+                                            <form action="{{ route('admins.product_sizes.destroy', $productSizes->id) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE') <!-- Sử dụng phương thức DELETE -->
+                                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this discount?');">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>         
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
 @endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const alert = document.getElementById('success-alert');
+    if (alert) {
+        setTimeout(() => {
+            alert.style.opacity = '1'; // Làm mờ dần
+            setTimeout(() => alert.remove(), 500); // Xóa thông báo sau 500ms
+        }, 3000); // Hiển thị trong 3 giây
+    }
+});
+
+</script>
 @section('script-libs')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>

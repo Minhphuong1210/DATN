@@ -33,7 +33,7 @@ class ProductSizeController extends Controller
             'name'=> 'required|string|max:255',
         ]);
         ProductSize::create($request->all());
-        return redirect()->route('admins.product_sizes.index')->with('success','Thêm kích thước sản phẩm thành công');
+        return redirect()->route('admins.product_sizes.index')->with('success','Thêm size mới thành công');
     }
 
     /**
@@ -65,7 +65,7 @@ class ProductSizeController extends Controller
         $productSize->update($request->all());
 
         return redirect()->route('admins.product_sizes.index')
-            ->with('success', 'Sửa kích thước sản phẩm thành công');
+            ->with('success', 'Cập nhật kích size thành công');
     }
 
     /**
@@ -77,6 +77,6 @@ class ProductSizeController extends Controller
         $productSize->delete();
     
     return redirect()->route('admins.product_sizes.index')
-        ->with('success', 'Xóa kích thước sản phẩm thành công');
+        ->with('success', 'Xóa size thành công');
     }
 }

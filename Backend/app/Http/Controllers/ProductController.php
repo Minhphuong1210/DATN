@@ -24,7 +24,9 @@ class ProductController extends Controller
     public function index()
     {
         $Product = Product::query()->orderBy('id', 'desc')->get();
+        // $Productname = $Product->SubCate->name;
         // dd($Product);
+
         return view('Admin.Product.index', compact('Product'));
     }
 

@@ -11,7 +11,7 @@
             <div class="card">
 
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Input Type</h5>
+                    <h5 class="card-title mb-0">Cập nhật banner</h5>
                 </div><!-- end card header -->
 
                 <div class="card-body">
@@ -23,7 +23,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="simpleinput" class="form-label">Tên danh mục</label>
+                                            <label for="simpleinput" class="form-label">Tên banner</label>
                                             <input type="text" id="simpleinput"
                                                 class="form-control  @error('title') is-invalid @enderror"
                                                 name="title" value="{{ $banner->title }}"
@@ -35,7 +35,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="simpleinput" class="form-label">Hình ảnh danh mục</label>
+                                            <label for="simpleinput" class="form-label">Hình ảnh</label>
                                             <input type="file" id="simpleinput" class="form-control" name="image"
                                                 onchange="showImage(event)" id="hinh_anh">
                                             <img src="{{Storage::url($banner->image)}}" alt="Hình ảnh sản phẩm" style="width:150px; "

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerRequest;
 use App\Models\Banner;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
@@ -47,7 +47,7 @@ class BannerController extends Controller
             $param['image'] = $filePath;
             // dd($param);
             Banner::query()->create($param);
-            return redirect()->route('admins.banner.index')->with('success', 'thêm danh mục thành công');
+            return redirect()->route('admins.banner.index')->with('success', 'Thêm banner thành công');
             // php artisan storage:lin sau khi xong thì chạy lệnh kia để tạo thư mục 
         }
     }
@@ -91,7 +91,7 @@ class BannerController extends Controller
             $param['image'] = $filePath;
             $banner->update($param);
         
-            return redirect()->route('admins.banner.index')->with('success', 'Cập nhật danh mục thành công');
+            return redirect()->route('admins.banner.index')->with('success', 'Cập nhật banner thành công');
         }
     }
 
@@ -105,6 +105,6 @@ class BannerController extends Controller
         if ($banner->image && Storage::disk('public')->exists($banner->image)) {
             Storage::disk('public')->delete($banner->image);
         }
-        return redirect()->route('admins.banner.index')->with('success', 'Xóa danh mục thành công');
+        return redirect()->route('admins.banner.index')->with('success', 'Xóa banner thành công');
     }
 }
