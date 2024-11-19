@@ -14,3 +14,12 @@ export type Comment = {
     comment: string
 }
 export type CommentInput = Omit<Comment, ' id'>
+
+export type Contacts = {
+    id: string;
+    name: string;
+    email: string;
+    phone: number;
+    note: string;
+}
+export type ContactsInput = Omit<Contacts, ' id'>

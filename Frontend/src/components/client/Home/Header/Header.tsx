@@ -85,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           setLoading(false) 
           return} ; // Nếu chưa đăng nhập thì không gọi API
         const response = await axios.get("/api/cart"); // Gọi API giỏ hàng
-        const cartItems = response.data.cart; // Giả sử `response.data.cart` là danh sách sản phẩm trong giỏ hàng
+        const cartItems = response.data.cart; // Lấy danh sách sản phẩm trong giỏ hàng
         const totalItems = cartItems.reduce((total: number, item: any) => total + item.quantity, 0); // Tính tổng số lượng
         setCartCount(totalItems);
       } catch (error) {

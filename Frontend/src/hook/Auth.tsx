@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { CommentInput, UserInput } from '../interfaces/auth';
+import { CommentInput, ContactsInput, UserInput } from '../interfaces/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
@@ -42,5 +42,19 @@ export const UseAuth = () => {
             toast.error(( message as AxiosError)?.message);
         }
     }
-    return { Register, Login, Comment };
+    
+    const Contacts = async (value: ContactsInput)=>{
+        try {
+            const { data } = await axios.post('/api/contas', value)
+            setMessage(data.message);
+            toast.success(data.message);
+            navigate('/')
+            console.log(data);
+            
+        } catch (error) {
+            toast.error((error as AxiosError)?.message);
+        }
+    }
+
+    return { Register, Login, Comment, Contacts };
 };
