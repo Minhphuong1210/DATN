@@ -34,7 +34,7 @@ const Home = () => {
                 </div >
                 {/* SP SALE */}
                 <div className=" lg:mx-[150px] ">
-                    <h1 className="mb-4 mt-8 text-center text-2xl">SẢN PHẨM Khuyến Mại</h1>
+                    <h1 className="mb-4 mt-8 text-center text-2xl">SẢN PHẨM KHUYẾN MÃI</h1>
                     <hr />
                     <ProductCarousel productsHot={productsSale} />
                 </div >

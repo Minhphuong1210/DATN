@@ -15,7 +15,7 @@ export const UseAuth = () => {
             navigate('/login')
         } catch (error) {
             console.error(error); // Log lỗi để dễ dàng gỡ lỗi
-            toast.error("Lỗi đăng ký");
+            toast.error("Email được đã sử dụng hoặc mật khẩu chưa đúng yêu cầu vui lòng nhập lại !!");
         }
     };
 
@@ -29,7 +29,7 @@ export const UseAuth = () => {
             toast.success("Đăng nhập thành công")
         } catch (error) {
             console.error(error); // Log lỗi để dễ dàng gỡ lỗi
-            toast.error("Lỗi đăng nhập");
+            toast.error("Tài khoẳn hoặc mật khẩu không đúng !!");
         }
     };
     const Comment = async ( value: CommentInput) => {

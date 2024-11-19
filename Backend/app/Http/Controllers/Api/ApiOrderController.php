@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\OrderConfirm;
 use App\Models\Cart;
 use App\Models\CartDetail;
+use App\Models\Momo;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
@@ -183,6 +184,7 @@ class ApiOrderController extends Controller
     // đây là khi kích vào nút mua hàng
     public function store(Request $request)
     {
+
         if ($request->isMethod('post')) {
             DB::beginTransaction();
 
@@ -197,8 +199,12 @@ class ApiOrderController extends Controller
 
                 $params = $request->input('orderData');
                 $paymentData = $request->input('paymentData');
+                
                 $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
                 $vnPay->update($paymentData);
+                $paymentDatas = $request->input('paymentDatas');
+                $momo = Momo::query()->where('orderId',$paymentDatas['orderId'])->first();
+                $momo->update($paymentDatas);
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
 
@@ -219,7 +225,15 @@ class ApiOrderController extends Controller
                         'error' => 'Giỏ hàng của bạn hiện đang trống'
                     ], 404);
                 }
+                $request -> validate([
+                    'order_id'=>'required',
+                    'product_detail_id'=>'required',
+                    'total'=>'required',
+                    'total_amount'=>'required',
+                    'quantity'=>'required',
+                    'price'=>'required',
 
+                ]);
                 foreach ($cartDetails as $item) {
                     $total = $item->price * $item->quantity;
                     OrderDetail::create([

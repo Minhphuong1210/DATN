@@ -79,7 +79,11 @@ class ApiAuthController extends Controller
 
     public function register(Request $request)
     {
-
+        $request -> validate([
+            'name'=>'required',
+            'email'=>'required|email',
+            'password'=>'required',
+        ]);
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -113,7 +117,13 @@ class ApiAuthController extends Controller
         // ]);
 
         $user = User::findOrFail($id);
-
+        $request -> validate([
+            'name'=>'required',
+            'email'=>'required|email',
+            'password'=>'required',
+            'address'=>'required',
+            'phone'=>'required'
+        ]);
         $param = $request->only(['name', 'email', 'password', 'address', 'phone']);
 
         if (isset($param['password'])) {
