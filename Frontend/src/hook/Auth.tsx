@@ -14,22 +14,24 @@ export const UseAuth = () => {
             setMessage(data.message);
             toast.success(data.message);
             navigate('/login')
+
         } catch (message) {
             toast.error(( message as AxiosError)?.message);
+
         }
     };
 
-    const Login = async (value: UserInput) => {
+   const Login = async (value: UserInput) => {
         try {
             const { data } = await axios.post('/api/login', value)
             localStorage.setItem('token', data.token)
             localStorage.setItem('user', JSON.stringify(data.user))
-            setMessage(data.message)
-            // console.log(data);
+            console.log(data);
             navigate('/')
-            toast.success(data.message)
-        } catch (message) {
-            toast.error(( message as AxiosError)?.message);
+            toast.success("Đăng nhập thành công")
+        } catch (error) {
+            console.error(error); // Log lỗi để dễ dàng gỡ lỗi
+            toast.error("Lỗi đăng nhập");
         }
     };
     const Comment = async ( value: CommentInput) => {

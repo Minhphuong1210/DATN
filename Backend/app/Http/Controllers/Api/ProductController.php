@@ -243,7 +243,9 @@ public function getRecentlyViewed(Request $request)
         ]);
     }
 
-
+    $request -> validate([
+        'product'=>'required'
+    ]);
         // Lấy danh sách sản phẩm đã xem gần đây của người dùng
         $products = ProductView::where('user_id', $user->id)
             ->orderBy('viewed_at', 'desc')
@@ -261,7 +263,9 @@ public function filterProduct(Request $request)
         ->select('products.*')
         ->distinct()
         ->join('product_details', 'products.id', '=', 'product_details.product_id');
-
+        $request -> validate([
+            'category'=>'required',
+        ]);
         // Lọc theo danh mục
         if ($request->filled('category')) {
             $category = Category::where('name', 'like', '%' . $request->category . '%')->first();

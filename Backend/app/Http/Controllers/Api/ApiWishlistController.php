@@ -27,6 +27,10 @@ class ApiWishlistController extends Controller
                 'message'=>'Sản phẩm không tồn tại',
             ],404);
         }
+        $request-> validate([
+            'wishlist_id'=>'required',
+            'product_id'=>'required',
+        ]);
 
         // Kiểm tra nếu đã có wishlist cho user
         $wishlist = Wishlist::firstOrCreate(['user_id' => $userId]);
