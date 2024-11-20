@@ -12,6 +12,7 @@ use App\Models\SubCategory;
 use App\Models\ProductSize;
 use App\Models\Shipping;
 use App\Models\Discount;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -30,7 +31,7 @@ class ApiProductController extends Controller
         // số lượng sản phẩm ở trong productDetail
         $stock = $product->ProductDetail->Sum('quantity');
         $product['stock'] = $stock;
-        // số lượng sản phẩm đã bán 
+        // số lượng sản phẩm đã bán
         $soldQuantity = $product->ProductDetail->flatMap(function ($productDetail) {
             return $productDetail->orderDetail->pluck('quantity');
         })->sum();
@@ -76,7 +77,7 @@ class ApiProductController extends Controller
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
             'comments' => $commentsArray,
-           
+
         ], 200);
 
     }
@@ -163,6 +164,45 @@ class ApiProductController extends Controller
             'data' => $discount,
         ];
         return response()->json($data);
+    }
+
+    public function subcateProduct(String $id){
+        $subcate = SubCategory::findOrFail($id);
+        $productcate=$subcate->product;
+        if($productcate){
+            return response()->json([
+                'message' => 'thành công',
+                'productcate'=>$productcate
+            ],200);
+        }else{
+            return response()->json([
+                'message' => 'Không có sản phẩm',
+
+            ],404);
+        }
+
+    }
+
+    public function cateProduct(String $id){
+        $category = Category::findOrFail($id);
+        $subcategory_ids = $category->subCategories->pluck('id');
+        // return response()->json([
+        //     'message' => 'thành công',
+        //     'CateProduct'=>$subcategory_ids
+        // ],200);
+        $CateProduct = Product::query()->whereIn('sub_category_id',$subcategory_ids)->get();
+        if($CateProduct){
+            return response()->json([
+                'message' => 'thành công',
+                'CateProduct'=>$CateProduct
+            ],200);
+        }else{
+            return response()->json([
+                'message' => 'Không có sản phẩm',
+
+            ],404);
+        }
+
     }
 
 }

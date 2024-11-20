@@ -6,3 +6,11 @@ export interface SubCategory {
     status: string
 
 }
+
+export interface Category {
+    id: string;
+    name: string;
+    slug: string;
+    sub_categories: SubCategory[];
+
+}

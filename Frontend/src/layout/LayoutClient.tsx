@@ -57,6 +57,7 @@ const LayoutClient: React.FC = () => {
   if (loadingpage) {
     return <LoadingPage />;
   }
+  const token = localStorage.getItem("token");
   return (
     <>
       <Loading isShow={loading} />

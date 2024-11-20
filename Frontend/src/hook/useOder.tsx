@@ -17,31 +17,10 @@ interface DataType {
 export const useOder = () => {
     const [oders, serOders] = useState<OderProducts[]>([]);
     const [total, serTotal] = useState<OderTotal>();
-    const [isOrderSuccessful, setIsOrderSuccessful] = useState(false);
-    const [isOfBtn, setIsOffBtn] = useState(false);
     const { loading, setLoading } = useLoading();
-    const [isConfirmVisible, setConfirmVisible] = useState(false); // State cho modal confirm
-    const [shippingInfo, setShippingInfo] = useState<any>(null); // State cho thông tin vận chuyển
     const [apply, setApply] = useState()
     const [myOrder, setMyOrder] = useState<DataType[]>([]);
-    const location = useLocation(); // Lấy đối tượng location
-    const queryParams = new URLSearchParams(location.search); // Tạo URLSearchParams từ location.search
-    // const vnpAmount = queryParams.get('vnp_Amount');
-
-    const paymentInfo = {
-        vnp_Amount: queryParams.get('vnp_Amount'),
-        vnp_BankCode: queryParams.get('vnp_BankCode'),
-        vnp_BankTranNo: queryParams.get('vnp_BankTranNo'),
-        vnp_CardType: queryParams.get('vnp_CardType'),
-        vnp_OrderInfo: queryParams.get('vnp_OrderInfo'),
-        vnp_PayDate: queryParams.get('vnp_PayDate'),
-        vnp_ResponseCode: queryParams.get('vnp_ResponseCode'),
-        vnp_TmnCode: queryParams.get('vnp_TmnCode'),
-        vnp_TransactionNo: queryParams.get('vnp_TransactionNo'),
-        vnp_TransactionStatus: queryParams.get('vnp_TransactionStatus'),
-        vnp_TxnRef: queryParams.get('vnp_TxnRef')
-    };
-    // console.log(paymentInfo);
+    const [isThankPayment, setThankPayment] = useState(false)
     const getAllOder = async () => {
         try {
             setLoading(true);
@@ -69,21 +48,12 @@ export const useOder = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         getTotal();
     }, []);
 
-    const handleSubmitOrder = async (info: any, total: any, shippingCost: number) => {
-        setShippingInfo({ info, total, shippingCost }); // Lưu thông tin cần thiết
-        setConfirmVisible(true); // Hiển thị modal confirm
-    };
-
-    const confirmOrder = async () => {
-        if (!shippingInfo) return;
-
+    const handleSubmitOrder = async (info: any, totalPayment: number, shippingCost: number) => {
         try {
-            const { info, total, shippingCost } = shippingInfo; // Lấy thông tin từ state
             const orderData: Order = {
                 username: info.username,
                 phone: info.phone,
@@ -94,55 +64,18 @@ export const useOder = () => {
                 total_amount: (total?.subtotal ?? 0) + shippingCost,
                 shipping_id: info.shippingMethod,
             };
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const paymentData = {
-                vnp_Amount: urlParams.get("vnp_Amount"),
-                vnp_BankCode: urlParams.get("vnp_BankCode"),
-                vnp_BankTranNo: urlParams.get("vnp_BankTranNo"),
-                vnp_CardType: urlParams.get("vnp_CardType"),
-                vnp_OrderInfo: urlParams.get("vnp_OrderInfo"),
-                vnp_PayDate: urlParams.get("vnp_PayDate"),
-                vnp_ResponseCode: urlParams.get("vnp_ResponseCode"),
-                vnp_TmnCode: urlParams.get("vnp_TmnCode"),
-                vnp_TransactionNo: urlParams.get("vnp_TransactionNo"),
-                vnp_TransactionStatus: urlParams.get("vnp_TransactionStatus"),
-                vnp_TxnRef: urlParams.get("vnp_TxnRef"),
-                vnp_SecureHash: urlParams.get("vnp_SecureHash"),
-            };
-
-            console.log("Order Data:", orderData);
-            console.log("Payment Data:", paymentData);
-
             setLoading(true);
-
-            const requestData = {
-                orderData,
-                paymentData,
-            };
-
-            console.log("Order Data:", orderData);
-            setLoading(true);
-            await axios.post('/api/donhangs/store', requestData);
-
-            toast.success("Đặt hàng thành công");
-            setIsOrderSuccessful(true);
+            await axios.post('/api/donhangs/store', orderData);
             localStorage.removeItem('activeStep');
             localStorage.removeItem('shippingInfo');
-            setIsOffBtn(true);
+            toast.success("Đặt hàng thành công!");
+            setThankPayment(true);
         } catch (error) {
             console.error("Error submitting order:", error);
-
-            alert("Error submitting order");
         } finally {
             setLoading(false);
-            setConfirmVisible(false); // Ẩn modal confirm sau khi hoàn thành
         }
-    };
-
-    const handleCloseModal = () => {
-        setIsOrderSuccessful(false);
-    };
+    }
     const applyDiscount = async (value: any) => {
         try {
             await axios.post('/api/applyPromotion', value)
@@ -166,18 +99,13 @@ export const useOder = () => {
     return {
         oders,
         total,
-        isOrderSuccessful,
-        isOfBtn,
         handleSubmitOrder,
-        handleCloseModal,
         loading,
-        isConfirmVisible,
-        confirmOrder,
-        setConfirmVisible, // Cho phép đóng modal confirm
         apply,
         applyDiscount,
         myOrder,
-        setMyOrder, getMyOrder
-
+        setMyOrder, getMyOrder,
+        isThankPayment,
+        setThankPayment,
     };
 };

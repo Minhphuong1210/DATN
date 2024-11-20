@@ -17,9 +17,9 @@ const AllProducts = () => {
     const [category, setCate] = useState<string | null>(null);
     const [color_id, setColorID] = useState<string | null>(null);
     const [size_id, setSizeID] = useState<string | null>(null);
-    const [subcate_id, setSubcateID] = useState<string | null>(null);
+    const [subcate, setSubcateID] = useState<string | null>(null);
     const { color, size } = useColor();
-    const { subcategory } = useCategory();
+    const { subcates, categories } = useCategory();
     const [sortOrder, setSortOrder] = useState<string>(""); // trạng thái sắp xếp
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
@@ -37,7 +37,7 @@ const AllProducts = () => {
         priceRange?.max || null,
         color_id,
         size_id,
-        subcate_id,
+        subcate,
         category ?? ""
     );
 
@@ -47,7 +47,6 @@ const AllProducts = () => {
             // Cập nhật khoảng giá đã chọn
             setPriceRange({ min, max });
         } else {
-            // Bỏ chọn sẽ đặt `selectedPriceRange` về null
             setPriceRange(null);
         }
     };
@@ -63,7 +62,6 @@ const AllProducts = () => {
     const handleColor = (color_id: string, isChecked: boolean) => {
         if (isChecked) {
             setColorID(color_id)
-
         } else {
             setColorID(null);
         }
@@ -71,7 +69,6 @@ const AllProducts = () => {
     const handleSize = (size_id: string, isChecked: boolean) => {
         if (isChecked) {
             setSizeID(size_id)
-
         } else {
             setSizeID(null);
         }
@@ -83,16 +80,22 @@ const AllProducts = () => {
             setSubcateID(null);
         }
     }
-
-
     const handleClearFilter = () => {
         setPriceRange(null);
-        setSubcateID(null);
-        setCate(null);
-        setColorID(null);
-        setSizeID(null);
-
+        fetchProducts();
     };
+    const handleClearFilterCate = () => {
+        setCate(null);
+    }
+    const handleClearFilterColor = () => {
+        setColorID(null);
+    }
+    const handleClearFilterSize = () => {
+        setSizeID(null);
+    }
+    const handleClearFilterSubcate = () => {
+        setSubcateID(null);
+    }
     // Hàm lấy sản phẩm sau khi lọc và sắp xếp
     const getFilteredAndSortedProducts = () => {
         const products = [...filterProductsPrice];
@@ -172,7 +175,7 @@ const AllProducts = () => {
 
             if (Array.isArray(responst.data.products)) {
                 setProductNew(responst.data.products);
-                // console.log(responst.data.products);
+                console.log("ád", responst.data.products);
 
             } else {
                 console.error("Dữ liệu trả về không phải là mảng");
@@ -182,21 +185,12 @@ const AllProducts = () => {
             console.error('Error fetching products:', error);
         }
     };
-
     useEffect(() => {
         fetchProducts();
     }, []);
-
     // console.log(filterProductsPrice);
-
     return (
         <>
-            {
-                filterProductsPrice.map((item, index) => (
-                    <div key={index}>{item.name}</div>
-                ))
-            }
-
             <div className='mx-[200px]'>
                 <div className="sticky top-24 z-30">
                     <div className="mb-5  text-gray-400">
@@ -223,32 +217,21 @@ const AllProducts = () => {
                                         }`}
                                 >
                                     <div className="p-4">
-                                        <form>
-                                            <label className="block mb-2">
+                                        {categories.map((item, index) =>
+                                        (
+                                            < label key={index} className="block mb-2" >
                                                 <input
                                                     type="checkbox"
-                                                    value="voluptas"
+
                                                     className="mr-2"
-                                                    onChange={(e) => handleCate("voluptas", e.target.checked)} // Gọi handleCate với giá trị riêng cho radio này
-                                                    checked={category === "voluptas"} // Kiểm tra nếu cate có phải là "voluptas" không
+                                                    onChange={(e) => handleCate(item.name, e.target.checked)}
+                                                    checked={category === item.name}
                                                     name="cate"
                                                 />
-
-                                                Nam
+                                                {item.name}
                                             </label>
-                                            <label className="block mb-2">
-                                                <input
-                                                    type="checkbox"
-                                                    value="et"
-                                                    className="mr-2"
-                                                    onChange={(e) => handleCate("et", e.target.checked)} // Gọi handleCate với giá trị riêng cho radio này
-                                                    checked={category === "et"} // Kiểm tra nếu cate có phải là "voluptas" không
-                                                    name="cate"
-                                                />
-                                                Nữ
-                                            </label>
-
-                                        </form>
+                                        )
+                                        )}
                                     </div>
                                 </div>
                                 <hr />
@@ -265,17 +248,15 @@ const AllProducts = () => {
                                         className={`transition-max-height duration-500 ease-in-out overflow-hidden ${isOpenShirt ? 'max-h-40' : 'max-h-0'
                                             }`}
                                     >
-
-
-
                                         <div className="p-4">
-                                            {subcategory.map((item, index) => (
+                                            {subcates.map((item, index) => (
                                                 <label key={index} className="block mb-2">
                                                     <input
                                                         type="checkbox"
+                                                        value={item.name}
                                                         className="mr-2"
                                                         onChange={(e) => handleSubCate(item.id, e.target.checked)}
-                                                        checked={subcate_id === item.id}
+                                                        checked={subcate === item.id}
                                                     />
                                                     {item.name}
                                                 </label>
@@ -447,11 +428,28 @@ const AllProducts = () => {
                                 <div>
                                     <div className="inline-block  mb-3 ml-4 pt-3">Đang dùng bộ lọc:</div>
                                     {priceRange && (
+                                        <div className="inline-flex items-center bg-slate-100 w-40  justify-center rounded-lg ml-2">
+                                            {priceRange.min} - {priceRange.max}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilter} />
+                                        </div>
+                                    )}
+                                    {category && (
                                         <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
-                                            {priceRange.min} -{' '}
-                                            {priceRange.max === Number.MAX_SAFE_INTEGER
-                                                ? 'trên 550.000'
-                                                : priceRange.max} <X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilter} />
+                                            {category}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterCate} />
+                                        </div>
+                                    )}
+                                    {color_id && (
+                                        <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
+                                            {color_id}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterColor} />
+                                        </div>
+                                    )}
+                                    {size_id && (
+                                        <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
+                                            {size_id}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterSize} />
+                                        </div>
+                                    )}
+                                    {subcate && (
+                                        <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
+                                            {subcate}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterSubcate} />
                                         </div>
                                     )}
                                 </div>

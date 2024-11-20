@@ -1,23 +1,35 @@
 import axios from "axios"
-import { useEffect, useState } from "react"
-import { SubCategory } from "../interfaces/Category"
+import { Category, SubCategory } from "../interfaces/Category"
+import { useQuery } from "@tanstack/react-query"
 
 export const useCategory = () => {
-    const [subcategory, setSubcate] = useState<SubCategory[]>([])
-    const subcates = async () => {
-        try {
-            const responsive = await axios.get("api/subcategory")
-            setSubcate(responsive.data.data)
-            console.log(subcategory);
-
-        } catch (error) {
-            console.log(error);
-
+    const { data: subcates = [] } = useQuery<SubCategory[]>({
+        queryKey: ["subcates"],
+        queryFn: async () => {
+            const response = await axios.get(`/api/subcategory`);
+            return response.data.data
         }
-    }
-    useEffect(() => {
-        subcates()
-    }, [])
-    return { subcategory }
+
+    })
+
+    // const { data: productByCateId = [] } = useQuery<SubCategory[]>({
+    //     queryKey: ["productByCateId", id],
+    //     queryFn: async () => {
+    //         const response = await axios.get(`/api/productSubcate${id}`);
+    //         return response.data.data
+    //     },
+    //     enabled: !!id
+    // })
+
+    const { data: categories = [] } = useQuery<Category[]>({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            const response = await axios.get(`/api/categorys`);
+            return response.data.data
+        }
+
+    })
+
+    return { subcates, categories }
 
 }

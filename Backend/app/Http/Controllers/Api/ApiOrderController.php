@@ -85,7 +85,7 @@ class ApiOrderController extends Controller
         $total = 0;
         $tax = 30000;
         $cartDetailsFormatted = [];
-        
+
 
         if ($userId) {
             // Khi người dùng đã đăng nhập
@@ -195,10 +195,12 @@ class ApiOrderController extends Controller
                 }
 
 
-                $params = $request->input('orderData');
-                $paymentData = $request->input('paymentData');
-                $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
-                $vnPay->update($paymentData);
+                $params = $request->all();
+                // if($request->input('paymentData')){
+                //     $paymentData = $request->input('paymentData');
+                //     $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
+                //     $vnPay->update($paymentData);
+                // }
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
 

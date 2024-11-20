@@ -2,18 +2,39 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import ConfirmModal from "../../../modalConfirm/ThankPayMent";
 
 interface PaymentFormProps {
   paymentMethod: string;
   setPaymentMethod: (value: string) => void;
-  totalPayment: number; // Nhận tổng tiền thanh toán từ Checkout
+  totalPayment: number;
+  handleNext: () => void;  // Không cần giá trị "value" nữa
+  // Nhận tổng tiền thanh toán từ Checkout
+
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({
-  paymentMethod,
   setPaymentMethod,
   totalPayment,
+  handleNext, shippingInfoo, total, shippingCost, handleSubmitOrder, setIsConfirmOrder
 }) => {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const showModal = () => {
+    setModalVisible(true);
+  };
+
+  // Hàm để đóng modal khi người dùng hủy
+  const handleCancel = () => {
+    setModalVisible(false);
+  };
+
+  // Hàm để xác nhận và gọi handleSubmitOrder
+  const handleConfirm = () => {
+    setModalVisible(false);
+    handleSubmitOrder(shippingInfoo, total, shippingCost, totalPayment, setIsConfirmOrder);
+  };
+  console.log(totalPayment);
+
   const [selectedOption, setSelectedOption] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -53,7 +74,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       toast.error("Có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.");
     }
   };
-
+  const handleStepChange = () => {
+    if (selectedOption === "cod") {
+      handleNext(); // Thực hiện chuyển bước tiếp theo
+    }
+  };
   return (
     <div className="mt-4 bg-white rounded-md max-w-lg mx-auto">
       <h2 className="text-xl font-semibold mb-4">Thanh toán</h2>
@@ -151,14 +176,33 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       </div>
 
       {/* Payment Button */}
-      {(selectedOption === "momo" || selectedOption === "vnpay") && (
-        <button
-          onClick={handlePayment}
-          className="mt-4 w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-400 transition duration-200"
-        >
-          Thanh toán
-        </button>
-      )}
+      <div>
+        {/* Nút Thanh toán cho momo hoặc vnpay */}
+        {(selectedOption === "momo" || selectedOption === "vnpay") && (
+          <button
+            onClick={handlePayment}
+            className="mt-4 w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-400 transition duration-200"
+          >
+            Thanh toán
+          </button>
+        )}
+
+        {/* Nút Tiếp theo cho cod */}
+        {selectedOption === "cod" && (
+          <div>
+            <button
+              onClick={showModal}
+              className="mt-4 w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-400 transition duration-200"
+            >
+              Tiếp theo
+            </button>
+
+            {/* Modal xác nhận */}
+            <ConfirmModal isVisible={isModalVisible} onCancel={handleCancel} onConfirm={handleConfirm} />
+          </div>
+        )}
+      </div>
+
     </div>
   );
 };

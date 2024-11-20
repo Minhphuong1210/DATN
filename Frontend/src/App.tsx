@@ -21,6 +21,7 @@ import AccountUpdate from './pages/client/AccountUpdate';
 
 import LogoutInterface from './pages/client/LogOut';
 import Profile from './pages/client/Profile';
+import PrivateRoute from './components/client/PrivateRoute/PrivateRoute';
 
 
 
@@ -36,22 +37,20 @@ function App() {
         <Route path='/' element={<LayoutClient />} >
           <Route index element={<Home />} />
           <Route path='productdetail/:id/subcate/:idd' element={<ProductDetail />} />
-          <Route path="cart" element={<Cart />} />
-          <Route path="checkout" element={<Checkout />} />
-          <Route path="payment" element={<PaymentMomo />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="cart" element={<Cart />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="payment" element={<PaymentMomo />} />
+            <Route path="order" element={<Order />} />
+            <Route path="wishlist" element={<ProductWishlist />} />
+            <Route path="profile" element={<Profile />} >
+              <Route path="order" element={<Order />} />
+              <Route index element={<AccountUpdate />} />
+            </Route>
+          </Route>
           <Route path="contact" element={<Contact />} />
           <Route path="allproduct" element={<AllProducts />} />
-
           <Route path="/search" element={<SearchProduct />} />
-          <Route path="order" element={<Order />} />
-          <Route path="wishlist" element={<ProductWishlist />} />
-          <Route path="profile" element={<Profile />} >
-            <Route path="order" element={<Order />} />
-            <Route index element={<AccountUpdate />} />
-          </Route>
-
-
-
         </Route>
       </Routes>
       <ToastContainer />

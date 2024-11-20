@@ -43,13 +43,13 @@ class PaymentController extends Controller
         $redirectUrl = "http://localhost:5173/checkout";
         $ipnUrl = "http://localhost:5173/checkout";
         $extraData = "";
-    
+
         $requestId = time() . "";
         $requestType = "payWithATM";
-    
+
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
         $signature = hash_hmac("sha256", $rawHash, $secretKey);
-    
+
         $data = array(
             'partnerCode' => $partnerCode,
             'partnerName' => "Test",
@@ -65,10 +65,10 @@ class PaymentController extends Controller
             'requestType' => $requestType,
             'signature' => $signature
         );
-    
+
         $result = $this->execPostRequest($endpoint, json_encode($data));
         $jsonResult = json_decode($result, true);
-        
+
         // Kiểm tra nếu có lỗi trong phản hồi từ MoMo
         if (isset($jsonResult['errorCode']) && $jsonResult['errorCode'] != 0) {
             return response()->json([
@@ -77,10 +77,10 @@ class PaymentController extends Controller
                 'errorCode' => $jsonResult['errorCode']
             ], 400);
         }
-    
+
         // Trả về JSON response với URL thanh toán nếu thành công
         if (isset($jsonResult['payUrl'])) {
-            //luu thong tin 
+            //luu thong tin
             $paymentData = [
                 'partnerCode' => $partnerCode,
                 'orderId' => $orderId,
@@ -96,9 +96,9 @@ class PaymentController extends Controller
                 'extraData' => $extraData,
                 'signature' => $signature
             ];
-    
+
             $paymentRecord = Momo::create($paymentData);
-    
+
             return response()->json([
                 'message' => 'Thanh toán thành công',
                 'data' => $paymentRecord,
@@ -120,18 +120,18 @@ class PaymentController extends Controller
         $vnp_Returnurl = "http://localhost:5173/checkout";
         // $vnp_Returnurl = route('donhangs.create');
 
-        $vnp_TmnCode = "LG8QMIJN";//Mã website tại VNPAY 
+        $vnp_TmnCode = "LG8QMIJN";//Mã website tại VNPAY
         $vnp_HashSecret = "UJU18IW0GAGF7Z0XFXP621M5WZOS1TTW"; //Chuỗi bí mật
 
-        $vnp_TxnRef = rand(00,9999);  // $_POST['order_id']; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này 
-        // cái này phải thay đổi liên tục  
+        $vnp_TxnRef = rand(00,9999);  // $_POST['order_id']; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này
+        // cái này phải thay đổi liên tục
         $vnp_OrderInfo = "thanh toán hóa đơn";
         $vnp_OrderType = "thanh toán online";
         $vnp_Amount = $data['amount'] * 100;
         $vnp_Locale = "VN";
         $vnp_BankCode = "NCB";
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
-       
+
         $inputData = array(
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => $vnp_TmnCode,
@@ -200,9 +200,31 @@ class PaymentController extends Controller
             'updated_at' => now(),
         ];
          Vnpayy::create($paymentData);
-        
+
     }
 
+    public function updateVnpay(Request $request, String $vnp_TxnRef)
+{
+    $paymentData = $request->input('paymentData');
+    if (!$paymentData) {
+        return response()->json(['message' => 'Dữ liệu thanh toán không được cung cấp'], 400);
+    }
 
+    $vnPay = Vnpayy::query()->where('vnp_TxnRef', $vnp_TxnRef)->first();
+    if (!$vnPay) {
+        return response()->json(['message' => 'Không tìm thấy giao dịch tương ứng'], 404);
+    }
+
+    if ($vnPay->vnp_ResponseCode === '00') {
+        return response()->json(['message' => 'Giao dịch đã được thanh toán trước đó'], 404);
+    }
+
+    if ($paymentData['vnp_ResponseCode'] === '00') {
+        $vnPay->update($paymentData);
+        return response()->json(['message' => 'Thanh toán thành công'], 200);
+    }
+
+    return response()->json(['message' => 'Thanh toán không thành công'], 400);
+}
 
 }

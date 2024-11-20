@@ -4,7 +4,6 @@ import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-
 const useFavorites = () => {
     const [favorites, setFavorites] = useState<Product[]>([]);
     const navigate = useNavigate()
@@ -22,21 +21,22 @@ const useFavorites = () => {
         fetchFavorites();
     }, []);
 
+    
     const addToFavorites = async (productId: string) => {
         const isAlreadyFavorite = favorites.some(product => product.id === productId);
-        
+
         if (isAlreadyFavorite) {
             toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
             return;
         }
-    
+
         try {
             await axios.post('/api/wishlist/add', { product_id: productId });
             const response = await axios.get('/api/wishlist');
             setFavorites(response.data);
             toast.success('Đã thêm sản phẩm vào yêu thích!');
             navigate('/wishlist');
-        }  catch (error: any) {
+        } catch (error: any) {
             if (error.response?.status === 409) {
                 toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
             } else {
@@ -44,7 +44,7 @@ const useFavorites = () => {
             }
         }
     };
-    
+
 
 
     // Xóa sản phẩm khỏi danh sách yêu thích
