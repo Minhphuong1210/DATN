@@ -30,7 +30,7 @@ class ApiProductController extends Controller
         // số lượng sản phẩm ở trong productDetail
         $stock = $product->ProductDetail->Sum('quantity');
         $product['stock'] = $stock;
-        // số lượng sản phẩm đã bán 
+        // số lượng sản phẩm đã bán
         $soldQuantity = $product->ProductDetail->flatMap(function ($productDetail) {
             return $productDetail->orderDetail->pluck('quantity');
         })->sum();
@@ -76,7 +76,7 @@ class ApiProductController extends Controller
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
             'comments' => $commentsArray,
-           
+
         ], 200);
 
     }
@@ -148,10 +148,10 @@ class ApiProductController extends Controller
 
         try {
             Mail::to($yourEmail)->send(new ContasUsMail($yourEmail, $email, $name, $phone, $note));
-            return response()->json(['success' => 'Gửi contact thành công']);
+            return response()->json(['message' => 'Gửi contact thành công']);
         } catch (\Throwable $th) {
             Log::error('Error sending email: ' . $th->getMessage());
-            return response()->json(['error' => 'Gửi contact thất bại']);
+            return response()->json(['message' => 'Gửi contact thất bại']);
         }
     }
     public function discount()
