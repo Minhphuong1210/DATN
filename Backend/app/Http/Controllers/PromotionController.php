@@ -33,7 +33,7 @@ class PromotionController extends Controller
     {
         Promotion::create($request->all());
 
-        return redirect()->route('admins.promotion.index');
+        return redirect()->route('admins.promotion.index')->with('success', 'Thêm khuyễn mãi thành công');
     }
 
     /**
@@ -56,12 +56,12 @@ class PromotionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PromotionRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
         $promotion = Promotion::findOrFail($id);
         $promotion->update($request->all());
 
-        return redirect()->route('admins.promotion.index');
+        return redirect()->route('admins.promotion.index')->with('success', 'Cập nhật mã khuyến mãi thành công');
     }
 
     /**
@@ -71,6 +71,6 @@ class PromotionController extends Controller
     {
         $promotion = Promotion::findOrFail($id);
         $promotion->delete();
-        return back();
+        return back()->with('success', 'Xóa mã khuyến mãi thành công');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -29,7 +30,7 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
         if ($request->isMethod('POST')) {
             $category_id = Category::max('id') ?? 0;
@@ -37,9 +38,9 @@ class CategoryController extends Controller
             $slug = $param['name'] . '-' . $category_id . '-' . $param['name'];
             $param['slug'] = $slug;
             Category::query()->create($param);
-          
-
             return redirect()->route('admins.category.index')->with('success', 'Thêm danh mục thành công');
+            // return redirect()->route('admins.category.index')->with('success', 'Thêm danh mục thành công');
+
         }
     }
 

@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 const useFavorites = () => {
     const [favorites, setFavorites] = useState<Product[]>([]);
     const navigate = useNavigate()
+    const [message, setMessage] = useState('')
     // Lấy danh sách sản phẩm yêu thích từ API Laravel khi component được mount
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -34,18 +35,16 @@ const useFavorites = () => {
             await axios.post('/api/wishlist/add', { product_id: productId });
             const response = await axios.get('/api/wishlist');
             setFavorites(response.data);
-            toast.success('Đã thêm sản phẩm vào yêu thích!');
+            toast.success(response.data.message);
             navigate('/wishlist');
         } catch (error: any) {
             if (error.response?.status === 409) {
                 toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
             } else {
-                toast.error('Vui lòng đăng nhập để thêm sản phẩm yêu thích');
+                toast.error((error as AxiosError)?.message);
             }
         }
     };
-
-
 
     // Xóa sản phẩm khỏi danh sách yêu thích
     const removeFromFavorites = async (productId: string) => {
@@ -58,11 +57,9 @@ const useFavorites = () => {
             console.error('Lỗi khi xóa sản phẩm khỏi yêu thích:', error);
         }
     };
-
     return {
         favorites,
         addToFavorites,
-        removeFromFavorites,
     };
 };
 

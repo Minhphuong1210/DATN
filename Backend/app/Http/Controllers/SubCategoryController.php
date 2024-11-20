@@ -14,11 +14,13 @@ class SubCategoryController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $subcategory = SubCategory::with('category')->get();
+{
+    $subcategory = SubCategory::with('category')->get(); // Load quan hệ category
+    $category_id = Category::all(); // Lấy danh sách tất cả danh mục
 
-        return view('Admin.SubCategory.index',compact('subcategory'));
-    }
+    return view('Admin.SubCategory.index', compact('subcategory', 'category_id'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -44,7 +46,7 @@ class SubCategoryController extends Controller
         }
         $data['image'] = $filePath;
         SubCategory::query()->create($data);
-        return redirect()->route('admins.subcategory.index');
+        return redirect()->route('admins.subcategory.index')->with('success','Thêm danh mục thành công');
     }
 
     /**
@@ -70,23 +72,36 @@ class SubCategoryController extends Controller
      */
     public function update(SubCategoryRequest $request, string $id)
     {
-        $model = SubCategory::find($id);
+        // Lấy thông tin của SubCategory theo id
+        $subcategory = SubCategory::findOrFail($id);
+    
+        // Lấy dữ liệu từ request, trừ file hình ảnh
         $data = $request->except('image');
     
-        if($request->hasFile('image')){
-            $pathImage = Storage::putFile('Images',$request->file('image'));
-            $imageUrl = 'storage/' .$pathImage;
-            $data['image'] = $imageUrl;
-            if($model->image && file_exists($model->image)){
-                unlink($model->image);
+        // Kiểm tra nếu có file hình ảnh mới trong request
+        if ($request->hasFile('image')) {
+            // Lưu hình ảnh mới
+            $filePath = $request->file('image')->store('uploads/subcategory', 'public');
+    
+            // Xóa hình ảnh cũ nếu tồn tại
+            if ($subcategory->image && Storage::disk('public')->exists($subcategory->image)) {
+                Storage::disk('public')->delete($subcategory->image);
             }
-        }else{
-            $data['image'] = $model->image;
+    
+            // Gán đường dẫn file mới vào dữ liệu cập nhật
+            $data['image'] = $filePath;
+        } else {
+            // Nếu không có hình ảnh mới, giữ nguyên hình ảnh cũ
+            $data['image'] = $subcategory->image;
         }
-        $model->update($data);
-
-        return redirect()->route('admins.subcategory.index');
+    
+        // Cập nhật thông tin SubCategory
+        $subcategory->update($data);
+    
+        // Chuyển hướng lại trang danh sách với thông báo thành công
+        return redirect()->route('admins.subcategory.index')->with('success', 'Cập nhật danh mục thành công');
     }
+    
 
     /**
      * Remove the specified resource from storage.
@@ -98,7 +113,7 @@ class SubCategoryController extends Controller
             unlink($model->image);
         }
         if($model->delete()){
-            return back();
+            return back()->with('success','Xóa danh mục thành công');
         }
     }
     

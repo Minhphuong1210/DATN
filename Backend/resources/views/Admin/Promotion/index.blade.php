@@ -1,90 +1,105 @@
-<div>
-    <!-- You must be the change you wish to see in the world. - Mahatma Gandhi -->
-</div>
 @extends('Layout.master')
 @section('title')
-    List Promotion
+    danh mục
 @endsection
 @section('content')
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-xl-12">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title align-content-center mb-2">Danh sách Promotion</h5>
-                    <a href="{{ route('admins.promotion.create') }}" class="btn btn-success">Thêm Promotion</a>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-2">Tất cả danh mục</h5>
+                    <a  href="{{ route('admins.promotion.create') }}" class="btn btn-success ml-auto">Thêm mới khuyến mãi</a>
                 </div>
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Basic Datatables</h5>
+                {{-- {{ dd(session('success')) }} --}}
+                @if (session('success'))
+                <div class="alert alert-danger col-3 mt-2 ms-2"  id="success-alert">
+                    {{ session('success') }}
                 </div>
+            @endif
+            
                 <div class="card-body">
-                    <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle"
-                        style="width:100%">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 10px;">
-                                    <div class="form-check">
-                                        <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
-                                    </div>
-                                </th>
-                                <th scope="col">#</th>
-                                <th scope="col">Code</th>
-                                <th scope="col">Discount</th>
-                                <th scope="col">Discount_type</th>
-                                <th scope="col">Minimum_spend</th>
-                                <th scope="col">Start_date</th>
-                                <th scope="col">End_date</th>
-                                <th scope="col">Usage_limit</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($promotion as $item)
-
-                            <tr>
-                                
-                                <th scope="row">
-                                    <div class="form-check">
-                                        <input class="form-check-input fs-15" type="checkbox" name="checkAll"
-                                            value="option1">
-                                    </div>
-                                </th>
-                                <td>{{ $item->id }}</td>
-                                        <td>{{ $item->code }}</td>
-                                        <td>{{ $item->discount }}</td>
-                                        <td>{{ $item->discount_type }}</td>
-                                        <td>{{ $item->minimum_spend }}</td>
-                                        <td>{{ $item->start_date }}</td>
-                                        <td>{{ $item->end_date }}</td>
-                                        <td>{{ $item->usage_limit }}</td>
-                                        <td>{{ $item->status }}</td>
-                                        <td>
-                                            <div class="d-flex ">
-                                                <form action="{{ route('admins.promotion.destroy', $item) }}" method="post">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn xóa không?')" style="border: none; background: none;">
-                                                        <i class="fas fa-trash-alt text-danger"></i> <!-- Icon xóa -->
-                                                    </button>
-                                                </form>
-                                                <a href="{{ route('admins.promotion.edit', $item) }}" class="btn btn-success ms-2" style="border: none; background: none;">
-                                                    <i class="fas fa-edit text-success"></i> <!-- Icon sửa -->
-                                                </a>
-                                            </div>
-                                        </td>
-                                        
-
-                            </tr>
-                            @endforeach
-
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle"
+                            style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 10px;">
+                                        <div class="form-check">
+                                            <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
+                                        </div>
+                                    </th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Code</th>
+                                    <th scope="col">Giảm giá</th>
+                                    <th scope="col">Loại giảm giá</th>
+                                    <th scope="col">Số tiến tối thiểu</th>
+                                    <th scope="col">Ngày bắt đầu</th>
+                                    <th scope="col">Ngày kết thúc</th>
+                                    <th scope="col">Số lượng</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($promotion as $item)
+    
+                                <tr>
+                                    
+                                    <th scope="row">
+                                        <div class="form-check">
+                                            <input class="form-check-input fs-15" type="checkbox" name="checkAll"
+                                                value="option1">
+                                        </div>
+                                    </th>
+                                    <td>{{ $item->id }}</td>
+                                            <td>{{ $item->code }}</td>
+                                            <td>{{ $item->discount }}</td>
+                                            <td>{{ $item->discount_type }}</td>
+                                            <td>{{ $item->minimum_spend }}</td>
+                                            <td>{{ $item->start_date }}</td>
+                                            <td>{{ $item->end_date }}</td>
+                                            <td>{{ $item->usage_limit }}</td>
+                                            <td>{{ $item->status }}</td>
+                                            <td>
+                                                <div class="d-flex ">
+                                                    <form action="{{ route('admins.promotion.destroy', $item) }}" method="post">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn xóa không?')" style="border: none; background: none;">
+                                                            <i class="fas fa-trash-alt text-danger"></i> <!-- Icon xóa -->
+                                                        </button>
+                                                    </form>
+                                                    <a href="{{ route('admins.promotion.edit', $item) }}" class="btn btn-success ms-2" style="border: none; background: none;">
+                                                        <i class="fas fa-edit text-success"></i> <!-- Icon sửa -->
+                                                    </a>
+                                                </div>
+                                            </td>                                
+    
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div><!--end col-->
+            
+        </div>
     </div>
 @endsection
+
 @section('script-libs')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const alert = document.getElementById('success-alert');
+    if (alert) {
+        setTimeout(() => {
+            alert.style.opacity = '1'; // Làm mờ dần
+            setTimeout(() => alert.remove(), 500); // Xóa thông báo sau 500ms
+        }, 3000); // Hiển thị trong 3 giây
+    }
+});
+
+</script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 

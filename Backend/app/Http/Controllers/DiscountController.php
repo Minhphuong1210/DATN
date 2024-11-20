@@ -79,7 +79,7 @@ class DiscountController extends Controller
 
 
 
-        return redirect()->route('admins.discounts.index')->with('success', 'Discount added successfully');
+        return redirect()->route('admins.discounts.index')->with('success', 'Thêm giảm giá thành công');
     }
 
     /**
@@ -109,7 +109,7 @@ class DiscountController extends Controller
         $discount = Discount::findOrFail($id);
         $discount->update($request->all());
 
-        return redirect()->route('admins.discounts.index')->with('success', 'Discount updated successfully.');
+        return redirect()->route('admins.discounts.index')->with('success', 'Cập nhật giảm giá thành công');
     }
 
     /**
@@ -119,7 +119,7 @@ class DiscountController extends Controller
     {
         $discount = Discount::findOrFail($id);
         $discount->delete();
-        return redirect()->route('admins.discounts.index')->with('success', 'Discount deleted successfully.');
+        return redirect()->route('admins.discounts.index')->with('success', 'Xóa giảm giá thành công');
     }
     public function discount()
     {

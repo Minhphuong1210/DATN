@@ -23,6 +23,8 @@ export const useProduct = () => {
             const { data } = await axios.get('/api/products');
             setProducts(data);
             setProductsHots(data.products_hot);
+        
+            
             setProductsSale(data.products_sale);
         } catch (error) {
             console.log(error);
@@ -52,7 +54,7 @@ export const useProduct = () => {
             getProductById(id, idd);
         }
     }, [id, idd]);
-
+    console.log(product);
     // Lấy bình luận theo sản phẩm
     const getComment = async (id: string) => {
         try {

@@ -149,10 +149,10 @@ class ApiProductController extends Controller
 
         try {
             Mail::to($yourEmail)->send(new ContasUsMail($yourEmail, $email, $name, $phone, $note));
-            return response()->json(['success' => 'Gửi contact thành công']);
+            return response()->json(['message' => 'Gửi contact thành công']);
         } catch (\Throwable $th) {
             Log::error('Error sending email: ' . $th->getMessage());
-            return response()->json(['error' => 'Gửi contact thất bại']);
+            return response()->json(['message' => 'Gửi contact thất bại']);
         }
     }
     public function discount()

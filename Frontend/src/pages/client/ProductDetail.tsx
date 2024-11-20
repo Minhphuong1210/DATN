@@ -21,6 +21,7 @@ const ProductDetail: React.FC = () => {
     const [showDescription, setShowDescription] = useState(true);
     const [showComment, setShowComment] = useState(false);
     const { color, size } = useColor();
+    const [cartCount, setCartCount] = useState<number>(0); // Trạng thái số lượng giỏ hàng
     const token = localStorage.getItem('token');
     const [addcomment, setAddcomment] = useState({
         comment: '',
@@ -123,7 +124,7 @@ const ProductDetail: React.FC = () => {
         quantity: number,
 
     ) => {
-
+        
         try {
             if (!token) {
                 toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
@@ -140,6 +141,7 @@ const ProductDetail: React.FC = () => {
                 quantity,
                 price: product.price
             });
+            setCartCount(cartCount + 1); // Tăng số lượng giỏ hàng lên 1
             toast.success('Thêm sản phẩm vào giỏ hàng thành công');
             nav('/cart');
         } catch (error) {

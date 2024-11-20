@@ -9,17 +9,8 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Input Type</h5>
+                    <h5 class="card-title mb-0">Thêm banner mới</h5>
                 </div><!-- end card header -->
 
                 <div class="card-body">
@@ -31,7 +22,9 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="title" class="form-label">Tiêu đề</label>
-                                            <input type="text" id="title" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}" placeholder="Title">
+                                            <input type="text" id="title"
+                                                class="form-control @error('title') is-invalid @enderror" name="title"
+                                                value="{{ old('title') }}" placeholder="Title">
                                             @error('title')
                                                 <p class="text-danger">{{ $message }}</p>
                                             @enderror
@@ -40,16 +33,19 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="image" class="form-label">Hình ảnh</label>
-                                            <input type="file" id="image" class="form-control @error('image') is-invalid @enderror" name="image" onchange="showImage(event)">
+                                            <input type="file" id="image"
+                                                class="form-control @error('image') is-invalid @enderror" name="image"
+                                                onchange="showImage(event)">
                                             @error('image')
                                                 <p class="text-danger">{{ $message }}</p>
                                             @enderror
-                                            <img src="" alt="Hình ảnh sản phẩm" style="width:150px; display:none" id="img_danh_muc">
+                                            <img src="" alt="Hình ảnh sản phẩm" style="width:150px; display:none"
+                                                id="img_danh_muc">
                                         </div>
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary justify-content-center">Gửi</button>
+                                <button type="submit" class="btn btn-primary justify-content-center">Thêm mới</button>
 
                             </form>
                         </div>
@@ -70,7 +66,7 @@
                 img_danh_muc.src = reader.result;
                 img_danh_muc.style.display = 'block';
             }
-            if(file){
+            if (file) {
                 reader.readAsDataURL(file);
             }
         }
