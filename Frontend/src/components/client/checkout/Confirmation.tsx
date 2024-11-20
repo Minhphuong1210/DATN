@@ -10,20 +10,20 @@ interface ConfirmationProps {
     shippings: { id: number; name: string; cost: number }[];
 }
 
-const Confirmation: React.FC<ConfirmationProps> = ({ shippingInfo, paymentMethod, shippings }) => {
+const Confirmation: React.FC<ConfirmationProps> = ({ shippingInfo, shippings }) => {
     const shippingId = parseInt(shippingInfo.shippingMethod, 10); // Chuyển đổi thành number
     const selectedShipping = shippings.find(shipp => shipp.id === shippingId);
 
     return (
-        <div>
-            <Typography variant="h6">Xác nhận thông tin</Typography>
-            <Typography><strong>Họ và tên:</strong> {shippingInfo.username}</Typography>
-            <Typography><strong>Địa chỉ:</strong> {shippingInfo.address}</Typography>
-            <Typography><strong>Email:</strong> {shippingInfo.email}</Typography>
-            <Typography><strong>Số điện thoại:</strong> {shippingInfo.phone}</Typography>
-            <Typography><strong>Ghi chú:</strong> {shippingInfo.note}</Typography>
-            <Typography><strong>Phương thức vận chuyển:</strong> {selectedShipping ? selectedShipping.name : 'Chưa chọn'}</Typography>
-            <Typography><strong>Phương thức thanh toán:</strong> {paymentMethod}</Typography>
+        <div className='ml-9'>
+            <p className='my-3 text-lg font-bold ml-3' >Xác nhận thông tin</p>
+            <p className='my-2 text-lg ml-3'><strong>Họ và tên:</strong> {shippingInfo.username}</p>
+            <p className='my-2 text-lg ml-3'><strong>Địa chỉ:</strong> {shippingInfo.address}</p>
+            <p className='my-2 text-lg ml-3'><strong>Email:</strong> {shippingInfo.email}</p>
+            <p className='my-2 text-lg ml-3'><strong>Số điện thoại:</strong> {shippingInfo.phone}</p>
+            <p className='my-2 text-lg ml-3'><strong>Ghi chú:</strong> {shippingInfo.note}</p>
+            <p className='my-2 text-lg ml-3'><strong>Phương thức vận chuyển:</strong> {selectedShipping ? selectedShipping.name : 'Chưa chọn'}</p>
+
         </div>
     );
 };

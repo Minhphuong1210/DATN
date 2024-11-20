@@ -113,3 +113,6 @@ Route::put('vnpay/store/{vnp_TxnRef}',[PaymentController::class,'vnPayUpdate']);
 
 
 Route::post('filterProduct',[ProductController::class,'filterProduct']);
+Route::get('productSubcate/{id}',[ApiProductController::class,'subcateProduct']);
+Route::get('Cate/{id}',[ApiProductController::class,'cateProduct']);
+Route::put('updatevnpay/{vnp_TxnRef}',[PaymentController::class,'updateVnpay']);

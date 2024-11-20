@@ -13,7 +13,8 @@ import MenuHeader from "./MenuHeader";
 import DropdownMenu from "./DropdowUser";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
-import { useLoading } from "../../../../context/Loading";
+import { useCategory } from "../../../../hook/useCategory";
+// import { useLoading } from "../../../../context/Loading";
 interface HeaderProps {
   isMobile: boolean;
 }
@@ -23,58 +24,39 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenUser, setIsOpenUser] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
+  const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
   const [error, setError] = useState(null);
   const { loading, setLoading } = useLoading();
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
   const [HeaderPage, setResponstHeader] = useState([]);
   const [cartCount, setCartCount] = useState(0); // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
   const handleMenu = () => {
     setOpenMenu(!openMenu);
   };
-  // const handleMouseEnter = () => {
-  //   setIsOpen(true);
-  // };
 
-  // const handleMouseLeave = () => {
-  //   setIsOpen(false);
-  // };
-  const [hoveredCategoryId, setHoveredCategoryId] = useState(null); // Lưu ID danh mục cha đang được hover
-
-  const handleMouseEnter = (id) => {
-    setHoveredCategoryId(id); // Lưu ID vào state
+  const handleMouseEnter = (id: number) => {
+    setIsOpen(true);
+    setActiveCategoryId(id); // Lưu lại id của category khi hover vào
   };
 
   const handleMouseLeave = () => {
-    setHoveredCategoryId(null); // Reset state khi rời chuột
+    setIsOpen(false);
+    setActiveCategoryId(null); // Đặt lại id khi rời khỏi
   };
   const token = localStorage.getItem('token');
-  // console.log(token);
 
   //CHỨC NĂNG TÌM KIẾM SẢN PHẨM
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    // console.log(searchTerm);
     e.preventDefault();
     // kiểm tra điều kiện trước khi điều hướng
     navigate(`/allproduct/?q=${searchTerm}`);
   };
 
-  const category = async () => {
-    try {
-      const response = await axios.get(`/api/categorys`);
+  const { categories, subcates } = useCategory();
 
-      setResponstHeader(response.data.data);
-      // console.log(responst);
-
-    } catch (error) {
-
-    }
-  }
-  useEffect(() => {
-    category();
-  }, []);
-
-  // console.log(HeaderPage);
 
     // Hàm lấy dữ liệu giỏ hàng từ API
     const fetchCartCount = async () => {
@@ -128,22 +110,19 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               </li>
 
 
-              {HeaderPage.map((HeaderPages) => (
+              {categories.map((category) => (
                 <li
-                  key={HeaderPages.id}
-                  className={`hovermenuNav ${isOpen ? "text-yellow-500" : ""}`}
-                  onMouseEnter={() => handleMouseEnter}
+                  key={category.id}
+                  className={`hovermenuNav ${isOpen && activeCategoryId === category.id ? "text-yellow-500" : ""}`}
+                  onMouseEnter={() => handleMouseEnter(category.id)} // Truyền id khi hover vào
                   onMouseLeave={handleMouseLeave}
                 >
-                  <a
-                    key={HeaderPages.id} // Cung cấp key duy nhất cho mỗi phần tử
-                    href=""
-                    className="hover:text-slate-600"
-                  >
-                    {HeaderPages.name} {/* Hiển thị tên */}
+                  <a href="" className="hover:text-slate-600">
+                    {category.name}
                   </a>
                 </li>
               ))}
+
 
               <li className="hovermenuNav">
                 <a href="#" className="hover:text-slate-600">
@@ -274,13 +253,15 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             )}
           </div>
         </div>
-        {isOpen && (
+        {isOpen && activeCategoryId !== null && (
           <MenuHeader
             handleMouseEnter={handleMouseEnter}
             handleMouseLeave={handleMouseLeave}
             isOpen={isOpen}
+            categoryId={activeCategoryId} // Truyền id của category đang hover vào
           />
         )}
+
       </div>
     </div>
   );

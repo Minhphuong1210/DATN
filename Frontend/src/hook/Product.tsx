@@ -14,8 +14,8 @@ export const useProduct = () => {
     const [ProductBycategorys, setProductBycategory] = useState<Product[]>([]);
     const { loading, setLoading } = useLoading();
     const { id, idd } = useParams();
-    
-    
+
+
     // để nhiều cái này bị lỗi api là 429
     const fetchProducts = async () => {
         try {
@@ -49,7 +49,6 @@ export const useProduct = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         if (id && idd) {
             getProductById(id, idd);
@@ -68,13 +67,11 @@ export const useProduct = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         if (id) {
             getComment(id);
         }
     }, [id]);
-
     // Lấy sản phẩm theo danh mục
     const getProductBycategory = async (id: string, idd: string) => {
         try {
@@ -95,6 +92,6 @@ export const useProduct = () => {
         }
     }, [id, idd]);
     // thêm bình luận
-  
+
     return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory };
 };

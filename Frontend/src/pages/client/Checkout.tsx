@@ -4,7 +4,6 @@ import { Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
 import ShippingForm from '../../components/client/checkout/ShippingForm';
 import PaymentForm from '../../components/client/checkout/PaymentForm';
 import Confirmation from '../../components/client/checkout/Confirmation';
-import ThankYouModal from '../../components/client/checkout/ThankYouModal';
 import CostShipping from '../../components/client/checkout/CostShpping';
 import { useOder } from '../../hook/useOder';
 import { useShipping } from '../../hook/useShipping';
@@ -14,18 +13,18 @@ import { ChevronLeft, ChevronRight, PackageX } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
-import MessagePayment from '../../components/client/checkout/MessagePayment';
-const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng ', 'Phương thức thanh toán', "Xác nhận"];
+import { Order } from '../../interfaces/oder';
+
+const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng ', 'Phương thức thanh toán'];
 const Checkout = () => {
+
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
         return savedStep !== null ? JSON.parse(savedStep) : 0;
     });
-    const { oders, total, isOrderSuccessful, handleSubmitOrder, handleCloseModal, isOfBtn, isConfirmVisible, confirmOrder, setConfirmVisible } = useOder();
-
+    const { oders, total, handleSubmitOrder, isThankPayment } = useOder();
     const [shippingCost, setShippingCost] = useState<number>(0);
-    // const [shippingMethod, setShippingMethod] = useState('standard');
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState<string>('');
     const totalPayment = (total?.subtotal || 0) + (shippingCost || 0);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 4;
@@ -38,17 +37,27 @@ const Checkout = () => {
     const responseCodeRefMomo = useRef<string | null>(null);
     const [vnpResponseCode, setVnpResponseCode] = useState<string | null>(null);
     const [MomoResponseCode, setMomoResponseCode] = useState<string | null>(null);
+    const [message, setMessage] = useState();
+    const [isConfirmOrder, setIsConfirmOrder] = useState(false);
+    const [shippingInfo, setShippingInfo] = useState({
+        username: '',
+        address: '',
+        email: '',
+        phone: '',
+        note: '',
+        shippingMethod: '',
+    });
+    const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         const checkResponseCode = () => {
-            const queryString = location.search;
-            const urlParams = new URLSearchParams(queryString);
+            const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('vnp_ResponseCode');
             if (code && code !== responseCodeRef.current) {
                 responseCodeRef.current = code;
                 setVnpResponseCode(code);
                 if (code === '00') {
-                    toast.success('Thanh toán thành công');
-                    setActiveStep(3); // Chuyển đến bước 3 nếu thanh toán thành công
+                    setActiveStep(1); // Chuyển đến bước 3 nếu thanh toán thành công
+                    // setConfirmVisible(true)
                 } else {
                     toast.error('Thanh toán không thành công');
                 }
@@ -56,6 +65,84 @@ const Checkout = () => {
         };
         checkResponseCode();
     }, [location]);
+    const shippingInfoo = JSON.parse(localStorage.getItem("shippingInfo")) || {
+        username: "",
+        phone: "",
+        address: "",
+        email: "",
+        note: "",
+        shippingMethod: "",
+    };
+
+
+    //chheck Thanh toán thanh công
+    const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
+    const checkResponseCode = async () => {
+        if (!shippingInfo || !total || shippingCost === undefined) {
+            console.error("Data is missing:", { shippingInfo, total, shippingCost });
+            return;
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentData = {
+            vnp_Amount: urlParams.get("vnp_Amount") || "",
+            vnp_BankCode: urlParams.get("vnp_BankCode") || "",
+            vnp_BankTranNo: urlParams.get("vnp_BankTranNo") || "",
+            vnp_CardType: urlParams.get("vnp_CardType") || "",
+            vnp_OrderInfo: urlParams.get("vnp_OrderInfo") || "",
+            vnp_PayDate: urlParams.get("vnp_PayDate"),
+            vnp_ResponseCode: urlParams.get("vnp_ResponseCode") || "",
+            vnp_TmnCode: urlParams.get("vnp_TmnCode"),
+            vnp_TransactionNo: urlParams.get("vnp_TransactionNo") || "",
+            vnp_TransactionStatus: urlParams.get("vnp_TransactionStatus") || "",
+            vnp_TxnRef: urlParams.get("vnp_TxnRef") || "",
+            vnp_SecureHash: urlParams.get("vnp_SecureHash") || "",
+        };
+        const txnRef = paymentData.vnp_TxnRef;
+        const vnp_ResponseCode = paymentData.vnp_ResponseCode;
+        // Kiểm tra xem đã gọi API chưa và mã phản hồi có hợp lệ không
+        if (txnRef && vnp_ResponseCode === "00" && !isChecked.current) {
+            isChecked.current = true; // Đánh dấu đã gọi API
+            try {
+                const { data } = await axios.put(`/api/updatevnpay/${txnRef}`, {
+                    paymentData: paymentData,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                // call tếp api
+                setMessage(data.message);
+                toast.success(data.message);
+                const orderData: Order = {
+                    username: shippingInfoo.username,
+                    phone: shippingInfoo.phone,
+                    address: shippingInfoo.address,
+                    email: shippingInfoo.email,
+                    note: shippingInfoo.note,
+                    commodity_money: (total?.subtotal || 0) + (shippingCost || 0),
+                    total_amount: (total?.subtotal || 0) + (shippingCost || 0),
+                    shipping_id: shippingInfoo.shippingMethod,
+                };
+                console.log(orderData);
+                await axios.post('/api/donhangs/store', orderData)
+                // Xử lý kết quả từ API thứ hai
+                toast.success("Đặt hàng thành công thành công!");
+                setIsConfirmOrder(true);
+                localStorage.removeItem('activeStep');
+                localStorage.removeItem('shippingInfo');
+            } catch (error) {
+                toast.error("Thanh toán thất bại!");
+            }
+        }
+    };
+    useEffect(() => {
+        if (shippingInfo.username && total && shippingCost !== undefined) {
+            checkResponseCode();
+        }
+    }, [shippingInfo, total, shippingCost]);
+
+
+
     useEffect(() => {
         const checkResponseCodeMomo = () => {
             const queryString = location.search;
@@ -66,7 +153,8 @@ const Checkout = () => {
                 setMomoResponseCode(code);
                 if (code === '0') {
                     toast.success('Thanh toán thành công');
-                    setActiveStep(3); // Chuyển đến bước 3 nếu thanh toán thành công
+                    setActiveStep(1); // Chuyển đến bước 3 nếu thanh toán thành công
+
                 } else {
                     toast.error('Thanh toán không thành công');
                 }
@@ -74,10 +162,7 @@ const Checkout = () => {
         };
         checkResponseCodeMomo();
     }, [location]);
-    interface appLy {
-        code: string
-        total_price: number
-    }
+
     const [apply, setApply] = useState()
 
 
@@ -93,15 +178,7 @@ const Checkout = () => {
             toast.error('Phiếu khuyến mại hết hạn')
         }
     }
-    const [shippingInfo, setShippingInfo] = useState({
-        username: '',
-        address: '',
-        email: '',
-        phone: '',
-        note: '',
-        shippingMethod: '',
-    });
-    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         const savedShippingInfo = localStorage.getItem('shippingInfo');
         if (savedShippingInfo) {
@@ -126,27 +203,18 @@ const Checkout = () => {
                 localStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
             }
         }
-
         // Nếu activeStep = 1 và vnpResponseCode = '00', bỏ qua bước 2 và chuyển đến bước 3
-        if (activeStep === 1 && vnpResponseCode === '00') {
+        if (activeStep === 1 && vnpResponseCode === '00' && MomoResponseCode === '00') {
             setActiveStep(3); // Bỏ qua bước 2, chuyển thẳng đến bước 3
             return;
         }
-
         // Nếu activeStep chưa phải là bước cuối cùng, tăng activeStep bình thường
         if (activeStep < steps.length - 1) {
             setActiveStep((prevStep) => prevStep + 1); // Tăng bước bình thường
         }
-
-        // Kiểm tra điều kiện cho bước cuối cùng
-        if (activeStep === steps.length - 1) {
-            const savedShippingInfo = JSON.parse(localStorage.getItem('shippingInfo'));
-            handleSubmitOrder(savedShippingInfo || shippingInfo, total, shippingCost);
-        }
     };
 
-
-
+    const savedShippingInfo = JSON.parse(localStorage.getItem('shippingInfo'));
     const handleBack = () => {
         // Nếu mã phản hồi tồn tại và là '00' và đang ở bước 3, quay lại trực tiếp bước 1
         if (activeStep === 3 && vnpResponseCode === '00') {
@@ -166,10 +234,6 @@ const Checkout = () => {
         });
     };
 
-    const handleShippingMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setShippingMethod(e.target.value);
-    };
-
     const { shippings } = useShipping();
 
     const getStepContent = (stepIndex: number) => {
@@ -179,7 +243,7 @@ const Checkout = () => {
                     <ShippingForm
                         shippingInfo={shippingInfo}
                         handleShippingChange={handleShippingChange}
-                        handleShippingMethodChange={handleShippingMethodChange}
+                        // handleShippingMethodChange={handleShippingMethodChange}
                         error={error ?? ''}
                     />
                 );
@@ -198,27 +262,28 @@ const Checkout = () => {
                         paymentMethod={paymentMethod}
                         setPaymentMethod={setPaymentMethod}
                         totalPayment={totalPayment}
+                        handleNext={handleNext}
+                        shippingInfoo={shippingInfoo}
+                        shippingInfo={shippingInfo}
+                        total={total}
+                        shippingCost={shippingCost}
+                        handleSubmitOrder={handleSubmitOrder}
+                        setIsConfirmOrder={setIsConfirmOrder}
                     />
                 );
-            case 3:
-                return (
-                    <MessagePayment
 
-
-                    />
-                );
             default:
                 return 'Unknown step';
         }
     };
-
-
     return (
         <>
+
+
             <div className="min-w-screen min-h-screen bg-gray-50 py-5 md:mx-[150px] lg:mx-[150px]">
                 <div className="px-5">
                     <div className="mb-2">
-                        {/* <a href="#" className="focus:outline-none hover:underline text-gray-500 text-sm"><i className="mdi mdi-arrow-left text-gray-400" />Back</a> */}
+
                     </div>
                     <div className="mb-2">
                         <h1 className="text-3xl md:text-5xl font-bold text-gray-600">Checkout.</h1>
@@ -236,8 +301,6 @@ const Checkout = () => {
                                 <span className="text-gray-500">Không có sản phẩm nào trong giỏ hàng.</span>
                             </div>
                         </div>
-
-
                     ) : (
                         <div className="w-full">
                             <div className="-mx-3 md:flex items-start">
@@ -382,11 +445,14 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                         <ConfirmModal
-                                            isVisible={isConfirmVisible}
-                                            onConfirm={confirmOrder}
-                                            onCancel={() => setConfirmVisible(false)}
+                                            isVisible={isConfirmOrder || isThankPayment}
+
+                                            onCancel={() => setIsConfirmOrder(false)}
+                                            savedShippingInfo={savedShippingInfo}
+                                            shippingInfo={shippingInfo}
+                                            totalPayment={totalPayment}
+                                            shippingCost={shippingCost}
                                         />
-                                        <ThankYouModal isVisible={isOrderSuccessful} onClose={handleCloseModal} />
                                     </div>
                                 </div>
                             </div>
