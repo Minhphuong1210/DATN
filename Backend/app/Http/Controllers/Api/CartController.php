@@ -27,14 +27,12 @@ class CartController extends Controller
     //Them san pham vao gio hang
     public function store(Request $request)
     {
-        $request-> validate([
-            'product_id'=>'required',
-            'size_id'=>'required',
-            'color_id'=>'required',
-            'quantity'=>'required',
-            'price'=>'required',
-            
-            
+        $request->validate([
+            'id' => 'required',
+            'size_id' => 'required',
+            'color_id' => 'required',
+            'quantity' => 'required',
+            'price' => 'required',
         ]);
         $product_id = $request->id;
         $size_id = $request->size_id;
@@ -42,63 +40,75 @@ class CartController extends Controller
         $quantity = $request->quantity;
         $price = $request->price;
 
-        if(!$product_id){
+        if (!$product_id) {
             return response()->json([
-                'message' => 'Không tìm thấy sản phẩm',
-            ],404);
+                'error' => 'Không tìm thấy sản phẩm',
+            ], 404);
         }
-        if(!$size_id){
+        if (!$size_id) {
             return response()->json([
-                'message' => 'Không tìm thấy kích cỡ sản phẩm',
-            ],404);
+                'error' => 'Không tìm thấy kích cỡ sản phẩm',
+            ], 404);
         }
-        if(!$color_id){
+        if (!$color_id) {
             return response()->json([
-                'message' => 'Không tìm thấy màu sắc sản phẩm',
-            ],404);
+                'error' => 'Không tìm thấy màu sắc sản phẩm',
+            ], 404);
         }
-        if(!$quantity){
+        if (!$quantity) {
             return response()->json([
-                'message' => 'Không tìm thấy số lượng sản phẩm',
-            ],404);
+                'error' => 'Không tìm thấy số lượng sản phẩm',
+            ], 404);
         }
-        if(!$price){
+        if (!$price) {
             return response()->json([
-                'message' => 'Không tìm thấy giá sản phẩm',
-            ],404);
+                'error' => 'Không tìm thấy giá sản phẩm',
+            ], 404);
         }
         if (Auth::check()) {
             $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+            
+          
             $productDetail = ProductDetail::where('product_id', $product_id)
                 ->where('size_id', $size_id)
                 ->where('color_id', $color_id)
                 ->first();
-
-            if ($productDetail) {
-                $productDetail_id = $productDetail->id;
-                $cartDetail = CartDetail::where('cart_id', $cart->id)
-                    ->where('product_detail_id', $productDetail_id)
-                    ->first();
-
-                if ($cartDetail) {
-                    $cartDetail->update([
-                        'quantity' => $cartDetail->quantity + $quantity,
-                    ]);
-                } else {
-                    CartDetail::create([
-                        'cart_id' => $cart->id,
-                        'product_detail_id' => $productDetail_id,
-                        'quantity' => $quantity,
-                        'price' => $price,
-                    ]);
-                }
-
-                return response()->json(['message' => 'Sản phẩm đã được thêm vào giỏ hàng'], 200);
-            } else {
-                return response()->json(['error' => 'Product not found'], 404);
+        
+         
+            if (!$productDetail) {
+                return response()->json(['error' => 'Không có sản phẩm'], 200);
             }
+        
+            $stock = $productDetail->quantity;
+            if ($stock == 0) {
+                return response()->json(['error' => 'Sản phẩm đã hết hàng']);
+            }
+        
+            if ($quantity > $stock) {
+                return response()->json(['error' => 'Số lượng vượt quá giới hạn']);
+            }
+        
+            $productDetail_id = $productDetail->id;
+            $cartDetail = CartDetail::where('cart_id', $cart->id)
+                ->where('product_detail_id', $productDetail_id)
+                ->first();
+        
+            if ($cartDetail) {
+                $cartDetail->update([
+                    'quantity' => $cartDetail->quantity + $quantity,
+                ]);
+            } else {
+                CartDetail::create([
+                    'cart_id' => $cart->id,
+                    'product_detail_id' => $productDetail_id,
+                    'quantity' => $quantity,
+                    'price' => $price,
+                ]);
+            }
+        
+            return response()->json(['message' => 'Sản phẩm đã được thêm vào giỏ hàng'], 200);
         } else {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json(['error' => 'Người dùng chưa đăng nhập'], 401);
         }
     }
 
@@ -111,10 +121,10 @@ class CartController extends Controller
     {
         if (Auth::check()) {
             $user_id = Auth::user()->id;
-            if(!$user_id){
+            if (!$user_id) {
                 return response()->json([
-                    'message'=>'Tài Khoản không tồn tại',
-                ],404);
+                    'message' => 'Tài Khoản không tồn tại',
+                ], 404);
             }
             $cart = Cart::where('user_id', $user_id)->first();
 
@@ -155,7 +165,7 @@ class CartController extends Controller
                 return response()->json(['cart' => $productsDetails], 200);
             }
 
-            return response()->json(['message' => 'Cart is empty'], 404);
+            return response()->json(['message' => 'Không có sản phẩm trong giỏ hàng'], 200);
         }
 
         return response()->json(['error' => 'User not authenticated'], 401);
@@ -187,7 +197,7 @@ class CartController extends Controller
             $cartDetail->delete();
             return response()->json(['message' => 'Xóa thành công'], 200);
         } else {
-            return response()->json(['message' => 'Giỏ hàng không có sản phẩm này'], 404);
+            return response()->json(['message' => 'Giỏ hàng không có sản phẩm này'], 200);
         }
     }
 

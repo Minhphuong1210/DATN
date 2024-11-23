@@ -26,7 +26,7 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(8)
             ->get();
-// ->paginate(5)
+        // ->paginate(5)
         $products_sale = Product::query()
             ->select('id', 'image', 'name', 'price', 'sub_category_id', 'price_sale', 'discount_id')
             ->where('is_active', '1')
@@ -84,7 +84,7 @@ class ProductController extends Controller
                     } else {
                         $product->discount_id = null;
                         $product->price_sale = null;
-                        $product->is_active = 0;
+                        $product->is_sale = 0;
                     }
                 }
             } else {
@@ -181,21 +181,21 @@ class ProductController extends Controller
     }
 
 
-// Sản phẩm đã xem gần đây
-public function addRecentlyViewed(Request $request)
-{
-    $user = $request->user(); // Lấy người dùng hiện tại
-    if(!$user){
-        return response()->json([
-            'message'=>'Bạn chưa đăng nhập vui lòng đăng nhập'
-        ],404);
-    }
-    $productId = $request->input('product_id');
-    if(!$productId){
-        return response()->json([
-            'message'=>'Bạn chưa có sản phẩm xem gần đây'
-        ],404);
-    }
+    // Sản phẩm đã xem gần đây
+    public function addRecentlyViewed(Request $request)
+    {
+        $user = $request->user(); // Lấy người dùng hiện tại
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn chưa đăng nhập vui lòng đăng nhập'
+            ], 404);
+        }
+        $productId = $request->input('product_id');
+        if (!$productId) {
+            return response()->json([
+                'message' => 'Bạn chưa có sản phẩm xem gần đây'
+            ], 404);
+        }
 
 
         // Kiểm tra sản phẩm có tồn tại không
@@ -233,19 +233,19 @@ public function addRecentlyViewed(Request $request)
         return response()->json(['message' => 'Đã thêm vào danh sách đã xem gần đây']);
     }
 
-// Hàm để lấy danh sách sản phẩm đã xem gần đây
-public function getRecentlyViewed(Request $request)
-{
-    $user = $request->user(); // Lấy người dùng hiện tại
-    if(!$user){
-        return response()->json([
-            'message'=>'Bạn chưa đăng nhập vui lòng đăng nhập'
-        ]);
-    }
+    // Hàm để lấy danh sách sản phẩm đã xem gần đây
+    public function getRecentlyViewed(Request $request)
+    {
+        $user = $request->user(); // Lấy người dùng hiện tại
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn chưa đăng nhập vui lòng đăng nhập'
+            ]);
+        }
 
-    $request -> validate([
-        'product'=>'required'
-    ]);
+        $request->validate([
+            'product' => 'required'
+        ]);
         // Lấy danh sách sản phẩm đã xem gần đây của người dùng
         $products = ProductView::where('user_id', $user->id)
             ->orderBy('viewed_at', 'desc')
@@ -256,16 +256,16 @@ public function getRecentlyViewed(Request $request)
         return response()->json($products);
     }
 
-public function filterProduct(Request $request)
+    public function filterProduct(Request $request)
     {
         // explode là để tách nó ra ví dụ : color đẩy dữ liệu là 2 màu thì nó tách ra thành mảng
         $query = Product::query()
-        ->select('products.*')
-        ->distinct()
-        ->join('product_details', 'products.id', '=', 'product_details.product_id');
-        $request -> validate([
-            'category'=>'required',
-        ]);
+            ->select('products.*')
+            ->distinct()
+            ->join('product_details', 'products.id', '=', 'product_details.product_id');
+        // $request->validate([
+        //     'category' => 'required',
+        // ]);
         // Lọc theo danh mục
         if ($request->filled('category')) {
             $category = Category::where('name', 'like', '%' . $request->category . '%')->first();
@@ -282,7 +282,7 @@ public function filterProduct(Request $request)
             $subcate = SubCategory::where('id', 'like', '%' . $request->subcate . '%')->first();
             if ($subcate) {
                 $subcategory_ids = $subcate->id;
-         $query->where('sub_category_id', 'like', '%' . $subcategory_ids . '%');
+                $query->where('sub_category_id', 'like', '%' . $subcategory_ids . '%');
             } else {
                 return response()->json([
                     'message' => 'Danh mục con không tồn tại!'
@@ -304,18 +304,18 @@ public function filterProduct(Request $request)
         }
 
         $products = $query->select('products.*')
-                          ->paginate(10);
-    if(!empty($products)){
-        return response()->json([
-            'message' => 'Lọc thành công',
-            'products' => $products
-        ], 200);
-    }else{
-        return response()->json([
-            'message' => 'không có sản phẩm',
-
-        ], 404);
-    }
+            ->paginate(10);
+            if ($products->isEmpty()) {
+                return response()->json([
+                    'message' => 'Không có sản phẩm chúng tôi sẽ đổ sản các sản phẩm ra để bạn chọn'
+                ], 200);
+            }
+        
+            // Trả về kết quả khi có sản phẩm
+            return response()->json([
+                'message' => 'Lọc thành công',
+                'products' => $products
+            ], 200);
 
 
     }

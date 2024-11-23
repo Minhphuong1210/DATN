@@ -22,7 +22,8 @@ class OrderController extends Controller
             $key_trang_thai = $key;
             $value_trang_thai = $value;
         }
-        return view('Admin.Orders.index', compact('listDonHang', 'trangThaiDonHang', 'key_trang_thai', 'value_trang_thai'));
+        $trangThaiThanhToan=Order::TRANG_THAI_THANH_TOAN;
+        return view('Admin.Orders.index', compact('listDonHang', 'trangThaiDonHang', 'key_trang_thai', 'value_trang_thai','trangThaiThanhToan'));
     }
 
     /**
@@ -70,9 +71,11 @@ class OrderController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // dd($request->all());
         $donHang = Order::query()->findOrFail($id);
         $currentTrangThai = $donHang->order_status;
         // dd($currentTrangThai);
+      
         $newTrangThai = $request->input('order_status');
         $trangThais = array_keys(Order::TRANG_THAI_DON_HANG);
         // kiếm tra nếu đơn hàng đã bị hủy thì không được thay đổi trạng thái nữa
@@ -88,6 +91,14 @@ class OrderController extends Controller
         return redirect()->route('admins.orders.index')->with('success', 'cập nhật trạng thái thành công');
     }
 
+    public function updatePayment(Request $request, string $id){
+        $donHang = Order::query()->findOrFail($id);
+        if ($request->input('order_payment') === 'da_thanh_toan') {
+            $donHang->order_payment = Order::DA_THANH_TOAN;
+            $donHang->save();
+            return redirect()->back()->with('success', 'cập nhật trạng thái thanh toán thành công');
+        }
+    }
     /**
      * Remove the specified resource from storage.
      */

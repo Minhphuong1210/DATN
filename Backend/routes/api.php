@@ -54,6 +54,9 @@ Route::resource('/products', ProductController::class);
 Route::resource('/categorys', CategoryController::class);
 // lấy sản phẩm promotion
 Route::get('/promotion',[ ApiProductController::class,'promotion']);
+Route::post('/addProdmotion',[PromotionController::class, 'addUserPromotion'])->middleware('auth:sanctum');
+Route::get('/promotionUser',[ PromotionController::class,'getPromotion'])->middleware('auth:sanctum');
+
 // Payment
 Route::post('/payment/momo', [PaymentController::class, 'payment_momo']);
 
@@ -88,7 +91,7 @@ Route::get('color',[ApiProductController::class,'color']);
 Route::get('size',[ApiProductController::class,'size']);
 Route::get('Shipping',[ApiProductController::class,'Shipping']);
 Route::get('/discount', [ApiProductController::class, 'discount']);
-Route::post('applyPromotion',[PromotionController::class,'applyPromotion']);
+Route::post('applyPromotion',[PromotionController::class,'applyPromotion'])->middleware('auth:sanctum');
 
 // Form liên hệ
 Route::post('contas', [ApiProductController::class, 'contasUs']);

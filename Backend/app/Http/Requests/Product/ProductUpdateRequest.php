@@ -4,12 +4,25 @@ namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductStoreRequest extends FormRequest
+class ProductUpdateRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'list_hinh_anh.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'products' => 'required|array',
             'products.*.size_id' => 'required|exists:product_sizes,id',
@@ -21,11 +34,9 @@ class ProductStoreRequest extends FormRequest
             'is_active' => 'nullable|boolean',
         ];
     }
-
     public function messages()
     {
         return [
-            'image.required' => 'Hình ảnh chính là bắt buộc.',
             'products.required' => 'Danh sách sản phẩm là bắt buộc.',
             'products.*.size_id.required' => 'Kích thước là bắt buộc.',
             'products.*.color_id.required' => 'Màu sắc là bắt buộc.',
