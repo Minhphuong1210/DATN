@@ -28,13 +28,13 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $request-> validate([
-            'product_id'=>'required',
+            'id'=>'required',
             'size_id'=>'required',
             'color_id'=>'required',
             'quantity'=>'required',
             'price'=>'required',
-            
-            
+
+
         ]);
         $product_id = $request->id;
         $size_id = $request->size_id;

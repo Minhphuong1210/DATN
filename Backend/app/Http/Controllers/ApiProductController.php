@@ -43,6 +43,7 @@ class ApiProductController extends Controller
             $productSubCategorys->imageUrl = 'http://127.0.0.1:8000/storage/' . $productSubCategorys->image;
         }
         $product->increment('view');
+        $product->images;
         $comments = Comment::where('product_id', $id)
             ->whereNull('parent_id')
             ->with('replies.user')

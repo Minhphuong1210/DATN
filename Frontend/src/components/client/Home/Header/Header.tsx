@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import yourImage from "../../../../public/images/logofix.png";
+import yourImage from "../../../../public/images/logofix2.png";
 import {
   AlignJustify,
   Heart,
@@ -12,8 +12,12 @@ import "../../../../css/tableHeader.css";
 import MenuHeader from "./MenuHeader";
 import DropdownMenu from "./DropdowUser";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCategory } from "../../../../hook/useCategory";
+import { useLoading } from "../../../../context/Loading";
+import { useCart } from "../../../../context/Cart";
+import { Badge } from "@mui/material";
+import ModalCart from "../../ModalCart/ModalCart";
 // import { useLoading } from "../../../../context/Loading";
 interface HeaderProps {
   isMobile: boolean;
@@ -22,17 +26,21 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [openMenu, setOpenMenu] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenCart, setsOpenCart] = useState(false)
   const [isOpenUser, setIsOpenUser] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const { totalQuantity } = useCart();
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const navigate = useNavigate();
-  const [searchResults, setSearchResults] = useState([]);
-  const [error, setError] = useState(null);
   const { loading, setLoading } = useLoading();
-//   const navigate = useNavigate();
-  const [HeaderPage, setResponstHeader] = useState([]);
-  const [cartCount, setCartCount] = useState(0); // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
+
+  const handleOpenCart = () => {
+    setsOpenCart(true)
+  }
+  const handleCloseCart = () => {
+    setsOpenCart(false)
+  }
+
   const handleMenu = () => {
     setOpenMenu(!openMenu);
   };
@@ -58,28 +66,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const { categories, subcates } = useCategory();
 
 
-    // Hàm lấy dữ liệu giỏ hàng từ API
-    const fetchCartCount = async () => {
-      try {
-        setLoading(true);
-        if (!token) {
-          setCartCount(0);
-          setLoading(false) 
-          return} ; // Nếu chưa đăng nhập thì không gọi API
-        const response = await axios.get("/api/cart"); // Gọi API giỏ hàng
-        const cartItems = response.data.cart; // Lấy danh sách sản phẩm trong giỏ hàng
-        const totalItems = cartItems.reduce((total: number, item: any) => total + item.quantity, 0); // Tính tổng số lượng
-        setCartCount(totalItems);
-      } catch (error) {
-        console.error("Failed to fetch cart count:", error);
-      }finally {
-        setLoading(false); 
-      }
-    };
-  
-    useEffect(() => {
-      fetchCartCount(); // Gọi hàm để lấy dữ liệu giỏ hàng
-    }, []);
+
 
   return (
     <div className={`sticky top-0 z-50 w-full bg-white p-2`}>
@@ -221,16 +208,16 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             ) : null
 
             }
-            <div className="relative">
-              <a href="/cart">
-                <ShoppingCart size={30} className="cursor-pointer text-slate-500 hover:text-black" />
-              </a>
-              {/* Hiển thị số lượng sản phẩm */}
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
+            <div className="relative" onMouseEnter={handleOpenCart} onMouseLeave={handleCloseCart}>
+              <Badge badgeContent={totalQuantity} color="primary">
+                <a href="/cart">
+                  <ShoppingCart
+                    size={30}
+                    className="cursor-pointer text-slate-500 hover:text-black"
+                  />
+                </a>
+              </Badge>
+
             </div>
 
             {/* Nút mở/đóng menu di động */}
@@ -259,6 +246,14 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
             handleMouseLeave={handleMouseLeave}
             isOpen={isOpen}
             categoryId={activeCategoryId} // Truyền id của category đang hover vào
+          />
+        )}
+
+        {isOpenCart && (
+          <ModalCart
+            handleMouseEnterCart={handleOpenCart}
+            handleMouseLeaveCart={handleCloseCart}
+            isOpenModalCart={isOpenCart}
           />
         )}
 

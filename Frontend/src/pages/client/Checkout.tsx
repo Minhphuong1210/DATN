@@ -97,6 +97,7 @@ const Checkout = () => {
             vnp_TxnRef: urlParams.get("vnp_TxnRef") || "",
             vnp_SecureHash: urlParams.get("vnp_SecureHash") || "",
         };
+
         const txnRef = paymentData.vnp_TxnRef;
         const vnp_ResponseCode = paymentData.vnp_ResponseCode;
         // Kiểm tra xem đã gọi API chưa và mã phản hồi có hợp lệ không
@@ -122,6 +123,7 @@ const Checkout = () => {
                     commodity_money: (total?.subtotal || 0) + (shippingCost || 0),
                     total_amount: (total?.subtotal || 0) + (shippingCost || 0),
                     shipping_id: shippingInfoo.shippingMethod,
+                    vnp_TxnReff: paymentData.vnp_TxnRef
                 };
                 console.log(orderData);
                 await axios.post('/api/donhangs/store', orderData)

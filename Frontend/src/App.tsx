@@ -18,14 +18,11 @@ import Order from './pages/client/Order';
 import ProductWishlist from './pages/client/ProductWishlist';
 import SearchProduct from './pages/client/search';
 import AccountUpdate from './pages/client/AccountUpdate';
-
 import LogoutInterface from './pages/client/LogOut';
 import Profile from './pages/client/Profile';
 import PrivateRoute from './components/client/PrivateRoute/PrivateRoute';
-
-
-
-
+import ScrollToTop from './components/ScrollToTop';
+import ProductsCate from './pages/client/ProductsCate';
 
 function App() {
   return (
@@ -51,8 +48,11 @@ function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="allproduct" element={<AllProducts />} />
           <Route path="/search" element={<SearchProduct />} />
+          <Route path="products/cate/:id/:name" element={<ProductsCate />} />
         </Route>
+
       </Routes>
+      <ScrollToTop />
       <ToastContainer />
     </>
   );

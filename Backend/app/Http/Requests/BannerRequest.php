@@ -22,9 +22,9 @@ class BannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
-            'title' => 'required|string|max:255', 
-            'user_id' => 'required|integer|exists:users,id', 
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'title' => 'required|string|max:255',
+
         ];
     }
 
@@ -43,9 +43,7 @@ class BannerRequest extends FormRequest
             'title.required' => 'Tiêu đề là bắt buộc.',
             'title.string' => 'Tiêu đề phải là một chuỗi.',
             'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
-            'user_id.required' => 'ID người dùng là bắt buộc.',
-            'user_id.integer' => 'ID người dùng phải là một số nguyên.',
-            'user_id.exists' => 'Người dùng không tồn tại.',
+
         ];
     }
 }

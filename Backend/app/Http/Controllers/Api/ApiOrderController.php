@@ -207,7 +207,7 @@ class ApiOrderController extends Controller
 
 //                 $params = $request->input('orderData');
 //                 $paymentData = $request->input('paymentData');
-                
+
 //                 $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
 //                 $vnPay->update($paymentData);
 //                 $paymentDatas = $request->input('paymentDatas');
