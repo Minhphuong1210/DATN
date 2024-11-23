@@ -25,6 +25,8 @@ export interface Order {
     commodity_money: number;
     total_amount: number;
     shipping_id: string;
+
     vnp_TxnReff: string | null;
     promotion_id:string | null;
+
 }

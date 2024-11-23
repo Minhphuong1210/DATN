@@ -22,9 +22,10 @@ class BannerRequest extends FormRequest
     public function rules(): array
     {
         return [
+
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
             'title' => 'required|string|max:255', 
-            
+
         ];
     }
 
@@ -43,6 +44,7 @@ class BannerRequest extends FormRequest
             'title.required' => 'Tiêu đề là bắt buộc.',
             'title.string' => 'Tiêu đề phải là một chuỗi.',
             'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
+
         ];
     }
 }

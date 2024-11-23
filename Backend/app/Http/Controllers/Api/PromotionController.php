@@ -53,6 +53,7 @@ class PromotionController extends Controller
         if ($checkUser) {
             return response()->json(['error' => 'Bạn đã sử dụng mã khuyến mãi này rồi'], 200);
         }
+
         if ($promotion->usage_limit !== null && $promotion->usage_limit <= 0) {
             return response()->json(['error' => 'Mã khuyến mãi đã hết lượt sử dụng'], 200);
         }
@@ -73,9 +74,15 @@ class PromotionController extends Controller
         $newTotal = $totalPrice - $discountAmount;
 
         // Giảm số lượng sử dụng (nếu có giới hạn)
+
+//         if ($promotion->usage_limit !== null) {
+//             $promotion->decrement('usage_limit');
+//         }
+
         // if ($promotion->usage_limit !== null) {
         //     $promotion->decrement('usage_limit');
         // }
+
 
         return response()->json([
             'promotion_id' => $promotion->id,
@@ -84,6 +91,7 @@ class PromotionController extends Controller
             'discount_amount' => $discountAmount
         ]);
     }
+
 
     public function addUserPromotion(Request $request)
     {

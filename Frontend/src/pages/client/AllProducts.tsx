@@ -13,6 +13,7 @@ interface PriceRange {
     max: number;
 }
 const AllProducts = () => {
+
     const [priceRange, setPriceRange] = useState<PriceRange | null>(null);
     const [category, setCate] = useState<string | null>(null);
     const [color_id, setColorID] = useState<string | null>(null);
@@ -25,6 +26,8 @@ const AllProducts = () => {
     const [searchResults, setSearchResults] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
+    // console.log(productBySubCateId);
+
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
@@ -175,7 +178,6 @@ const AllProducts = () => {
 
             if (Array.isArray(responst.data.products)) {
                 setProductNew(responst.data.products);
-                console.log("ád", responst.data.products);
 
             } else {
                 console.error("Dữ liệu trả về không phải là mảng");
@@ -188,13 +190,13 @@ const AllProducts = () => {
     useEffect(() => {
         fetchProducts();
     }, []);
-    // console.log(filterProductsPrice);
+
     return (
         <>
             <div className='mx-[200px]'>
-                <div className="sticky top-24 z-30">
-                    <div className="mb-5  text-gray-400">
-                        <a href="/" className="focus:outline-none hover:underline text-gray-500">Trang chủ</a> / <span className="text-gray-600">Checkout</span>
+                <div className="">
+                    <div className=" m-1 bg-white text-gray-400">
+                        <a href="/" className="focus:outline-none hover:underline text-gray-500">Trang chủ </a> / <span className="text-gray-600">{name ? name : "Checkout"}</span>
                     </div>
                 </div>
                 <div className='flex '>
@@ -423,10 +425,10 @@ const AllProducts = () => {
 
                     {/* BOX PRODUCTS*/}
                     <div className=''>
-                        <div className='sticky top-[79px] z-40 pt-2 bg-white '>
+                        <div className='sticky top-[68px] z-40 pt-2 bg-white '>
                             <div className='flex justify-between'>
                                 <div>
-                                    <div className="inline-block  mb-3 ml-4 pt-3">Đang dùng bộ lọc:</div>
+                                    <div className="inline-block  mb-3 ml-4 ">Đang dùng bộ lọc:</div>
                                     {priceRange && (
                                         <div className="inline-flex items-center bg-slate-100 w-40  justify-center rounded-lg ml-2">
                                             {priceRange.min} - {priceRange.max}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilter} />
@@ -681,71 +683,8 @@ const AllProducts = () => {
                                             </div>
                                         </div>
                                     ))
-                                ) : (productNew.length > 0) ? (
-                                    // Nếu cả productNew và searchResults đều không có dữ liệu, hiển thị getFilteredAndSortedProducts
-                                    productNew.map((item) => (
-                                        <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
-                                            <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
-                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
-                                                    <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
-                                                        <img
-                                                            src={`http://127.0.0.1:8000/storage/${item.image}`}
-                                                            alt={item.name || "Product Image"}
-                                                            className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
-                                                        />
-                                                    </div>
-                                                    <div className="relative">
-                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                                <Eye
-                                                                    color="currentColor"
-                                                                    strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                                />
-                                                            </a>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                                <ShoppingCart
-                                                                    color="currentColor"
-                                                                    strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                                />
-                                                            </div>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
-                                                                <Heart
-                                                                    color="currentColor"
-                                                                    strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <a className="block overflow-hidden">
-                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
-                                                            {item.name}
-                                                        </div>
-                                                        <div className="text-center block">
-                                                            {item.price_sale !== null ? (
-                                                                <>
-                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
-                                                                        {formatPrice(item.price)}
-                                                                    </span>
-                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                                        {formatPrice(item.price_sale)}
-                                                                    </span>
-                                                                </>
-                                                            ) : (
-                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                                                    {formatPrice(item.price)}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
                                 ) : (
-                                    <p>Chưa có sản phẩm</p> // Hiển thị khi không có dữ liệu từ tất cả các mảng
+                                    <p>Chưa có sản phẩm</p>
                                 )
                             }
                         </div>

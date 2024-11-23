@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { Comment, Product } from "../interfaces/Product";
+import { Comment, ImageProd, Product } from "../interfaces/Product";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useLoading } from "../context/Loading";
@@ -7,8 +7,10 @@ import { toast } from "react-toastify";
 
 export const useProduct = () => {
     const [products, setProducts] = useState<Product[]>([]);
+    const [expiresTimeProducts, setExpiresTimeProducts] = useState();
     const [product, setProduct] = useState<Product>();
     const [productsHots, setProductsHots] = useState<Product[]>([]);
+    const [imgsProduct, setImgsProduct] = useState<ImageProd>();
     const [productsSale, setProductsSale] = useState<Product[]>([]);
     const [comments, setComments] = useState<Comment[]>([]);
     const [ProductBycategorys, setProductBycategory] = useState<Product[]>([]);
@@ -23,16 +25,14 @@ export const useProduct = () => {
             const { data } = await axios.get('/api/products');
             setProducts(data);
             setProductsHots(data.products_hot);
-        
-            
             setProductsSale(data.products_sale);
+            setExpiresTimeProducts(data.products_sale[0].discount.expires_at)
         } catch (error) {
             console.log(error);
         } finally {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -43,6 +43,7 @@ export const useProduct = () => {
             setLoading(true);
             const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
             setProduct(response.data.Product);
+            setImgsProduct(response.data.Product.images)
         } catch (error) {
             toast.error((error as AxiosError)?.message);
         } finally {
@@ -54,7 +55,7 @@ export const useProduct = () => {
             getProductById(id, idd);
         }
     }, [id, idd]);
-    console.log(product);
+
     // Lấy bình luận theo sản phẩm
     const getComment = async (id: string) => {
         try {
@@ -93,5 +94,5 @@ export const useProduct = () => {
     }, [id, idd]);
     // thêm bình luận
 
-    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory };
+    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory, imgsProduct, expiresTimeProducts };
 };

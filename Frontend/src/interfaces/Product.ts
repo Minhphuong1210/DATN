@@ -14,7 +14,22 @@ export interface Product {
     description: string;
     sub_category_id: string
     price_sale: number
+    images: ImageProd[]
+    content: string
+    imageUrl: string
+    discount: Discount;
+}
 
+export interface Discount {
+    id: number;
+    discount_percent: string;
+    expires_at: string;
+    is_active: number;
+}
+export interface ImageProd {
+    id: string;
+    image: string;
+    product_image_id: string
 }
 export interface ApiResponse {
     status: string;
