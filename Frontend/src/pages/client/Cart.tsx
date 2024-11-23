@@ -8,7 +8,7 @@ const Cart = () => {
     const { productCart, setProductCart, handleRemoveCart } = useCarts();
     const { increaseQuantity, decreaseQuantity } = useQuantity();
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 4;
+    const productsPerPage = 3;
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = productCart.slice(indexOfFirstProduct, indexOfLastProduct);

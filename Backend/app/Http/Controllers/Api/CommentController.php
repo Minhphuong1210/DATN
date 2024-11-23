@@ -18,41 +18,47 @@ class CommentController extends Controller
         // Xác thực dữ liệu đầu vào
         $validatedData = $request->validate([
             'comment' => 'required|string|max:255',
-            'rating' => 'nullable|integer|between:1,5',
+            'rating' => 'required|integer|between:1,5',
             'parent_id' => 'nullable|exists:comments,id',
         ]);
 
 
-        $productId = $id; 
+        $productId = $id;
 
 
         $productDetails = ProductDetail::where('product_id', $productId)->pluck('id')->toArray();
 
 
         $userId = Auth::id();
-        if(!$userId){
+        if (!$userId) {
             return response()->json([
-                'message'=>'Tài Khoản không tồn tại',
-            ],404);
+                'message' => 'Tài Khoản không tồn tại',
+            ], 404);
         }
         $hasPurchased = OrderDetail::whereIn('product_detail_id', $productDetails)
-            ->whereHas('Order', function($query) use ($userId) {
+            ->whereHas('Order', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
             ->exists();
-
+        $comment1lan = Comment::query()
+        ->where('user_id', $userId)
+        ->where('product_id', $productId)
+        ->exists();
+        if($comment1lan){
+            return response()->json(['error' => 'Bạn đã bình luận sản phẩm này rồi vui lòng không bình luận lại'], 200);
+        }
         if ($hasPurchased) {
             // Tạo bình luận
             $comment = Comment::create([
                 'comment' => $validatedData['comment'],
-                'rating' => $validatedData['rating']?? 0,
+                'rating' => $validatedData['rating'] ?? 0,
                 'user_id' => $userId,
                 'product_id' => $productId, // Sử dụng product_id đã lấy
                 'parent_id' => $validatedData['parent_id'] ?? null, // Nếu không có parent_id thì là bình luận mới
                 'status' => 1,
             ]);
         } else {
-            return response()->json(['message' => 'Bạn cần mua sản phẩm này trước khi bình luận.'], 403);
+            return response()->json(['error' => 'Bạn cần mua sản phẩm này trước khi bình luận.'], 200);
         }
 
         return response()->json([

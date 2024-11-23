@@ -5,6 +5,7 @@ import CancelMyOrder from "../../modalConfirm/CancelMyoOrder";
 import { PenLine } from "lucide-react";
 import { Link } from "react-router-dom";
 import Comment from "../../components/client/Comment/Comment";
+import { toast } from "react-toastify";
 interface OrderItem {
     id: string;
     image: string;
@@ -48,6 +49,7 @@ const Order: React.FC = () => {
         try {
             const payload = action === "confirm" ? { da_nhan_hang: "1" } : { huy_don_hang: "1" };
             const response = await axios.put(`/api/donhangs/${id}/update`, payload);
+console.log(response.data.error);
 
             if (response.status === 200) {
                 // Update order status in myOrder state
@@ -58,6 +60,11 @@ const Order: React.FC = () => {
                             : order
                     )
                 );
+            }
+            if(response.data.message){
+                toast.success(response.data.message);
+            }else{
+                toast.error(response.data.error);
             }
         } catch (error) {
             console.error("Lỗi khi xử lý đơn hàng:", error);

@@ -35,8 +35,8 @@
                         <div class="mt-2">
                             <label for="status">Status</label>
                             <select name="status" class="form-select">
-                                <option value="Active" {{ $model->status == 'Active' ? 'selected' : '' }}>Active</option>
-                                <option value="Inactive" {{ $model->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                                <option value="1" {{ $model->status == 'Active' ? 'selected' : '' }}>Active</option>
+                                <option value="0" {{ $model->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                             </select>
                             @error('status')
                                 <span style="color:red">{{ $message }}</span>
