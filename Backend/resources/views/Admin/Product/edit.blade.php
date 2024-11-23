@@ -22,6 +22,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    @error('products')
+                                    <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
                                     <label for="product_name" class="form-label">Name</label>
                                     <input type="text" id="product_name"
                                         class="form-control @error('name') is-invalid @enderror" name="name"
@@ -55,7 +58,7 @@
                                     <input type="file" id="simpleinput"
                                         class="form-control  @error('image') is-invalid @enderror" name="image"
                                         value="{{ $product->image }}" placeholder="image ">
-                                        <img src="{{Storage::url( $product->image)}}" alt="">
+                                        <img src="{{Storage::url( $product->image)}}" alt="" width="100px">
                                     @error('image')
                                         <p class="text-danger">{{ $message }}</p>
                                     @enderror

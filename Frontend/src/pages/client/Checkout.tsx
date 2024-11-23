@@ -27,7 +27,7 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState<string>('');
     const totalPayment = (total?.subtotal || 0) + (shippingCost || 0);
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 4;
+    const productsPerPage = 3;
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = oders.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -39,6 +39,9 @@ const Checkout = () => {
     const [MomoResponseCode, setMomoResponseCode] = useState<string | null>(null);
     const [message, setMessage] = useState();
     const [isConfirmOrder, setIsConfirmOrder] = useState(false);
+    const [PricePromotion, setPricePromotion] = useState<string | null>(null);
+    const [price_after_discountPromotion, settotal_price_after_discount] = useState<string | null>(null);
+    const tongthanhtoan = totalPayment - (PricePromotion ? parseFloat(PricePromotion) : 0);
     const [shippingInfo, setShippingInfo] = useState({
         username: '',
         address: '',
@@ -74,10 +77,38 @@ const Checkout = () => {
         shippingMethod: "",
     };
 
-
+    // thanh toán
+    const Apply = async () => {
+        try {
+            console.log(totalPayment);
+            const response = await axios.post('/api/applyPromotion', { code: apply, totalPayment: totalPayment })
+            console.log(response);
+            setPricePromotion(response.data.discount_amount);
+            settotal_price_after_discount(response.data.total_price_after_discount);
+           
+            if(response.data.message){
+                toast.success(response.data.message)
+                
+            }else{
+                toast.error(response.data.error);
+            }
+            localStorage.setItem('promotion_id', response.data.promotion_id)
+        } catch (error) {
+            if (error.response) {
+                // Đảm bảo có phản hồi từ server
+                console.error('Error response:', error.response);
+                toast.error(error.response.data.message || 'Đã xảy ra lỗi khi áp dụng khuyến mãi');
+            }
+        }
+    }
+    const promotion_id=localStorage.getItem('promotion_id')
+    // console.log(promotion_id);
+    
     //chheck Thanh toán thanh công
     const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
+    // console.log(promotion_id);
     const checkResponseCode = async () => {
+        
         if (!shippingInfo || !total || shippingCost === undefined) {
             console.error("Data is missing:", { shippingInfo, total, shippingCost });
             return;
@@ -123,15 +154,19 @@ const Checkout = () => {
                     commodity_money: (total?.subtotal || 0) + (shippingCost || 0),
                     total_amount: (total?.subtotal || 0) + (shippingCost || 0),
                     shipping_id: shippingInfoo.shippingMethod,
-                    vnp_TxnReff: paymentData.vnp_TxnRef
+
+                    vnp_TxnReff: paymentData.vnp_TxnRef,
+                    promotion_id: promotion_id
+
                 };
-                console.log(orderData);
+                // console.log(orderData);
                 await axios.post('/api/donhangs/store', orderData)
                 // Xử lý kết quả từ API thứ hai
                 toast.success("Đặt hàng thành công thành công!");
                 setIsConfirmOrder(true);
                 localStorage.removeItem('activeStep');
                 localStorage.removeItem('shippingInfo');
+                localStorage.removeItem('promotion_id');
             } catch (error) {
                 toast.error("Thanh toán thất bại!");
             }
@@ -171,14 +206,6 @@ const Checkout = () => {
     const handleChange = (e: any) => {
         setApply(e.target.value)
 
-    }
-    const Apply = async () => {
-        try {
-            await axios.post('/api/applyPromotion', { code: apply, totalPayment: totalPayment })
-            toast.success('Áp dụng thành công')
-        } catch (error) {
-            toast.error('Phiếu khuyến mại hết hạn')
-        }
     }
 
     useEffect(() => {
@@ -263,7 +290,7 @@ const Checkout = () => {
                     <PaymentForm
                         paymentMethod={paymentMethod}
                         setPaymentMethod={setPaymentMethod}
-                        totalPayment={totalPayment}
+                        totalPayment={tongthanhtoan}
                         handleNext={handleNext}
                         shippingInfoo={shippingInfoo}
                         shippingInfo={shippingInfo}
@@ -383,6 +410,16 @@ const Checkout = () => {
                                                     </span>
                                                 </div>
                                             </div>
+                                            <div className="w-full flex items-center">
+                                                <div className="flex-grow">
+                                                    <span className="text-gray-600">Tiền Khuyến mại</span>
+                                                </div>
+                                                <div className="pl-3">
+                                                    <span className="font-semibold">
+                                                        {PricePromotion}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                     <div className="mb-6 pb-6 border-b border-gray-200 md:border-none text-gray-800 text-xl">
@@ -392,7 +429,7 @@ const Checkout = () => {
                                             </div>
                                             <div className="pl-3">
 
-                                                <span className="font-semibold">{totalPayment.toFixed(2)}</span> <span className="font-semibold text-gray-400 text-sm">VND</span>
+                                                <span className="font-semibold">{tongthanhtoan.toFixed(2)}</span> <span className="font-semibold text-gray-400 text-sm">VND</span>
                                             </div>
                                         </div>
                                     </div>

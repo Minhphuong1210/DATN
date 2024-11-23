@@ -57,9 +57,9 @@
                                     <div class="mt-2">
                                         <label for="status">Trạng thái</label>
                                         <select name="status" class="form-select">
-                                            <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Sử dụng
+                                            <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Sử dụng
                                             </option>
-                                            <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
+                                            <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>
                                                 Khóa</option>
                                         </select>
                                         @error('status')

@@ -87,7 +87,7 @@ class ApiProductController extends Controller
 
     public function promotion()
     {
-        $promotion = Promotion::all();
+        $promotion = Promotion::query()->whereNotNull('minimum_spend')->get();
         $data = [
             'status' => 'success',
             'data' => $promotion,

@@ -45,8 +45,8 @@ function App() {
               <Route index element={<AccountUpdate />} />
             </Route>
           </Route>
-          <Route path="contact" element={<Contact />} />
-          <Route path="allproduct" element={<AllProducts />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/allproducts" element={<AllProducts />} />
           <Route path="/search" element={<SearchProduct />} />
           <Route path="products/cate/:id/:name" element={<ProductsCate />} />
         </Route>

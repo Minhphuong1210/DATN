@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductDetail;
+use App\Models\Promotion;
 use App\Models\SubCategory;
 
 use App\Models\vnpay;
@@ -32,10 +33,10 @@ class ApiOrderController extends Controller
     {
         $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
         $donHangs = Auth::user()->order()->orderBy('id', 'desc')->paginate(5);
-        if(!$donHangs){
+        if (!$donHangs) {
             return response()->json([
                 'message' => 'Không có đơn hàng',
-            ],404);
+            ], 404);
         }
         $arrayDonHang = $donHangs->map(function ($donHang) use ($trangThaiDonHang) {
             return [
@@ -62,7 +63,7 @@ class ApiOrderController extends Controller
                     'orderStatus' => $trangThaiDonHang[$donHang->order_status],
                     'imageUrl' => 'http://127.0.0.1:8000/storage/' . $detail->productDetail->product->image,
                     'id' => $donHang->id,
-                    'id_product'=>$detail->productDetail->product->id,
+                    'id_product' => $detail->productDetail->product->id,
                 ];
             });
         });
@@ -184,7 +185,15 @@ class ApiOrderController extends Controller
     // đây là khi kích vào nút mua hàng
     public function store(Request $request)
     {
-
+        $request->validate([
+            'address' => 'required',
+            'commodity_money' => 'required',
+            'email' => 'required',
+            'phone' => 'required',
+            'shipping_id' => 'required',
+            'total_amount' => 'required',
+            'username' => 'required',
+        ]);
         if ($request->isMethod('post')) {
             DB::beginTransaction();
 
@@ -195,15 +204,13 @@ class ApiOrderController extends Controller
                         'error' => 'Người dùng chưa đăng nhập'
                     ], 401);
                 }
-
-
-
                 $params = $request->all();
                 // if($request->input('paymentData')){
                 //     $paymentData = $request->input('paymentData');
                 //     $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
                 //     $vnPay->update($paymentData);
                 // }
+
 
 //                 $params = $request->input('orderData');
 //                 $paymentData = $request->input('paymentData');
@@ -214,10 +221,24 @@ class ApiOrderController extends Controller
 //                 $momo = Momo::query()->where('orderId',$paymentDatas['orderId'])->first();
 //                 $momo->update($paymentDatas);
 
+
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
-
                 $order = Order::create($params);
+                if ($params['vnp_TxnReff']) {
+                    $vnp_TxnReff = $params['vnp_TxnReff'];
+                    $vnpayy = Vnpayy::where('vnp_TxnRef', $vnp_TxnReff)->first();
+                    if ($vnpayy) {
+                        $order->vnpayy_id = $vnpayy->id;
+                        $order->order_payment=Order::CHO_XAC_NHA;
+                        $order->save();
+                    }
+                }
+                if($params['promotion_id']){
+                    $promotion = Promotion::query()->where('id', $params['promotion_id'])->first();
+                    $promotion->usage_limit -= 1;
+                    $promotion->save();
+                }
                 $order_id = $order->id;
 
                 // Xử lý giỏ hàng và tạo OrderDetail như trước
@@ -234,15 +255,7 @@ class ApiOrderController extends Controller
                         'error' => 'Giỏ hàng của bạn hiện đang trống'
                     ], 404);
                 }
-                $request -> validate([
-                    'order_id'=>'required',
-                    'product_detail_id'=>'required',
-                    'total'=>'required',
-                    'total_amount'=>'required',
-                    'quantity'=>'required',
-                    'price'=>'required',
 
-                ]);
                 foreach ($cartDetails as $item) {
                     $total = $item->price * $item->quantity;
                     OrderDetail::create([
@@ -300,6 +313,11 @@ class ApiOrderController extends Controller
         DB::beginTransaction();
         try {
             if ($request->has('huy_don_hang')) {
+                if ($donHang = Order::DANG_VAN_CHUYEN) {
+                    return response()->json([
+                        'error' => 'Cập nhật không thành công'
+                    ]);
+                }
                 $donHang['order_status'] = Order::HUY_HANG;
                 $donHang->save();
 

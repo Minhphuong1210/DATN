@@ -35,8 +35,8 @@ class DashboardController extends Controller
          // sắn xếp theo tổng nhiều nhất
          ->limit(10)
          // giời hạn là 10 
-         // ->toRawSql();
-         // để hiện sql ra check
+         // ->toRawSql(); 
+         // để hiện sql ra check 
          ->get();
       // đây là nối 4 bảng vào với nhau để có thể lấy được top 10 danh mục sản phẩm bán được nhiều nhất 
 

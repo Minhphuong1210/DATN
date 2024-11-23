@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Product\ProductStoreRequest;
+use App\Http\Requests\Product\ProductUpdateRequets;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
@@ -59,7 +60,13 @@ class ProductController extends Controller
             $params['is_hot'] = $request->has('is_hot') ? 1 : 0;
             $params['is_show_home'] = $request->has('is_show_home') ? 1 : 0;
             $params['is_active'] = $request->has('is_active') ? 1 : 0;
-            $params['product_code'] = $request->name . '-' . $category_id . '-' . Str::random(3);
+
+//             $params['product_code'] = $request->name . '-' . $category_id . '-' . Str::random(3);
+
+
+            $productName = $request->name;
+            $slugName = Str::slug($productName, '-');
+            $params['product_code'] = $slugName . '-' . $category_id . '-' . Str::random(3);
 
             // Lưu hình ảnh chính
             $params['image'] = $request->file('image')->store('uploads/products', 'public');
@@ -131,12 +138,12 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-
+// dd($request->all());
         // dd($request->all());
         $product = Product::findOrFail($id);
         $product_id = $product->id;
         if ($request->isMethod('PUT')) {
-            try {
+            // try {
                 $params = $request->except('_token', '_method');
                 $params['is_sale'] = $request->has('is_sale') ? 1 : 0;
                 $params['is_hot'] = $request->has('is_hot') ? 1 : 0;
@@ -147,7 +154,6 @@ class ProductController extends Controller
                         Storage::disk('public')->delete($product->image);
                     }
                     $params['image'] = $request->file('image')->store('uploads/products', 'public');
-
                 } else {
                     $product['image'] = $product->image;
                 }
@@ -156,19 +162,16 @@ class ProductController extends Controller
                 $arrCombine = array_combine($currentImage, $currentImage);
                 // dd($arrCombine);
                 if (is_array($request->list_hinh_anh)) {
-
                     foreach ($arrCombine as $key => $value) {
                         // rồi kiểm tra mảng đó xem có ở request không nếu thiếu cái nào thì xóa cái đó đi (ở reequest có 2,3 mà ở database có 2,3,4 thì xóa 4)
                         if (!in_array($key, array_keys($request->list_hinh_anh))) {
                             $images = Image::query()->find($key);
                             if ($images && Storage::disk('public')->exists($images->image)) {
-
                                 Storage::disk('public')->delete($images->image);
                                 $images->delete();
                             }
                         }
                     }
-
                     // Trường hợp thêm hoặc sửa ảnh
                     foreach ($request->list_hinh_anh as $key => $image) {
                         // Nếu là ảnh mới được thêm vào
@@ -197,47 +200,58 @@ class ProductController extends Controller
                     // Nếu không có thay đổi gì trong danh sách hình ảnh, giữ nguyên hình ảnh cũ
                     $params['images'] = $product->images;
                 }
+                // Xử lý ProductDetail
+        $products = $request->input('products');
+        $existingVariants = []; // Mảng kiểm tra trùng lặp
+        $errors = []; // Mảng lỗi
 
+        if ($products) {
+            $ProductDetailArrray = $product->ProductDetail->pluck('id')->toArray();
+            $arrCombineProductDetail = array_combine($ProductDetailArrray, $ProductDetailArrray);
 
-                $products = $request->input('products');
-                $ProductDetailArrray = $product->ProductDetail->pluck('id')->toArray();
-                $arrCombineProductDetail = array_combine($ProductDetailArrray, $ProductDetailArrray);
+            foreach ($arrCombineProductDetail as $keys => $arrCombineProductDetails) {
+                if (!in_array($keys, array_keys($products))) {
+                    $ProductDetail = ProductDetail::query()->find($keys);
+                    $ProductDetail->delete();
+                }
+            }
 
-
-                if ($request->input('products')) {
-                    foreach ($arrCombineProductDetail as $keys => $arrCombineProductDetails) {
-                        if (!in_array($keys, array_keys($request->input('products')))) {
-                            $ProductDetail = ProductDetail::query()->find($keys);
-                            $ProductDetail->delete();
-                        }
-                    }
-                    foreach ($products as $key => $value) {
-                        if (!array_key_exists($key, $arrCombineProductDetail)) {
-                            $product->ProductDetail()->create([
-                                'product_id' => $product_id,
-                                'size_id' => $value['size_id'],
-                                'color_id' => $value['color_id'],
-                                'quantity' => $value['quantity'],
-                            ]);
-                        }
-                        // Trường hợp thay đổi hình ảnh cũ
-                        else if ($request->has("products.$key")) {
-                            $product->ProductDetail()->update([
-                                'size_id' => $value['size_id'],
-                                'color_id' => $value['color_id'],
-                                'quantity' => $value['quantity'],
-                            ]);
-                        }
-                    }
+            foreach ($products as $key => $value) {
+                $variantKey = $value['color_id'] . '-' . $value['size_id'];
+                if (isset($existingVariants[$variantKey])) {
+                    $errors[] = "Biến thể trùng lặp: Màu sắc {$value['color_id']} và kích thước {$value['size_id']} đã tồn tại.";
+                } else {
+                    $existingVariants[$variantKey] = true;
                 }
 
-                $product->update($params);
-                DB::commit();
-                return redirect()->route('admins.product.index')->with('success', 'sửa sản phẩm thành công');
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return redirect()->back()->withErrors(['error' => 'Cập nhật thất bại']);
+                if (!array_key_exists($key, $arrCombineProductDetail)) {
+                    $product->ProductDetail()->create([
+                        'product_id' => $product_id,
+                        'size_id' => $value['size_id'],
+                        'color_id' => $value['color_id'],
+                        'quantity' => $value['quantity'],
+                    ]);
+                } else if ($request->has("products.$key")) {
+                    ProductDetail::query()->where('id', $key)->update([
+                        'size_id' => $value['size_id'],
+                        'color_id' => $value['color_id'],
+                        'quantity' => $value['quantity'],
+                    ]);
+                }
             }
+        }
+
+        if (!empty($errors)) {
+            return redirect()->back()->withErrors(['products' => $errors])->withInput();
+        }
+
+        $product->update($params);
+
+        return redirect()->route('admins.product.index')->with('success', 'Sửa sản phẩm thành công');
+            // } catch (\Exception $e) {
+            //     DB::rollBack();
+            //     return redirect()->back()->withErrors(['error' => 'Cập nhật thất bại']);
+            // }
         }
     }
 

@@ -14,11 +14,13 @@ import DropdownMenu from "./DropdowUser";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCategory } from "../../../../hook/useCategory";
+
 import { useLoading } from "../../../../context/Loading";
 import { useCart } from "../../../../context/Cart";
 import { Badge } from "@mui/material";
 import ModalCart from "../../ModalCart/ModalCart";
 // import { useLoading } from "../../../../context/Loading";
+
 interface HeaderProps {
   isMobile: boolean;
 }
@@ -32,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const { totalQuantity } = useCart();
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const navigate = useNavigate();
-  const { loading, setLoading } = useLoading();
+
 
   const handleOpenCart = () => {
     setsOpenCart(true)
@@ -40,6 +42,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const handleCloseCart = () => {
     setsOpenCart(false)
   }
+// Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
 
   const handleMenu = () => {
     setOpenMenu(!openMenu);
@@ -65,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
   const { categories, subcates } = useCategory();
 
-
+    // Hàm lấy dữ liệu giỏ hàng từ AP
 
 
   return (
@@ -91,7 +94,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           <div className="ml-10 hidden flex-grow text-sm md:flex">
             <ul className="flex space-x-5">
               <li className="hovermenuNav relative">
-                <a href="/allproduct" className="hover:text-slate-600">
+                <a href="/allproducts" className="hover:text-slate-600">
                   TẤT CẢ SẢN PHẨM
                 </a>
               </li>
