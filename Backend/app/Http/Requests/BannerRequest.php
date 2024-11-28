@@ -44,7 +44,6 @@ class BannerRequest extends FormRequest
             'title.required' => 'Tiêu đề là bắt buộc.',
             'title.string' => 'Tiêu đề phải là một chuỗi.',
             'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
-
         ];
     }
 }

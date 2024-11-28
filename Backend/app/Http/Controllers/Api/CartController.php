@@ -34,7 +34,6 @@ class CartController extends Controller
             'color_id' => 'required',
             'quantity' => 'required',
             'price' => 'required',
-
         ]);
         $product_id = $request->id;
         $size_id = $request->size_id;

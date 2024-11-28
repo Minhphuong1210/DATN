@@ -1,3 +1,4 @@
+
 import { Heart, LockKeyhole, PenLine, ShoppingBag, User } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
@@ -15,17 +16,25 @@ const Profile = () => {
 
 
 
+
+import { Heart, LockKeyhole, PenLine, ShoppingBag } from "lucide-react";
+import React from "react";
+import { Link, Outlet } from "react-router-dom";
+
+const Profile = () => {
+
     return (
-        <>
-            <div className="mx-[150px] mb-96">
-                <div className="sticky top-16 z-30 bg-white py-3">
-                    <div className="mb-5 text-gray-400">
-                        <a href="/" className="text-gray-500 hover:underline focus:outline-none">
-                            Trang chủ
-                        </a>
-                        / <span className="text-gray-600">Đơn hàng của tôi</span>
-                    </div>
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 mb-16">
+            {/* Breadcrumb */}
+            <div className="sticky top-16 z-30 bg-white py-3">
+                <div className="mb-5 text-sm text-gray-400">
+                    <Link to="/" className="text-gray-500 hover:underline">
+                        Trang chủ
+                    </Link>
+                    <span className="mx-1">/</span>
+                    <span className="text-gray-600">Đơn hàng của tôi</span>
                 </div>
+
                 <div className=" grid grid-cols-5">
                     <div className="col-span-1 border-2 h-96 text-[14px]">
                         <div className="m-4">
@@ -63,20 +72,59 @@ const Profile = () => {
                                             </Link>
                                         </li>
 
-                                    </ul>
-                                </div>
-                            </div>
+            </div>
+
+
+            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {/* Sidebar */}
+                <aside className="col-span-1 md:col-span-1 lg:col-span-1 bg-white border rounded-lg p-4">
+                    <div className="flex flex-col items-center md:items-start gap-4 mb-6">
+                        <img
+                            className="w-16 h-16 rounded-full object-cover"
+                            src="https://inkythuatso.com/uploads/thumbnails/800/2023/03/9-anh-dai-dien-trang-inkythuatso-03-15-27-03.jpg"
+                            alt="Profile"
+                        />
+                        <div className="text-center md:text-left">
+                            <p className="text-base font-semibold">Hoàng Hùng</p>
+                            <Link
+                                to="/account"
+                                className="flex items-center text-sm text-gray-500 hover:text-blue-500 mt-2 gap-1"
+                            >
+                                <PenLine size={15} />
+                                Sửa hồ sơ
+                            </Link>
                         </div>
                     </div>
+
+                    <ul className="space-y-4 text-sm">
+                        <li className="flex items-center gap-3">
+                            <Heart color="#0046d1" size={20} strokeWidth={1.5} />
+                            <Link to="/profile/favorites" className="hover:text-yellow-500">
+                                Sản phẩm yêu thích
+                            </Link>
+                        </li>
+                        <li className="flex items-center gap-3">
+                            <LockKeyhole color="#0046d1" size={20} strokeWidth={1.5} />
+                            <Link to="/profile/changepassword" className="hover:text-yellow-500">
+                                Đổi mật khẩu
+                            </Link>
+                        </li>
+                        <li className="flex items-center gap-3">
+                            <ShoppingBag color="#0046d1" size={20} strokeWidth={1.5} />
+                            <Link to="/profile/order" className="hover:text-yellow-500">
+                                Đơn hàng
+                            </Link>
+                        </li>
+                    </ul>
+                </aside>
+
+                {/* Main Content */}
+                <main className="col-span-1 md:col-span-3 lg:col-span-4">
                     <Outlet />
-                </div>
-
-
-
-
+                </main>
             </div>
-        </>
-    )
-}
+        </div>
+    );
+};
 
-export default Profile
+export default Profile;

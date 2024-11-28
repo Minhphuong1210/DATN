@@ -92,7 +92,12 @@ const Checkout = () => {
             } else {
                 toast.error(response.data.error);
             }
-            localStorage.setItem('promotion_id', response.data.promotion_id)
+            if (response.data.promotion_id !== undefined && response.data.promotion_id !== null) {
+                localStorage.setItem('promotion_id', response.data.promotion_id);
+            } else {
+                // Nếu không có giá trị, có thể xóa hoặc không lưu vào localStorage
+                localStorage.removeItem('promotion_id');
+            }
         } catch (error) {
             if (error.response) {
                 // Đảm bảo có phản hồi từ server
@@ -101,8 +106,11 @@ const Checkout = () => {
             }
         }
     }
-    const promotion_id = localStorage.getItem('promotion_id')
-    // console.log(promotion_id);
+
+
+    const promotion_id=localStorage.getItem('promotion_id')
+    console.log(promotion_id);
+    
 
     //chheck Thanh toán thanh công
     const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
@@ -128,7 +136,6 @@ const Checkout = () => {
             vnp_TxnRef: urlParams.get("vnp_TxnRef") || "",
             vnp_SecureHash: urlParams.get("vnp_SecureHash") || "",
         };
-
         const txnRef = paymentData.vnp_TxnRef;
         const vnp_ResponseCode = paymentData.vnp_ResponseCode;
         // Kiểm tra xem đã gọi API chưa và mã phản hồi có hợp lệ không
@@ -156,7 +163,6 @@ const Checkout = () => {
                     shipping_id: shippingInfoo.shippingMethod,
                     vnp_TxnReff: paymentData.vnp_TxnRef,
                     promotion_id: promotion_id
-
                 };
                 // console.log(orderData);
                 await axios.post('/api/donhangs/store', orderData)
