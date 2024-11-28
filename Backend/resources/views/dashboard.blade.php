@@ -13,6 +13,12 @@
                             <!-- card -->
                             <div class="card card-animate">
                                 <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 overflow-hidden">
+                                            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+                                                Tổng giá tiền</p>
+                                        </div>
+                                    </div>
                                     <div class="d-flex align-items-end justify-content-between mt-4">
                                         <div>
                                             <h4 class="fs-22 fw-semibold ff-secondary mb-4"><span class="counter-value"
@@ -85,7 +91,7 @@
 
                         <div class="col-xl-3 col-md-6">
                             <!-- card -->
-                            <div class="card card-animate">
+                            {{-- <div class="card card-animate">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1 overflow-hidden">
@@ -113,7 +119,8 @@
                                         </div>
                                     </div>
                                 </div><!-- end card body -->
-                            </div><!-- end card -->
+                            </div> --}}
+                            <!-- end card -->
                         </div><!-- end col -->
                     </div> <!-- end row-->
 

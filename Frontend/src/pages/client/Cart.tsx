@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, PackageX } from "lucide-react";
 import { useCart } from "../../context/Cart";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Cart = () => {
     const { cart, removeFromCart, increaseQuantity, decreaseQuantity } =
@@ -19,6 +20,19 @@ const Cart = () => {
         (acc, item) => acc + item.PriceProduct * item.quantity,
         0,
     );
+
+    const handlecheckNav = (event: any) => {
+        for (let item of cart) {
+            // console.log(item);
+            
+            if (item.quantity > item.product_detail.quantity) {
+                event.preventDefault();
+                toast.error(`Số lượng sản phẩm ${item.NameProduct} , vượt quá số lượng có sẵn trong kho`);
+                return;
+            }
+        }
+    }
+
     const totalPages = Math.ceil(cart.length / productsPerPage);
     const handleCheckboxChange = (id: number) => {
         setSelectedIds((prev) =>
@@ -32,6 +46,16 @@ const Cart = () => {
             minimumFractionDigits: 0,
         }).format(price);
     };
+    //   const soluongtong = Number(cart.map(item => item.product_detail.quantity)); // số lượng chi tiết sản phẩm
+    //   console.log(soluongtong);
+
+    //   const soluongcart = Number(cart.map(item => item.quantity));
+    // console.log(soluongcart);
+
+      
+   
+    // console.log(item);
+    
     const handleButtonClick = () => {
         console.log("Selected ID:", selectedIds);
 
@@ -343,6 +367,7 @@ const Cart = () => {
                                         <div className="flex justify-end xl:hidden ">
                                             <Link
                                                 to={"/checkout"}
+                                                onClick={handlecheckNav}
                                                 className="rounded-md bg-yellow-400 px-4 py-2 hover:bg-yellow-300 text-[14px]"
                                             >
                                                 Đặt hàng
@@ -360,6 +385,7 @@ const Cart = () => {
                                         <div className=" justify-center hidden xl:flex">
                                             <Link
                                                 to={"/checkout"}
+                                                onClick={handlecheckNav}
                                                 className="rounded-md bg-yellow-400  xl:px-5 xl:py-3 hover:bg-yellow-300 "
                                             >
                                                 Đặt hàng

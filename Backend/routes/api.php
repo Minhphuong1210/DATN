@@ -119,3 +119,9 @@ Route::post('filterProduct',[ProductController::class,'filterProduct']);
 Route::get('productSubcate/{id}',[ApiProductController::class,'subcateProduct']);
 Route::get('Cate/{id}',[ApiProductController::class,'cateProduct']);
 Route::put('updatevnpay/{vnp_TxnRef}',[PaymentController::class,'updateVnpay']);
+
+Route::get('forgot_password',[ApiAuthController::class, 'forgot_password']);
+Route::post('check_forgot_password',[ApiAuthController::class, 'check_forgot_password']);
+// từ đây có thể xử lí thường
+Route::get('reset_password/{token}',[ApiAuthController::class, 'reset_password'])->name('account.reset_password');
+Route::post('reset_password/{token}',[ApiAuthController::class, 'check_reset_password']);

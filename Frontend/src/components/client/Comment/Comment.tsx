@@ -35,6 +35,7 @@ const Comment: React.FC<ConfirmModalProps> = ({ isVisible, onConfirm, onCancel, 
                 rating: rating,
             });
             console.log(response.data);
+            onCancel();
             setTimeout(() => {
                 window.location.reload();
             }, 3000);

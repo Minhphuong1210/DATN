@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -37,18 +37,49 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   const [selectedOption, setSelectedOption] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [cartQuantity, setCartQuantity] = useState([]);
+  const [productQuantity, setProductQuantity] = useState([]);
+  const [tensanpham, settensanpham] = useState("");
   const handlePaymentMethodChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedMethod = event.target.value;
     setPaymentMethod(selectedMethod);
   };
+  useEffect(() => {
+    const fetchCartQuantity = async () => {
+      try {
+        const responseCart = await axios.get("/api/cart");
+        // console.log(responseCart.data.cart);
+        
+        const soluongtong = responseCart.data.cart.map(item => item.product_detail.quantity); // Số lượng có sẵn
+        const soluongcart = responseCart.data.cart.map(item => item.quantity); // Số lượng trong giỏ
+        const tensanpham = responseCart.data.cart.map(item => item.NameProduct); // Tên sản phẩm
+
+        // Lưu vào state
+        setCartQuantity(soluongcart);
+        setProductQuantity(soluongtong);
+        settensanpham(tensanpham);
+
+        // console.log(soluongtong); // In số lượng có sẵn
+        // console.log(soluongcart); // In số lượng trong giỏ
+
+      } catch (error) {
+        toast.error("Không thể lấy số lượng giỏ hàng.");
+      }
+    };
+    fetchCartQuantity();
+  }, []);
 
   const handlePayment = async () => {
     if (isNaN(totalPayment) || totalPayment <= 0) {
       toast.error("Tổng tiền thanh toán không hợp lệ.");
       return;
     }
-
+    for (let i = 0; i < cartQuantity.length; i++) {
+      if (cartQuantity[i] > productQuantity[i]) {
+        toast.error(`Không đủ số lượng sản phẩm "${tensanpham[i]}".`);
+        return; // Nếu có sản phẩm không đủ số lượng thì dừng việc thanh toán
+      }
+    }
     try {
       let response;
       if (selectedOption === "momo") {

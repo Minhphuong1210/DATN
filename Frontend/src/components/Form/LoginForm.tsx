@@ -129,6 +129,13 @@ const LoginForm = ({ onSubmit }: AuthFormProps) => {
                   Bạn chưa có tài khoản? Đăng Ký
                 </a>
               </div>
+              <br />
+              <a
+                href="/forgotpassword"
+                className="text-sm text-blue-500 hover:underline"
+              >
+               Bạn đã quên mật khẩu ?
+              </a>
             </form>
           </div>
         </div>
