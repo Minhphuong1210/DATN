@@ -19,24 +19,19 @@ const ScrollToTop: React.FC = () => {
         }
     };
 
-
-
-
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
-
 
         return () => {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
 
-
     return (
         isVisible && (
             <button
                 onClick={scrollToTop}
-                className="fixed bottom-24 right-10 z-50 p-2 px-3 rounded bg-yellow-400 text-white hover:bg-yellow-500 transition"
+                className="fixed bottom-14 right-7 z-40 rounded bg-yellow-400 p-1 text-white transition hover:bg-yellow-500 xl:bottom-24 xl:right-10 xl:p-2 xl:px-3 "
             >
                 <ArrowUp />
             </button>

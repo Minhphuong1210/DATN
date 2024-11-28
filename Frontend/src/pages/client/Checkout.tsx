@@ -85,11 +85,11 @@ const Checkout = () => {
             console.log(response);
             setPricePromotion(response.data.discount_amount);
             settotal_price_after_discount(response.data.total_price_after_discount);
-           
-            if(response.data.message){
+
+            if (response.data.message) {
                 toast.success(response.data.message)
-                
-            }else{
+
+            } else {
                 toast.error(response.data.error);
             }
             if (response.data.promotion_id !== undefined && response.data.promotion_id !== null) {
@@ -107,14 +107,16 @@ const Checkout = () => {
         }
     }
 
+
     const promotion_id=localStorage.getItem('promotion_id')
     console.log(promotion_id);
     
+
     //chheck Thanh toán thanh công
     const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
     // console.log(promotion_id);
     const checkResponseCode = async () => {
-        
+
         if (!shippingInfo || !total || shippingCost === undefined) {
             console.error("Data is missing:", { shippingInfo, total, shippingCost });
             return;

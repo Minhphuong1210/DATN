@@ -35,14 +35,16 @@ const Comment: React.FC<ConfirmModalProps> = ({ isVisible, onConfirm, onCancel, 
                 rating: rating,
             });
             console.log(response.data);
-            
-            // window.location.reload();
-if(response.data.message){
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
 
-    toast.success(response.data.message);
-}else{
-    toast.error(response.data.error);
-}
+            if (response.data.message) {
+
+                toast.success(response.data.message);
+            } else {
+                toast.error(response.data.error);
+            }
         } catch (error) {
             console.log(error);
         }

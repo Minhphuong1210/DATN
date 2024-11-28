@@ -23,34 +23,34 @@ class ApiAuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        
+
         $user = User::where('email', $request->email)->first();
         if(!$user){
             return response()->json([
                 'message' => 'Tài khoản không tồn tại',
-            ],404); 
+            ],404);
         }
-        
+
         // Kiểm tra người dùng và mật khẩu
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Thông tin đăng nhập không chính xác'],
             ]);
         }
-    
+
         // Kiểm tra trạng thái tài khoản
         // if ($user->is_active == 0) {
         //     return response()->json([
         //         'message' => 'Tài khoản đã bị khóa'
         //     ], 403); // Sử dụng mã lỗi 403 cho Forbidden
         // }
-    
+
         // Đăng nhập người dùng
         Auth::login($user);
-    
+
         // Tạo token
         $token = $user->createToken('Access Token')->plainTextToken;
-    
+
         return response()->json([
             'token' => $token,
             'user' => $user,
@@ -95,18 +95,18 @@ class ApiAuthController extends Controller
             'user' => $user,
             'message' => 'Đăng ký thành công',
         ]);
-        
+
     }
 
     public function show(string $id)
     {
         $user = User::find($id);
-        
+
 
         if ($user) {
             return response()->json($user, 200);
         }
-        
+
         return response()->json(['error' => 'User not found'], 404);
     }
     public function update(Request $request, string $id)
@@ -120,7 +120,7 @@ class ApiAuthController extends Controller
         $request -> validate([
             'name'=>'required',
             'email'=>'required|email',
-            'password'=>'required',
+            // 'password'=>'required',
             'address'=>'required',
             'phone'=>'required'
         ]);
@@ -181,7 +181,7 @@ class ApiAuthController extends Controller
         return response()->json([
             'message' => 'Đã trả về trang'
         ]);
-        
+
     }
     public function check_reset_password($token)
     {

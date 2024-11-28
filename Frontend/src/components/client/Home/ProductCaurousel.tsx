@@ -8,6 +8,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import useFavorites from '../../../hook/useFavorites';
 import { useModalAddCartProvider } from '../../../context/MoDalAddToCart';
 import ModalAddToCart from './ModalAddToCart/ModalAddToCart';
+import { Link } from 'react-router-dom';
 
 
 interface ProductCarouselProps {
@@ -69,7 +70,8 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
                 settings: {
                     slidesToShow: 2, // Hiển thị 2 sản phẩm trên điện thoại
                 },
-            },
+            }
+
         ],
     };
 
@@ -93,30 +95,30 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
                                     )}
                                 </div>
                                 <div className="relative">
-                                    <div className="absolute bottom-[35px] left-0 right-0 z-10 flex justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:opacity-100">
-                                        <a href={`productdetail/${product.id}/subcate/${product.sub_category_id}`}
-                                            className="transform translate-y-[30px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-[50] ease-out rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                    <div className=" absolute bottom-[35px] lg:bottom-[27px] xl:bottom-[35px] left-0 right-0 z-10 flex justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                                        <Link to={`productdetail/${product.id}/subcate/${product.sub_category_id}`}
+                                            className="transform translate-y-[30px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-[50] ease-out rounded-full bg-white p-2 lg:p-[5px] xl:lg:p-2 hover:bg-black hover:text-white">
                                             <Eye
                                                 color="currentColor"
                                                 strokeWidth="1.5"
-                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-5 xl:h-5"
+                                                className="w-4 h-4 sm:w-6 sm:h-6 md:w-5 md:h-5 lg:w-4 lg:h-4 xl:w-5 xl:h-5"
                                             />
-                                        </a>
+                                        </Link>
                                         {/* Hiệu ứng di chuyển từ dưới lên cho ShoppingCart */}
-                                        <div className="transform translate-y-[35px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <div className="transform translate-y-[35px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out rounded-full bg-white p-2 lg:p-[5px] xl:lg:p-2 hover:bg-black hover:text-white">
                                             <ShoppingCart
                                                 color="currentColor"
                                                 strokeWidth="1.5"
-                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7  xl:w-5 xl:h-5"
+                                                className="w-4 h-4 sm:w-6 sm:h-6 md:w-5 md:h-5 lg:w-4 lg:h-4  xl:w-5 xl:h-5"
                                                 onClick={() => openModal(product.id, product.sub_category_id)}
                                             />
                                         </div>
                                         {/* Hiệu ứng di chuyển từ dưới lên cho Heart */}
-                                        <div className="transform translate-y-[35px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                        <div className="transform translate-y-[35px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out rounded-full bg-white p-2 lg:p-[5px] xl:lg:p-2 hover:bg-black hover:text-white">
                                             <Heart
                                                 color="currentColor"
                                                 strokeWidth="1.5"
-                                                className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7  xl:w-5 xl:h-5"
+                                                className="w-4 h-4 sm:w-6 sm:h-6 md:w-5 md:h-5 lg:w-4 lg:h-4  xl:w-5 xl:h-5"
                                                 onClick={() => addToFavorites(product.id)}
                                             />
                                         </div>

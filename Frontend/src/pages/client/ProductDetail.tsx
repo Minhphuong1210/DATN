@@ -7,6 +7,15 @@ import { useProduct } from "../../hook/Product";
 import { Colors, Product, Sizes } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
 import { useCart } from "../../context/Cart";
+import { Link } from "react-router-dom";
+import { Swiper, SwiperSlide } from 'swiper/react';
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/navigation';
+import 'swiper/css/thumbs';
+// import required modules
+import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
 
 const ProductDetail: React.FC = () => {
     const { product, comments, ProductBycategorys } = useProduct();
@@ -17,6 +26,8 @@ const ProductDetail: React.FC = () => {
     const [showComment, setShowComment] = useState(false);
     const { color, size } = useColor();
     const [selectedImage, setSelectedImage] = useState(null);
+    const [thumbsSwiper, setThumbsSwiper] = useState(null);
+
     const { addToCart } = useCart();
 
     const formatPrice = (price) => {
@@ -61,41 +72,64 @@ const ProductDetail: React.FC = () => {
 
     const handleAddToCart = async (product: Product, color_id: string, size_id: string) => {
         try {
-            await addToCart(product, color_id, size_id, quantity); // Gọi addToCart từ context
+            await addToCart(product, color_id, size_id, quantity);
         } catch (error) {
             console.error(error);
         }
 
     };
+
     return (
         <>
             {product && (
-                <div className="mx-2 mt-4 overflow-hidden md:mx-7 lg:mx-[150px] lg:mt-14">
-                    <div className="lg:flex justify-center lg:space-x-56">
-                        <div className="flex gap-6">
-                            {/* Danh sách ảnh */}
-                            <div className="mb-3 h-[560px] overflow-y-scroll scrollable-content">
-                                {product.images.map((img) => (
-                                    <div
-                                        key={img.id}
-                                        className="mr-2 p-1 h-[140px] hover:bg-slate-300 cursor-pointer"
-                                        onClick={() => setSelectedImage(`http://127.0.0.1:8000/storage/${img.image}`)}
-                                    >
-                                        <img
-                                            className="h-full w-12 lg:h-full lg:w-full object-fill"
-                                            src={`http://127.0.0.1:8000/storage/${img.image}`}
-                                            alt=""
-                                        />
-                                    </div>
-                                ))}
+                <div className="mx-2 mt-4 overflow-hidden md:mx-7 lg:mx-[100px] xl:mx-[150px] lg:mt-14">
+                    <div className="md:flex lg:flex justify-center md:gap-10">
+                        <div className="flex gap-4 xl:gap-6">
+                            {/* Danh sách ảnh (Swiper) - Hiển thị dọc */}
+                            <div className="mb-3 w-[100px] h-[300px] lg:h-[400px] lg:w-[100px] xl:h-[500px] hidden lg:block ">
+                                <Swiper
+                                    direction="vertical" // Đặt chiều dọc cho swiper
+                                    slidesPerView={4} // Đảm bảo nhiều ảnh hiển thị cùng lúc
+                                    spaceBetween={10}
+                                    onSwiper={setThumbsSwiper}
+                                    modules={[Navigation, Thumbs]}
+                                    className="h-full w-20 xl:w-20 overflow-hidden"
+                                >
+                                    {product.images.map((img) => (
+                                        <SwiperSlide key={img.id}>
+                                            <div
+                                                className="p-1 lg:h-[90px] xl:h-[120px] hover:bg-slate-300 cursor-pointer"
+                                                onClick={() => setSelectedImage(`http://127.0.0.1:8000/storage/${img.image}`)}
+                                            >
+                                                <img
+                                                    className="h-full w-full object-cover"
+                                                    src={`http://127.0.0.1:8000/storage/${img.image}`}
+                                                    alt=""
+                                                />
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
                             </div>
+
                             {/* Ảnh chính */}
-                            <div className="mb-3 flex justify-center w-[450px]  h-[560px]">
-                                <img
-                                    src={selectedImage || product.imageUrl}
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                />
+                            <div className="mb-3 flex justify-center h-[300px] w-full md:w-[400px] md:h-[500px] lg:w-[250px] lg:h-[400px] xl:w-[400px] xl:h-[500px]">
+                                <Swiper
+                                    navigation
+                                    thumbs={{ swiper: thumbsSwiper }}
+                                    modules={[Navigation, Thumbs]}
+                                    className="h-full w-full"
+                                >
+                                    {product.images.map((img) => (
+                                        <SwiperSlide key={img.id}>
+                                            <img
+                                                src={`http://127.0.0.1:8000/storage/${img.image}`}
+                                                alt=""
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
                             </div>
                         </div>
 
@@ -104,24 +138,26 @@ const ProductDetail: React.FC = () => {
                                 {product.name}
                             </div>
                             <div className="flex items-center">
-                                <span>4.0</span>
-                                <span className="ml-2 mr-2 flex text-[14px]">
-                                    <FontAwesomeIcon icon={faStarSolid} />
-                                    <FontAwesomeIcon icon={faStarSolid} />
-                                    <FontAwesomeIcon icon={faStarSolid} />
-                                    <FontAwesomeIcon icon={faStarSolid} />
-                                    <FontAwesomeIcon icon={faStarRegular} />
-                                </span>
-                                <span className="text-xs">| Đã bán: {product.soldQuantity}</span>
-                            </div>
-                            <div className="text-xs">
-                                Tình trạng:
-                                {product.stock > 0 ? (
-                                    <span className="text-sm font-bold text-green-500">Còn hàng</span>
-                                ) : (
-                                    <span className="text-sm font-bold text-green-500">Hết hàng</span>
-                                )
-                                }
+                                <div className="flex items-center mr-3">
+                                    <span>4.0</span>
+                                    <span className="ml-2 mr-2 flex text-[12px] xl:text-[14px]">
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarSolid} />
+                                        <FontAwesomeIcon icon={faStarRegular} />
+                                    </span>
+                                    <span className="text-xs">| Đã bán: {product.soldQuantity}</span>
+                                </div>
+                                <div className=" text-[13px] xl:text-sm">
+                                    Tình trạng:
+                                    {product.stock > 0 ? (
+                                        <span className="text-[13px] xl:text-sm font-bold text-green-500 ml-1">Còn hàng</span>
+                                    ) : (
+                                        <span className="text-[13px] xl:text-sm font-bold text-red-500 ml-1">Hết hàng</span>
+                                    )
+                                    }
+                                </div>
                             </div>
                             <div className="text-lg font-bold">
                                 {product.price_sale !== null ? (
@@ -142,17 +178,17 @@ const ProductDetail: React.FC = () => {
                             </div>
                             <form action="">
                                 <div>
-                                    <div className="mb-2 flex justify-between text-sm md:block">
-
+                                    <div className="mb-2 flex justify-start items-center text-[13px] xl:text-sm md:block gap-3">
                                         <span className="hover:text-yellow-400 md:mr-11">
-                                            <a href="">Giúp bạn chọn size</a>
+                                            <Link to="">Giúp bạn chọn size</Link>
                                         </span>
                                         <span className="hover:text-yellow-400">
                                             <a href="">Bảng size</a>
                                         </span>
+                                        <span></span>
                                     </div>
                                     <div className="mb-2 mt-3 text-sm">
-                                        <span>Màu Sắc:{selectColor.name} </span>
+                                        <span>Màu Sắc: {selectColor.name} </span>
                                         <div className="mt-2 flex space-x-2">
                                             {color.map((color, index) => {
                                                 return (
@@ -164,7 +200,7 @@ const ProductDetail: React.FC = () => {
                                                                 value={color.id}
                                                                 checked={selectColor.id === color.id}
                                                                 onChange={(event) => handleChangeColor(event, color.name)}
-                                                                className="peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
+                                                                className="peer h-6 w-6 xl:h-7 xl:w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
                                                                 style={{ backgroundColor: color.color_code }}
                                                             />
                                                         </label>
@@ -175,9 +211,9 @@ const ProductDetail: React.FC = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        <div className="inline-flex items-center text-sm md:block md:mr-11 md:mt-3">
-                                            <span className="md:mr-11  uppercase">Kích thước: {selectSize.name}</span>
-                                            <div className="flex space-x-2">
+                                        <div className=" items-center text-sm md:block md:mr-11 md:mt-3">
+                                            <span className="md:mr-11 text-sm  mb-8">Kích thước: {selectSize.name}</span>
+                                            <div className="flex space-x-2 mt-2">
                                                 {size.map((size, index) => {
                                                     return (
                                                         <label key={index} className="relative flex cursor-pointer items-center">
@@ -187,9 +223,9 @@ const ProductDetail: React.FC = () => {
                                                                 value={size.id}
                                                                 checked={selectSize.id === size.id}
                                                                 onChange={(event) => handleChangeSize(event, size.name)}
-                                                                className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-500 hover:bg-zinc-400 hover:shadow-md"
+                                                                className="peer h-7 w-7 xl:h-9 xl:w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-500 hover:bg-zinc-400 hover:shadow-md"
                                                             />
-                                                            <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                            <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-[12px] xl:text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
                                                                 {size.name}
                                                             </span>
                                                         </label>
@@ -201,13 +237,16 @@ const ProductDetail: React.FC = () => {
                                 </div>
 
                             </form>
-                            <div className="mt-5">Mô tả:</div>
-                            <div className="m-2">
-                                <p>{product.description}</p>
+                            <div className=" flex items-center mt-5">
+                                <div className="mr-2 text-[14px] xl:text-base">Mô tả:</div>
+
+                                <p className="opacity-70 text-[14px] xl:text-base">{product.description}</p>
+
                             </div>
+
                             <div className="mt-7 flex ">
                                 <button
-                                    className="rounded-sm border bg-gray-200 px-3 py-1 hover:bg-gray-300"
+                                    className="rounded-sm border bg-gray-200 px-3 xl:py-1  hover:bg-gray-300"
                                     onClick={dercrement}
                                 >
                                     -
@@ -216,19 +255,19 @@ const ProductDetail: React.FC = () => {
                                     type="number"
                                     value={quantity}
                                     readOnly
-                                    className="w-16 appearance-none border-b border-t border-gray-300 text-center"
+                                    className="w-16 appearance-none border-b border-t border-gray-300 text-center text-[13px] xl:text-base"
                                     style={{
                                         WebkitAppearance: "none",
                                         MozAppearance: "textfield",
                                     }}
                                 />
                                 <button
-                                    className="mr-4 rounded-sm border bg-gray-200 px-3 py-1 hover:bg-gray-300"
+                                    className="mr-4 rounded-sm border bg-gray-200 px-3 xl:py-1 hover:bg-gray-300"
                                     onClick={incurement}
                                 >
                                     +
                                 </button>
-                                <button className=" w-[300px] rounded-sm bg-yellow-400 px-10 py-3" onClick={() => handleAddToCart(product, selectColor.id, selectSize.id, quantity)}>
+                                <button className=" text-[13px] xl:text-base w-[300px] rounded-sm bg-yellow-400 px-10 py-3" onClick={() => handleAddToCart(product, selectColor.id, selectSize.id, quantity)}>
                                     Thêm vào giỏ hàng
                                 </button>
 
