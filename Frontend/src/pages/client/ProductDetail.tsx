@@ -64,31 +64,6 @@ const ProductDetail: React.FC = () => {
             await addToCart(product, color_id, size_id, quantity); // Gọi addToCart từ context
         } catch (error) {
             console.error(error);
-            if (!token) {
-                toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
-                nav('/login')
-            }
-            // if (!color_id || !size_id) {
-            //     toast.error("Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng");
-            //     return; // Dừng hàm nếu thiếu thông tin
-            // }
-           const response= await axios.post('/api/cart/add', {
-                id: product.id,
-                color_id,
-                size_id,
-                quantity,
-                price: product.price
-            });
-            setCartCount(cartCount + 1); // Tăng số lượng giỏ hàng lên 1
-            if(response.data.message){
-                toast.success(response.data.message);
-                nav('/cart');
-            }else{
-                toast.error(response.data.error);
-            }
-            
-        } catch (error) {
-
         }
 
     };
