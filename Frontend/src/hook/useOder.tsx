@@ -75,12 +75,22 @@ export const useOder = () => {
                 promotion_id:promotion_id,
             };
             setLoading(true);
-            await axios.post('/api/donhangs/store', orderData);
-            localStorage.removeItem('activeStep');
-            localStorage.removeItem('shippingInfo');
-            localStorage.removeItem('promotion_id');
-            toast.success("Đặt hàng thành công!");
-            setThankPayment(true);
+            const response= await axios.post('/api/donhangs/store', orderData);
+            // localStorage.removeItem('activeStep');
+            // localStorage.removeItem('shippingInfo');
+            // localStorage.removeItem('promotion_id');
+            console.log(response);
+            
+            if(response.data.success){
+                
+                localStorage.removeItem('activeStep');
+                localStorage.removeItem('shippingInfo');
+                localStorage.removeItem('promotion_id');
+                toast.success(response.data.success);
+                setThankPayment(true);
+            }else{
+                toast.error(response.data.error);
+            }
         } catch (error) {
             console.error("Error submitting order:", error);
         } finally {

@@ -41,7 +41,6 @@
                             <tbody>
                                 <?php
                                 $stt = 1;
-                               
                                 ?>
                                 @foreach ($Product as $index => $item)
                                     <tr>

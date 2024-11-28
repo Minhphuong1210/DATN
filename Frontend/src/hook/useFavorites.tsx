@@ -26,17 +26,24 @@ const useFavorites = () => {
     const addToFavorites = async (productId: string) => {
         const isAlreadyFavorite = favorites.some(product => product.id === productId);
 
-        if (isAlreadyFavorite) {
-            toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
-            return;
-        }
+        // if (isAlreadyFavorite) {
+        //     toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
+        //     return;
+        // }
 
         try {
-            await axios.post('/api/wishlist/add', { product_id: productId });
+          const responAdd=  await axios.post('/api/wishlist/add', { product_id: productId });
             const response = await axios.get('/api/wishlist');
             setFavorites(response.data);
-            toast.success(response.data.message);
-            navigate('/wishlist');
+            // console.log(responAdd);
+            
+            if(responAdd.data.message){
+            toast.success(responAdd.data.message);
+
+            }else{
+                toast.warning(responAdd.data.error);
+            }
+            // navigate('/wishlist');
         } catch (error: any) {
             if (error.response?.status === 409) {
                 toast.warning('Sản phẩm đã có trong danh sách yêu thích!');

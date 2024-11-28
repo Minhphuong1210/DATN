@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Cart_detail } from "../interfaces/Cart";
 import { toast } from "react-toastify";
 import { Product } from "../interfaces/Product";
@@ -37,6 +37,7 @@ interface CartProviderProps {
 // CartProvider để quản lý trạng thái giỏ hàng
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<Cart_detail[]>([]);
+  const [Message,setMessage] = useState('');
   const { setLoading } = useLoading()
   // Hàm để thêm sản phẩm vào giỏ hàng
   const addToCart = async (product: Product, color_id: string, size_id: string, quantity: number) => {
@@ -51,21 +52,26 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         return;
       }
       setLoading(true)
-      await axios.post('/api/cart/add', {
+      const response = await axios.post('/api/cart/add', {
         id: product.id,
         color_id,
         size_id,
         quantity,
         price: product.price,
       });
-
+    
       // Thêm sản phẩm vào giỏ hàng trong state của context
       setCart(prevItems => [
         ...prevItems,
         { product, color_id, size_id, quantity }
       ]);
 
-      toast.success('Thêm sản phẩm vào giỏ hàng thành công');
+      console.log(response.data.error);
+      if(response.data.message){
+        toast.success(response.data.message);
+      }else{
+        toast.error(response.data.error);
+      }
     } catch {
       toast.error('Sản phẩm đã hết hàng hoặc có lỗi xảy ra');
     } finally {
@@ -120,9 +126,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       );
       setCart(updatedCart);
-      await axios.put(`/api/cart/${id}/update`, { quantity: updatedCart.find(item => item.id === id)?.quantity });
+      const response = await axios.put(`/api/cart/${id}/update`, { quantity: updatedCart.find(item => item.id === id)?.quantity });
+      //  console.log(response.data.message);
+      
+      if(response.data.message){
+        toast.success(response.data.message);
+      }else{
+        toast.error(response.data.error);
+        return;
+      }
+      setMessage(response.data.error)
     } catch (error) {
-      console.error("Lỗi khi tăng số lượng sản phẩm:", error);
+      toast.error((error as AxiosError)?.message);
     } finally {
       setLoading(false)
     }

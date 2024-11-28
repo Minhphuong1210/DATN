@@ -211,6 +211,17 @@ class ApiOrderController extends Controller
                 //     $vnPay->update($paymentData);
                 // }
 
+
+                //                 $params = $request->input('orderData');
+//                 $paymentData = $request->input('paymentData');
+
+                //                 $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
+//                 $vnPay->update($paymentData);
+//                 $paymentDatas = $request->input('paymentDatas');
+//                 $momo = Momo::query()->where('orderId',$paymentDatas['orderId'])->first();
+//                 $momo->update($paymentDatas);
+
+
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
                 $order = Order::create($params);
@@ -219,11 +230,11 @@ class ApiOrderController extends Controller
                     $vnpayy = Vnpayy::where('vnp_TxnRef', $vnp_TxnReff)->first();
                     if ($vnpayy) {
                         $order->vnpayy_id = $vnpayy->id;
-                        $order->order_payment=Order::CHO_XAC_NHA;
+                        $order->order_payment = Order::CHO_XAC_NHA;
                         $order->save();
                     }
                 }
-                if($params['promotion_id']){
+                if ($params['promotion_id']) {
                     $promotion = Promotion::query()->where('id', $params['promotion_id'])->first();
                     $promotion->usage_limit -= 1;
                     $promotion->save();
@@ -247,6 +258,10 @@ class ApiOrderController extends Controller
 
                 foreach ($cartDetails as $item) {
                     $total = $item->price * $item->quantity;
+                    $detail = ProductDetail::query()->where('id', $item->product_detail_id)->first();
+                    if ($item->quantity > $detail->quantity) {
+                        return response()->json(['error' => 'số lượng kho đã hết vui lòng mua sản phẩm khác'], 200);
+                    }
                     OrderDetail::create([
                         'order_id' => $order_id,
                         'product_detail_id' => $item->product_detail_id,
@@ -255,9 +270,6 @@ class ApiOrderController extends Controller
                         'quantity' => $item->quantity,
                         'price' => $item->price
                     ]);
-
-                    $detail = ProductDetail::query()->where('id', $item->product_detail_id)->first();
-
                     if ($detail) {
                         $detail->quantity -= $item->quantity;
                         $detail->save();
@@ -302,7 +314,7 @@ class ApiOrderController extends Controller
         DB::beginTransaction();
         try {
             if ($request->has('huy_don_hang')) {
-                if ($donHang = Order::DANG_VAN_CHUYEN) {
+                if ($donHang->order_status == 'dang_van_chuyen') {
                     return response()->json([
                         'error' => 'Cập nhật không thành công'
                     ]);

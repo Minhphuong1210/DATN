@@ -25,10 +25,10 @@ class ApiAuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-        if(!$user){
+        if (!$user) {
             return response()->json([
                 'message' => 'Tài khoản không tồn tại',
-            ],404);
+            ], 404);
         }
 
         // Kiểm tra người dùng và mật khẩu
@@ -58,31 +58,31 @@ class ApiAuthController extends Controller
         ]);
     }
     public function logout()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if (!$user) {
+        if (!$user) {
+            return response()->json([
+                'message' => 'Tài Khoản không tồn tại',
+            ], 404);
+        }
+
+        // Delete all tokens associated with the user
+        $user->tokens()->delete();
+
         return response()->json([
-            'message' => 'Tài Khoản không tồn tại',
-        ], 404);
+            'message' => 'Đăng xuất thành công',
+            'user' => $user,
+        ]);
     }
-
-    // Delete all tokens associated with the user
-    $user->tokens()->delete();
-
-    return response()->json([
-        'message' => 'Đăng xuất thành công',
-        'user' => $user,
-    ]);
-}
 
 
     public function register(Request $request)
     {
-        $request -> validate([
-            'name'=>'required',
-            'email'=>'required|email',
-            'password'=>'required',
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
         $user = User::create([
             'name' => $request->name,
@@ -117,12 +117,12 @@ class ApiAuthController extends Controller
         // ]);
 
         $user = User::findOrFail($id);
-        $request -> validate([
-            'name'=>'required',
-            'email'=>'required|email',
-            // 'password'=>'required',
-            'address'=>'required',
-            'phone'=>'required'
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+            'address' => 'required',
+            'phone' => 'required'
         ]);
         $param = $request->only(['name', 'email', 'password', 'address', 'phone']);
 
@@ -162,18 +162,29 @@ class ApiAuthController extends Controller
         ];
         if (password_reset_token::create($tokenData)) {
             Mail::to($request->email)->send(new ForgotpasswordMail($user, $token));
+
             return response()->json([
                 'message' => 'Đã kiểm tra thành công vui lòng kiểm tra email'
             ]);
         }
         return response()->json([
-            'message' => 'Vui lòng kiểm tra lại email'
+            'error' => 'Vui lòng kiểm tra lại email'
         ]);
     }
     public function reset_password($token)
     {
+
         // cái này có thể viết bên model
         $tokenData = password_reset_token::CheckToken($token);
+        // thời gian tạo token
+        $timestamp = $tokenData->created_at->timestamp;
+        $timeout = strtotime('+5 minutes', $timestamp);
+        $timescurrent = time(); // đây là thời gian hiện tại
+        if ($timeout < $timescurrent) {
+            $thoiGianHetHan = password_reset_token::where('token', $token)->delete();
+            return response()->json(['message'=>'token đã hết hạn']);
+        }
+        
         // // cách 1 cách 2 sang model
         // $user = User::where('email', $tokenData->email)->firstOrFail();
         // $user = $tokenData->user;
@@ -186,16 +197,34 @@ class ApiAuthController extends Controller
     public function check_reset_password($token)
     {
         $tokenData = password_reset_token::CheckToken($token);
+        $timestamp = $tokenData->created_at->timestamp;
+        $timeout = strtotime('+5 minutes', $timestamp);
+        $timescurrent = time(); // đây là thời gian hiện tại
+        if ($timeout < $timescurrent) {
+            $thoiGianHetHan = password_reset_token::where('token', $token)->delete();
+            return response()->json(['message'=>'token đã hết hạn']);
+        }
+        if (!$tokenData) {
+            return response()->json([
+                'message' => 'không tìm thấy'
+            ]);
+        }
         $user = $tokenData->user;
+        if (!$user) {
+            return response()->json([
+                'message' => 'không tìm thấy'
+            ]);
+        }
         $data = [
             'password' => bcrypt(request('password'))
         ];
         $check = $user->update($data);
-        if($check){
+        if ($check) {
+            password_reset_token::where('token', $token)->delete();
             return response()->json([
                 'message' => 'Đã cập nhật mật khẩu'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Chưa cập nhật mật khẩu'
             ]);
