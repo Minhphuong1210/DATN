@@ -43,7 +43,7 @@ class ProductStoreRequest extends FormRequest
             foreach ($products as $productVariant) {
                 $variantKey = $productVariant['size_id'] . '-' . $productVariant['color_id'];
                 if (in_array($variantKey, $existingVariants)) {
-                    $validator->errors()->add('products', 'Kích thước và màu sắc bị trùng: ' . $variantKey);
+                    $validator->errors()->add('products', 'Kích thước và màu sắc bị trùng: ');
                 }
 
                 $existingVariants[] = $variantKey;

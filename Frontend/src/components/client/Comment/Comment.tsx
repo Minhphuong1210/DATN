@@ -30,16 +30,21 @@ const Comment: React.FC<ConfirmModalProps> = ({ isVisible, onConfirm, onCancel, 
     }
     const handleSend = async () => {
         try {
-            await axios.post(`/api/comment/${productId}`, {
+            const response = await axios.post(`/api/comment/${productId}`, {
                 comment: comment,
                 rating: rating,
             });
-            window.location.reload();
+            console.log(response.data);
+            
+            // window.location.reload();
+if(response.data.message){
 
-            toast.success("Bình luận thành công");
+    toast.success(response.data.message);
+}else{
+    toast.error(response.data.error);
+}
         } catch (error) {
             console.log(error);
-
         }
 
     }

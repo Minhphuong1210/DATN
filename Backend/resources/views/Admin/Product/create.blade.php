@@ -21,6 +21,9 @@
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-4">
+                                        @error('products')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
                                         <div class="mb-3">
                                             <label for="simpleinput" class="form-label">Name</label>
                                             <input type="text" id="simpleinput"
@@ -66,7 +69,8 @@
                                             <label for="simpleinput" class="form-label">price_sale</label>
                                             <input type="text" id="simpleinput"
                                                 class="form-control  @error('price_sale') is-invalid @enderror"
-                                                name="price_sale" value="{{ old('price_sale') }}" placeholder="price_sale ">
+                                                name="price_sale" value="{{ old('price_sale') }}"
+                                                placeholder="price_sale ">
                                             @error('price_sale')
                                                 <p class="text-danger">{{ $message }}</p>
                                             @enderror

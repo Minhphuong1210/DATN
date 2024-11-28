@@ -51,7 +51,11 @@ export const useOder = () => {
     useEffect(() => {
         getTotal();
     }, []);
-
+    
+    const promotion_id=localStorage.getItem('promotion_id')
+    if(promotion_id==undefined){
+        promotion_id==null
+    }
     const handleSubmitOrder = async (info: any, totalPayment: number, shippingCost: number) => {
         try {
             const orderData: Order = {
@@ -63,11 +67,14 @@ export const useOder = () => {
                 commodity_money: total?.subtotal || 0,
                 total_amount: (total?.subtotal ?? 0) + shippingCost,
                 shipping_id: info.shippingMethod,
+                vnp_TxnReff:null,
+                promotion_id:promotion_id,
             };
             setLoading(true);
             await axios.post('/api/donhangs/store', orderData);
             localStorage.removeItem('activeStep');
             localStorage.removeItem('shippingInfo');
+            localStorage.removeItem('promotion_id');
             toast.success("Đặt hàng thành công!");
             setThankPayment(true);
         } catch (error) {

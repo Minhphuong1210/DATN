@@ -44,6 +44,7 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('show');
             Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('edit');
             Route::put('/{id}/update', [OrderController::class, 'update'])->name('update');
+            Route::put('/{id}/updatePayment', [OrderController::class, 'updatePayment'])->name('updatePayment');
             Route::delete('/{id}/destroy', [OrderController::class, 'destroy'])->name('destroy');
         });
 

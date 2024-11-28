@@ -22,6 +22,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    @if ($errors->has('products'))
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->get('products') as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                     <label for="product_name" class="form-label">Name</label>
                                     <input type="text" id="product_name"
                                         class="form-control @error('name') is-invalid @enderror" name="name"
@@ -55,7 +64,7 @@
                                     <input type="file" id="simpleinput"
                                         class="form-control  @error('image') is-invalid @enderror" name="image"
                                         value="{{ $product->image }}" placeholder="image ">
-                                        <img src="{{Storage::url( $product->image)}}" alt="">
+                                    <img src="{{ Storage::url($product->image) }}" alt="" width="100px">
                                     @error('image')
                                         <p class="text-danger">{{ $message }}</p>
                                     @enderror
@@ -128,7 +137,8 @@
                                                             onchange="previewImage(this, {{ $image->id }})">
                                                         <img src="{{ Storage::url($image->image) }}" alt=""
                                                             width="100px" id="preview_{{ $image->id }}">
-                                                            <input type="hidden" name="list_hinh_anh[{{ $image->id }}]" value="{{$image->id}}">
+                                                        <input type="hidden" name="list_hinh_anh[{{ $image->id }}]"
+                                                            value="{{ $image->id }}">
                                                     </td>
                                                     <td>
                                                         <i class="mdi mdi-delete text-muted fs-18 rounded-2 border remove-image p-1"

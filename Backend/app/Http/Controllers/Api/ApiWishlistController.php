@@ -28,7 +28,6 @@ class ApiWishlistController extends Controller
             ],404);
         }
         $request-> validate([
-            'wishlist_id'=>'required',
             'product_id'=>'required',
         ]);
 
@@ -96,6 +95,6 @@ class ApiWishlistController extends Controller
             return response()->json($wishlistDetails, 200);
         }
 
-        return response()->json(['message' => 'Không có sản phẩm yêu thích'], 404);
+        return response()->json(['message' => 'Không có sản phẩm yêu thích'], 200);
     }
 }
