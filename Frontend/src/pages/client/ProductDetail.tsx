@@ -65,6 +65,7 @@ const ProductDetail: React.FC = () => {
         } catch (error) {
             console.error(error);
         }
+
     };
     return (
         <>

@@ -15,11 +15,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCategory } from "../../../../hook/useCategory";
 
+
 import { useLoading } from "../../../../context/Loading";
 import { useCart } from "../../../../context/Cart";
 import { Badge } from "@mui/material";
 import ModalCart from "../../ModalCart/ModalCart";
 // import { useLoading } from "../../../../context/Loading";
+
 
 interface HeaderProps {
   isMobile: boolean;
@@ -35,6 +37,9 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const navigate = useNavigate();
 
+  const [cartCount, setCartCount] = useState(0); // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
+
+
 
   const handleOpenCart = () => {
     setsOpenCart(true)
@@ -43,7 +48,6 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
     setsOpenCart(false)
   }
 // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
-
   const handleMenu = () => {
     setOpenMenu(!openMenu);
   };
@@ -69,6 +73,26 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const { categories, subcates } = useCategory();
 
     // Hàm lấy dữ liệu giỏ hàng từ AP
+
+
+    // Hàm lấy dữ liệu giỏ hàng từ API
+    const fetchCartCount = async () => {
+      try {
+        if (!token) {
+          setCartCount(0);
+          return} ; // Nếu chưa đăng nhập thì không gọi API
+        const response = await axios.get("/api/cart"); // Gọi API giỏ hàng
+        const cartItems = response.data.cart; // Lấy danh sách sản phẩm trong giỏ hàng
+        const totalItems = cartItems.reduce((total: number, item: any) => total + item.quantity, 0); // Tính tổng số lượng
+        setCartCount(totalItems);
+      } catch (error) {
+        console.error("Failed to fetch cart count:", error);
+      }
+    };
+  
+    useEffect(() => {
+      fetchCartCount(); // Gọi hàm để lấy dữ liệu giỏ hàng
+    }, []);
 
 
   return (

@@ -61,6 +61,7 @@ class ProductController extends Controller
             $params['is_show_home'] = $request->has('is_show_home') ? 1 : 0;
             $params['is_active'] = $request->has('is_active') ? 1 : 0;
 
+         
 //             $params['product_code'] = $request->name . '-' . $category_id . '-' . Str::random(3);
 
 
