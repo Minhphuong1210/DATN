@@ -1,17 +1,12 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import yourImage from "../../public/images/AoPolo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 import { Eye, Heart, ShoppingCart, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useProduct } from "../../hook/Product"; import { toast } from "react-toastify";
-import { Colors, Product, Sizes, Comment } from "../../interfaces/Product";
+import { useProduct } from "../../hook/Product";
+import { Colors, Product, Sizes } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
-import axios from "axios";
-
-
-
+import { useCart } from "../../context/Cart";
 
 const ProductDetail: React.FC = () => {
     const { product, comments, ProductBycategorys } = useProduct();
@@ -21,62 +16,9 @@ const ProductDetail: React.FC = () => {
     const [showDescription, setShowDescription] = useState(true);
     const [showComment, setShowComment] = useState(false);
     const { color, size } = useColor();
-    const [cartCount, setCartCount] = useState<number>(0); // Trạng thái số lượng giỏ hàng
-    const token = localStorage.getItem('token');
-    const [addcomment, setAddcomment] = useState({
-        comment: '',
-        rating: '',
-        parent_id: '',
-        product_id: product ? product.id : '',
-    });
+    const [selectedImage, setSelectedImage] = useState(null);
+    const { addToCart } = useCart();
 
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        setAddcomment(prev => ({
-            ...prev,
-            product_id: product ? product.id : '',
-        }));
-    }, [product]);
-    //lưu giá trị từ form vào đây
-    const handleChangeComment = (e) => {
-        const { name, value } = e.target;
-        setAddcomment({
-            ...addcomment,
-            [name]: value,
-        });
-    };
-    // const handleSubmitComment = async (e) => {
-    //     e.preventDefault();
-    //     console.log(addcomment);
-    //     const id = product.id;
-    //     try {
-    //         if (!token) {
-    //             toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
-    //             nav('/login')
-    //         }
-    //         setLoading(true);
-    //         const response = await axios.post(`/api/comment/${id}`, {
-    //             comment: addcomment.comment,
-    //             rating: addcomment.rating,
-    //             parent_id: addcomment.parent_id,
-    //             product_id: addcomment.product_id,
-    //         });
-    //         toast.success("Bình luận thành công");
-    //         // Reset form sau khi gửi thành công
-    //         setAddcomment({
-    //             comment: '',
-    //             rating: '',
-    //             parent_id: '',
-    //             product_id: product ? product.id : '',
-    //         });
-    //         window.location.reload();
-    //     } catch (error) {
-    //         toast.error("bạn cần mua sản phẩm mới được bình luận");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
@@ -116,16 +58,12 @@ const ProductDetail: React.FC = () => {
         setShowComment(true);
         setShowDescription(false);
     };
-    const nav = useNavigate()
-    const handleAddToCart = async (
-        product: Product,
-        color_id: string,
-        size_id: string,
-        quantity: number,
 
-    ) => {
-        
+    const handleAddToCart = async (product: Product, color_id: string, size_id: string) => {
         try {
+            await addToCart(product, color_id, size_id, quantity); // Gọi addToCart từ context
+        } catch (error) {
+            console.error(error);
             if (!token) {
                 toast.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng")
                 nav('/login')
@@ -150,37 +88,39 @@ const ProductDetail: React.FC = () => {
             }
             
         } catch (error) {
+
         }
 
     };
-
     return (
         <>
             {product && (
                 <div className="mx-2 mt-4 overflow-hidden md:mx-7 lg:mx-[150px] lg:mt-14">
-                    <div className=" lg:flex justify-center lg:space-x-56">
-
-                        <div className=" flex ">
-                            <div className="mb-3 h-[700px]  ">
-                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
-                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
-                                </div>
-                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
-                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
-                                </div>
-                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
-                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
-                                </div>
-                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
-                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
-                                </div>
-                                <div className="mr-2 p-1 h-[140px] hover:bg-slate-300">
-                                    <img className="h-full w-12 lg:h-full lg:w-full object-fill" src={yourImage} alt="" />
-                                </div>
-
+                    <div className="lg:flex justify-center lg:space-x-56">
+                        <div className="flex gap-6">
+                            {/* Danh sách ảnh */}
+                            <div className="mb-3 h-[560px] overflow-y-scroll scrollable-content">
+                                {product.images.map((img) => (
+                                    <div
+                                        key={img.id}
+                                        className="mr-2 p-1 h-[140px] hover:bg-slate-300 cursor-pointer"
+                                        onClick={() => setSelectedImage(`http://127.0.0.1:8000/storage/${img.image}`)}
+                                    >
+                                        <img
+                                            className="h-full w-12 lg:h-full lg:w-full object-fill"
+                                            src={`http://127.0.0.1:8000/storage/${img.image}`}
+                                            alt=""
+                                        />
+                                    </div>
+                                ))}
                             </div>
-                            <div className="mb-3 flex justify-center w-[500px] h-[700px]">
-                                <img src={product.imageUrl} alt="" className="w-full h-full object-cover" />
+                            {/* Ảnh chính */}
+                            <div className="mb-3 flex justify-center w-[450px]  h-[560px]">
+                                <img
+                                    src={selectedImage || product.imageUrl}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
                         </div>
 
@@ -314,7 +254,7 @@ const ProductDetail: React.FC = () => {
                                     +
                                 </button>
                                 <button className=" w-[300px] rounded-sm bg-yellow-400 px-10 py-3" onClick={() => handleAddToCart(product, selectColor.id, selectSize.id, quantity)}>
-                                    Add to Cart
+                                    Thêm vào giỏ hàng
                                 </button>
 
                                 {/* <button className="rounded-sm bg-yellow-400 px-10 py-3" onClick={() => { handleAddToCart(product, setSelectColor, setsize_id
@@ -344,7 +284,7 @@ const ProductDetail: React.FC = () => {
                         </div>
                         {showDescription && (
                             <p className="mb-8 text-sm lg:text-lg opacity-85  lg:mx-20 lg:mt-8">
-                                {product.description}
+                                {product.content}
                             </p>
                         )}
 

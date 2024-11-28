@@ -47,8 +47,7 @@ const MenuHeader = ({ handleMouseEnter, handleMouseLeave, isOpen, categoryId }: 
                     {categoryData && categoryData.sub_categories && categoryData.sub_categories.length > 0 ? (
                         categoryData.sub_categories.map((subcategory: any, index: number) => (
                             <div key={index}>
-                                <Link to={`/subcategory/${subcategory.id}`}>{subcategory.name}</Link>
-
+                                <Link to={`/products/cate/${subcategory.id}/${subcategory.name}`}>{subcategory.name}</Link>
                             </div>
                         ))
                     ) : (

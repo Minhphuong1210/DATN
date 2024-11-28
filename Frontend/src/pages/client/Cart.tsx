@@ -1,28 +1,32 @@
 import React, { useState } from "react";
-import { useCarts } from "../../hook/Cart";
-import { useQuantity } from "../../hook/useCartQuantity";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, PackageX } from "lucide-react";
+import { useCart } from "../../context/Cart";
 
 const Cart = () => {
-    const { productCart, setProductCart, handleRemoveCart } = useCarts();
-    const { increaseQuantity, decreaseQuantity } = useQuantity();
+    const { cart, removeFromCart, increaseQuantity, decreaseQuantity } = useCart();
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 3;
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = productCart.slice(indexOfFirstProduct, indexOfLastProduct);
-    const totalCartPrice = productCart.reduce(
+    const currentProducts = cart.slice(indexOfFirstProduct, indexOfLastProduct);
+    const safeCart = Array.isArray(cart) ? cart : [];  // Default to empty array if cart is not an array
+
+    // Then use safeCart instead of cart
+    const totalCartPrice = safeCart.reduce(
         (acc, item) => acc + item.PriceProduct * item.quantity,
         0
     );
-    const totalPages = Math.ceil(productCart.length / productsPerPage);
+
+    const totalPages = Math.ceil(cart.length / productsPerPage);
     return (
+
         <section className="bg-white py-8 md:py-16">
+
             <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Giỏ hàng của bạn</h2>
 
-                {productCart.length === 0 ? (
+                {currentProducts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center">
                         <div className="mt-6 flex flex-col items-center">
                             <PackageX size={200} strokeWidth="0.1" className="opacity-50" />
@@ -47,13 +51,13 @@ const Cart = () => {
                                                 </a>
                                                 <div className="flex items-center justify-between md:order-3 md:justify-end">
                                                     <div className="flex items-center">
-                                                        <button onClick={() => decreaseQuantity(item, setProductCart)} type="button" className="inline-flex h-5 w-5 items-center justify-center border rounded-md bg-gray-100 hover:bg-gray-200">
+                                                        <button onClick={() => decreaseQuantity(item.id)} type="button" className="inline-flex h-5 w-5 items-center justify-center border rounded-md bg-gray-100 hover:bg-gray-200">
                                                             <svg className="h-2.5 w-2.5 text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
                                                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1h16" />
                                                             </svg>
                                                         </button>
                                                         <input type="text" className="w-10 text-center" value={item.quantity} readOnly />
-                                                        <button onClick={() => increaseQuantity(item, setProductCart)} type="button" className="inline-flex h-5 w-5 items-center justify-center border rounded-md bg-gray-100 hover:bg-gray-200">
+                                                        <button onClick={() => increaseQuantity(item.id)} type="button" className="inline-flex h-5 w-5 items-center justify-center border rounded-md bg-gray-100 hover:bg-gray-200">
                                                             <svg className="h-2.5 w-2.5 text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
                                                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 1v16M1 9h16" />
                                                             </svg>
@@ -75,7 +79,7 @@ const Cart = () => {
                                                             </svg>
                                                             Add to Favorites
                                                         </button>
-                                                        <button onClick={() => handleRemoveCart(item.id)} type="button" className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">
+                                                        <button onClick={() => removeFromCart(item.id)} type="button" className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">
                                                             <svg className="me-1.5 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={24} height={24} fill="none" viewBox="0 0 24 24">
                                                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18 17.94 6M18 18 6.06 6" />
                                                             </svg>

@@ -43,25 +43,12 @@ const LayoutClient: React.FC = () => {
     }
   }, [windowSize]);
 
-  const [loadingpage, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Giả lập việc tải dữ liệu (có thể là gọi API hoặc tải tài nguyên khác)
-    const timer = setTimeout(() => {
-      setLoading(false); // Sau 2 giây, set loading thành false
-    }, 1000);
 
-    return () => clearTimeout(timer); // Dọn dẹp timer khi component unmount
-  }, []);
-
-  if (loadingpage) {
-    return <LoadingPage />;
-  }
-  const token = localStorage.getItem("token");
   return (
     <>
       <Loading isShow={loading} />
-      <div className="h-screen overflow-y-auto overflow-x-hidden ">
+      <div className="min-h-screen  ">
         <div className="mx-[150px] flex gap-2 text-[15px] mb-3">
           <PhoneCall strokeWidth={1} />
           <div>

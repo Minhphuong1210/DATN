@@ -39,6 +39,7 @@ class PromotionController extends Controller
         ->exists();
         if (!$checkPromotion) {
             return response()->json(['error' => 'Bạn chưa lưu mã khuyến mại này'], 200);
+
         }
         $checkUser = Order::query()
             ->where('user_id', $user_id)
@@ -53,6 +54,23 @@ class PromotionController extends Controller
         if ($checkUser) {
             return response()->json(['error' => 'Bạn đã sử dụng mã khuyến mãi này rồi'], 200);
         }
+
+        }
+        $checkUser = Order::query()
+            ->where('user_id', $user_id)
+            ->where('promotion_id', $promotion->id)
+            ->exists();
+        // response()->json(['message' =>$checkUser]);
+        // return response()->json([
+        //     'user_id' => $user_id,
+        //     'promotion_id' => $promotion_id,
+        //     'checkUser' => $checkUser,
+        // ]);
+        if ($checkUser) {
+            return response()->json(['error' => 'Bạn đã sử dụng mã khuyến mãi này rồi'], 200);
+        }
+
+
         if ($promotion->usage_limit !== null && $promotion->usage_limit <= 0) {
             return response()->json(['error' => 'Mã khuyến mãi đã hết lượt sử dụng'], 200);
         }
@@ -73,9 +91,6 @@ class PromotionController extends Controller
         $newTotal = $totalPrice - $discountAmount;
 
         // Giảm số lượng sử dụng (nếu có giới hạn)
-        // if ($promotion->usage_limit !== null) {
-        //     $promotion->decrement('usage_limit');
-        // }
 
         return response()->json([
             'promotion_id' => $promotion->id,

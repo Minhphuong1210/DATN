@@ -47,27 +47,33 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProductStoreRequest $request)
+    public function store( Request $request)
     {
         $category = Category::query()->orderBy('id', 'desc')->first();
         $category_id = $category->id;
-    
+
         DB::beginTransaction();
-    
+
         try {
             $params = $request->except('_token');
             $params['is_sale'] = $request->has('is_sale') ? 1 : 0;
             $params['is_hot'] = $request->has('is_hot') ? 1 : 0;
             $params['is_show_home'] = $request->has('is_show_home') ? 1 : 0;
             $params['is_active'] = $request->has('is_active') ? 1 : 0;
+
+         
+//             $params['product_code'] = $request->name . '-' . $category_id . '-' . Str::random(3);
+
+
             $productName = $request->name;
             $slugName = Str::slug($productName, '-');
             $params['product_code'] = $slugName . '-' . $category_id . '-' . Str::random(3);
+
             // Lưu hình ảnh chính
             $params['image'] = $request->file('image')->store('uploads/products', 'public');
             $product = Product::create($params);
             $product_id = $product->id;
-    
+
             // Xử lý hình ảnh bổ sung
             if ($request->hasFile('list_hinh_anh')) {
                 foreach ($request->file('list_hinh_anh') as $image) {
@@ -80,9 +86,9 @@ class ProductController extends Controller
                     }
                 }
             }
-    
+
             $products = $request->input('products');
-    
+
             foreach ($products as $productVariant) {
                 // Thêm chi tiết sản phẩm
                 $product->ProductDetail()->create([
@@ -92,7 +98,7 @@ class ProductController extends Controller
                     'quantity' => $productVariant['quantity'],
                 ]);
             }
-    
+
             DB::commit();
             return redirect()->route('admins.product.index')->with('success', 'Thêm sản phẩm thành công');
         } catch (\Exception $e) {
@@ -101,7 +107,7 @@ class ProductController extends Controller
             return redirect()->route('admins.product.create')->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
         }
     }
-    
+
 
 
     /**

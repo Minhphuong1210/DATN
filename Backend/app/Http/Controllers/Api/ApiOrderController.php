@@ -210,6 +210,7 @@ class ApiOrderController extends Controller
                 //     $vnPay = Vnpayy::query()->where('vnp_TxnRef', $paymentData['vnp_TxnRef'])->first();
                 //     $vnPay->update($paymentData);
                 // }
+
                 $params['user_id'] = $user_id;
                 $params['code_order'] = $this->generateUniqueOrderCode();
                 $order = Order::create($params);

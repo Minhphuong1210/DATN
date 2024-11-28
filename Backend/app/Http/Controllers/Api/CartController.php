@@ -27,6 +27,7 @@ class CartController extends Controller
     //Them san pham vao gio hang
     public function store(Request $request)
     {
+
         $request->validate([
             'id' => 'required',
             'size_id' => 'required',

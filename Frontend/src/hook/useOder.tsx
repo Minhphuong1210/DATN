@@ -51,11 +51,15 @@ export const useOder = () => {
     useEffect(() => {
         getTotal();
     }, []);
+
     
     const promotion_id=localStorage.getItem('promotion_id')
     if(promotion_id==undefined){
         promotion_id==null
     }
+
+
+
     const handleSubmitOrder = async (info: any, totalPayment: number, shippingCost: number) => {
         try {
             const orderData: Order = {
