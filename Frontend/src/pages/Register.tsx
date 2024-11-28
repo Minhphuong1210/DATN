@@ -12,7 +12,7 @@ const Register = () => {
     return (
         <>
             <Header isMobile={isMobile} />
-            <div className="flex justify-center bgr py-5">
+            <div className="xl:flex xl:justify-center  py-10   bgr ">
                 <AuthForm onSubmit={Register} />
             </div>
             <Footer />

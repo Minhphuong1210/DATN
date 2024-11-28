@@ -1,8 +1,19 @@
 import { Heart, LockKeyhole, PenLine, ShoppingBag, User } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 
 const Profile = () => {
+    const [name, setName] = useState<string>("");
+
+    useEffect(() => {
+        const userJson = localStorage.getItem("user");
+        if (userJson) {
+            const user = JSON.parse(userJson);
+            setName(user.name ?? "Anonymous");
+        }
+    }, []);
+
+
 
     return (
         <>
@@ -26,7 +37,7 @@ const Profile = () => {
                                         alt="Profile"
                                     />
                                     <div className="flex flex-col ">
-                                        <div className="text-[15px]">Hoàng Hùng</div>
+                                        <div className="text-[15px]">{name}</div>
                                         <Link to={"/account"} className="opacity-45 flex items-center gap-2"> <PenLine size={15} />Sửa hồ sơ</Link>
                                     </div>
                                 </div>

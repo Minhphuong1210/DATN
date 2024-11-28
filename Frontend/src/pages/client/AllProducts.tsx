@@ -1,47 +1,87 @@
-
-import { ChevronDown, ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
-import '../../css/AllProduct.css'
-import { useFilterProducts } from '../../hook/UseFilterProduct';
-import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useColor } from '../../hook/Color';
-import { useCategory } from '../../hook/useCategory';
+import {
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    Eye,
+    Filter,
+    Heart,
+    ShoppingCart,
+    X,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import "../../css/AllProduct.css";
+import { useFilterProducts } from "../../hook/UseFilterProduct";
+import axios from "axios";
+import { Link, useLocation } from "react-router-dom";
+import { useColor } from "../../hook/Color";
+import { useCategory } from "../../hook/useCategory";
+import { useModalAddCartProvider } from "../../context/MoDalAddToCart";
+import ModalAddToCart from "../../components/client/Home/ModalAddToCart/ModalAddToCart";
+import { useLoading } from "../../context/Loading";
+import { Product } from "../../interfaces/Product";
 
 interface PriceRange {
     min: number;
     max: number;
 }
 const AllProducts = () => {
-
+    const { setLoading } = useLoading();
     const [priceRange, setPriceRange] = useState<PriceRange | null>(null);
     const [category, setCate] = useState<string | null>(null);
-    const [color_id, setColorID] = useState<string | null>(null);
-    const [size_id, setSizeID] = useState<string | null>(null);
-    const [subcate, setSubcateID] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState<{
+        id: string;
+        name: string;
+    } | null>(null);
+    const [selectedSize, setSellectedSize] = useState<{
+        id: string;
+        name: string;
+    } | null>(null);
+    const [selectedSubcate, setSelectedSubcate] = useState<{
+        id: string;
+        name: string;
+    } | null>(null);
     const { color, size } = useColor();
     const { subcates, categories } = useCategory();
     const [sortOrder, setSortOrder] = useState<string>(""); // trạng thái sắp xếp
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
-    const navigate = useNavigate();
+    const [searchResults, setSearchResults] = useState<Product[]>([]);
     const location = useLocation();
-    // console.log(productBySubCateId);
+    const [isFilterMobile, setIsFilterMobile] = useState(false);
 
+    const { isOpenModalAddToCart, setIsOpenModalAddToCart } =
+        useModalAddCartProvider();
+    const [selectedProductId, setSelectedProductId] = useState<{
+        id: string;
+        idSub: string;
+    } | null>(null);
+    const openModal = (id: string, idSub: string) => {
+        setSelectedProductId({ id, idSub });
+        setIsOpenModalAddToCart(true);
+    };
+    const closeModal = () => {
+        setIsOpenModalAddToCart(false);
+    };
+
+    const handleFilterMobile = () => {
+        setIsFilterMobile(true);
+    };
+    const closeFilterMobile = () => {
+        setIsFilterMobile(false);
+    };
     const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
+        return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
             minimumFractionDigits: 0,
         }).format(price);
     };
-    const { filterProductsPrice, FilterProductsByPrice } = useFilterProducts(
+    const { filterProductsPrice, } = useFilterProducts(
         priceRange?.min || null,
         priceRange?.max || null,
-        color_id,
-        size_id,
-        subcate,
-        category ?? ""
+        selectedColor?.id,
+        selectedSize?.id,
+        selectedSubcate?.id,
+        category ?? "",
     );
 
     // Hàm xử lý khi người dùng chọn khoảng giá
@@ -62,43 +102,56 @@ const AllProducts = () => {
         }
     };
 
-    const handleColor = (color_id: string, isChecked: boolean) => {
+    const handleColor = (
+        color_id: string,
+        color_name: string,
+        isChecked: boolean,
+    ) => {
         if (isChecked) {
-            setColorID(color_id)
+            setSelectedColor({ id: color_id, name: color_name });
         } else {
-            setColorID(null);
+            setSelectedColor(null);
         }
-    }
-    const handleSize = (size_id: string, isChecked: boolean) => {
+    };
+
+    const handleSize = (
+        size_id: string,
+        size_name: string,
+        isChecked: boolean,
+    ) => {
         if (isChecked) {
-            setSizeID(size_id)
+            setSellectedSize({ id: size_id, name: size_name });
         } else {
-            setSizeID(null);
+            setSellectedSize(null);
         }
-    }
-    const handleSubCate = (subcate_id: string, isChecked: boolean) => {
+    };
+    const handleSubCate = (
+        subcate_id: string,
+        subcate_name: string,
+        isChecked: boolean,
+    ) => {
         if (isChecked) {
-            setSubcateID(subcate_id)
+            setSelectedSubcate({ id: subcate_id, name: subcate_name });
         } else {
-            setSubcateID(null);
+            setSelectedSubcate(null);
         }
-    }
+    };
     const handleClearFilter = () => {
         setPriceRange(null);
         fetchProducts();
     };
     const handleClearFilterCate = () => {
         setCate(null);
-    }
+    };
     const handleClearFilterColor = () => {
-        setColorID(null);
-    }
+        setSelectedColor(null);
+    };
     const handleClearFilterSize = () => {
-        setSizeID(null);
-    }
+        setSellectedSize(null);
+    };
     const handleClearFilterSubcate = () => {
-        setSubcateID(null);
-    }
+        setSelectedSubcate(null);
+    };
     // Hàm lấy sản phẩm sau khi lọc và sắp xếp
     const getFilteredAndSortedProducts = () => {
         const products = [...filterProductsPrice];
@@ -116,7 +169,7 @@ const AllProducts = () => {
     const [isOpenTrousers, setIsOpenTrousers] = useState(false);
     const [isOpenPrice, setIsOpenPrice] = useState(false);
     const [isOpenArrange, setIsOpenArrange] = useState(false);
-    const [productNew, setProductNew] = useState([]);
+    const [productNew, setProductNew] = useState<Product[]>([]);
 
     const toggleCollapseSex = () => {
         setIsOpenSex(!isOpenSex);
@@ -134,8 +187,7 @@ const AllProducts = () => {
         setIsOpenArrange(!isOpenArrange);
     };
 
-
-    // search 
+    // search
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get("q");
@@ -147,44 +199,38 @@ const AllProducts = () => {
 
     const handleSearch = async (searchTerm: string) => {
         try {
-            //   setError(null);
-            // console.log(searchTerm);
+            setLoading(true);
             const search = await axios.post(
                 `http://127.0.0.1:8000/api/search?q=${searchTerm}`,
             );
             setSearchResults(search.data);
-            //   console.log(search);
-
             if (!search.ok) {
                 throw new Error("Không thể tải dữ liệu sản phẩm");
             }
         } catch (error) {
             // console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
     // các sản phẩm mới nhất
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = 4;
 
-    const handlePageChange = (page: any) => {
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-        }
-    };
     const fetchProducts = async () => {
         try {
-            const responst = await axios.get('http://127.0.0.1:8000/api/products?page=${currentPage}');
-
+            const responst = await axios.get(
+                "http://127.0.0.1:8000/api/products?page=${currentPage}",
+            );
 
             if (Array.isArray(responst.data.products)) {
                 setProductNew(responst.data.products);
-
             } else {
                 console.error("Dữ liệu trả về không phải là mảng");
-                setProductNew([]);  // Nếu không phải mảng, đặt productNew là mảng rỗng
+                setProductNew([]); // Nếu không phải mảng, đặt productNew là mảng rỗng
             }
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error("Error fetching products:", error);
         }
     };
     useEffect(() => {
@@ -193,127 +239,141 @@ const AllProducts = () => {
 
     return (
         <>
-            <div className='mx-[200px]'>
-                <div className="">
-                    <div className=" m-1 bg-white text-gray-400">
-                        <a href="/" className="focus:outline-none hover:underline text-gray-500">Trang chủ </a> / <span className="text-gray-600">{name ? name : "Checkout"}</span>
-                    </div>
+            <div className="mt-2 bg-gray-50 px-5 pt-1 lg:mx-[100px] xl:mx-[150px] xl:mt-3 xl:py-5">
+                <div className="mb-2">
+                    <h1 className="text-xl font-bold text-gray-600 xl:text-2xl">
+                        Sản phẩm
+                    </h1>
                 </div>
-                <div className='flex '>
+                <div className="mb-5 text-sm text-gray-400 xl:text-base">
+                    <a
+                        href="/"
+                        className="text-gray-500 hover:underline focus:outline-none"
+                    >
+                        Trang chủ
+                    </a>{" "}
+                    /{" "}
+                    <span className="text-sm text-gray-600 xl:text-base"> Sản phẩm</span>
+                </div>
+            </div>
+            <div className="lg:mx-[100px] xl:mx-[150px]">
+                <div className="flex">
                     {/* BỘ LỌC */}
-                    <div className='mr-20'>
-                        <div className=' h-[700px]  overflow-y-scroll  scrollable-content'>
-                            <div className='text-2xl mt-5'>Bộ lọc</div>
+                    <div className="hidden lg:block xl:mr-20 xl:block">
+                        <div className="scrollable-content h-[700px] overflow-y-scroll">
+                            <div className="mt-5 text-2xl">Bộ lọc</div>
                             <div className="w-64">
                                 {/* Header Collapse */}
                                 <div
-                                    className="  p-4 cursor-pointer flex items-center"
+                                    className="flex cursor-pointer items-center p-4"
                                     onClick={toggleCollapseSex}
                                 >
-                                    <h2 className="text-base mr-2 ">Giới tính</h2><ChevronDown size={17} strokeWidth={1.5} />
+                                    <h2 className="mr-2 text-base">Giới tính</h2>
+                                    <ChevronDown size={17} strokeWidth={1.5} />
                                 </div>
 
                                 {/* Nội dung Collapse */}
                                 <div
-                                    className={`transition-max-height duration-500 ease-in-out overflow-hidden ${isOpenSex ? 'max-h-40' : 'max-h-0'
+                                    className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenSex ? "max-h-40" : "max-h-0"
                                         }`}
                                 >
                                     <div className="p-4">
-                                        {categories.map((item, index) =>
-                                        (
-                                            < label key={index} className="block mb-2" >
+                                        {categories.map((item, index) => (
+                                            <label key={index} className="mb-2 block">
                                                 <input
                                                     type="checkbox"
-
                                                     className="mr-2"
-                                                    onChange={(e) => handleCate(item.name, e.target.checked)}
+                                                    onChange={(e) =>
+                                                        handleCate(item.name, e.target.checked)
+                                                    }
                                                     checked={category === item.name}
                                                     name="cate"
                                                 />
                                                 {item.name}
                                             </label>
-                                        )
-                                        )}
+                                        ))}
                                     </div>
                                 </div>
                                 <hr />
                                 <div>
                                     <div
-                                        className="  p-4 cursor-pointer flex items-center"
+                                        className="flex cursor-pointer items-center p-4"
                                         onClick={toggleCollapseShirt}
                                     >
-                                        <h2 className="text-base mr-2">Áo</h2><ChevronDown size={17} strokeWidth={1.5} />
+                                        <h2 className="mr-2 text-base">Áo</h2>
+                                        <ChevronDown size={17} strokeWidth={1.5} />
                                     </div>
 
                                     {/* Nội dung Collapse */}
                                     <div
-                                        className={`transition-max-height duration-500 ease-in-out overflow-hidden ${isOpenShirt ? 'max-h-40' : 'max-h-0'
+                                        className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenShirt ? "max-h-40" : "max-h-0"
                                             }`}
                                     >
                                         <div className="p-4">
                                             {subcates.map((item, index) => (
-                                                <label key={index} className="block mb-2">
+                                                <label key={index} className="mb-2 block">
                                                     <input
                                                         type="checkbox"
                                                         value={item.name}
                                                         className="mr-2"
-                                                        onChange={(e) => handleSubCate(item.id, e.target.checked)}
-                                                        checked={subcate === item.id}
+                                                        onChange={(e) =>
+                                                            handleSubCate(
+                                                                item.id,
+                                                                item.name,
+                                                                e.target.checked,
+                                                            )
+                                                        }
+                                                        checked={selectedSubcate?.id === item.id}
                                                     />
                                                     {item.name}
                                                 </label>
                                             ))}
-
                                         </div>
-
                                     </div>
                                 </div>
 
-                                <hr className=' bg-black' />
+                                <hr className="bg-black" />
 
                                 <div>
                                     <div
-                                        className=" text-black p-4 cursor-pointer flex items-center"
+                                        className="flex cursor-pointer items-center p-4 text-black"
                                         onClick={toggleCollapseTrousers}
                                     >
-                                        <h2 className="text-base mr-2 ">Quần</h2> <ChevronDown size={17} strokeWidth={1.5} />
+                                        <h2 className="mr-2 text-base">Quần</h2>{" "}
+                                        <ChevronDown size={17} strokeWidth={1.5} />
                                     </div>
 
                                     {/* Nội dung Collapse */}
                                     <div
-                                        className={`transition-max-height duration-500 ease-in-out overflow-hidden ${isOpenTrousers ? 'max-h-40' : 'max-h-0'
+                                        className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenTrousers ? "max-h-40" : "max-h-0"
                                             }`}
                                     >
-                                        <div className="p-4 ">
+                                        <div className="p-4">
                                             <form>
-                                                <label className="block mb-2">
+                                                <label className="mb-2 block">
                                                     <input
                                                         type="checkbox"
                                                         value="option1"
-
                                                         className="mr-2"
                                                     />
                                                     Quần Polo
                                                 </label>
-                                                <label className="block mb-2">
+                                                <label className="mb-2 block">
                                                     <input
                                                         type="checkbox"
                                                         value="option2"
-
                                                         className="mr-2"
                                                     />
                                                     Quần sơ mi
                                                 </label>
-                                                <label className="block mb-2">
+                                                <label className="mb-2 block">
                                                     <input
                                                         type="checkbox"
                                                         value="option2"
-
                                                         className="mr-2"
                                                     />
                                                     Quần phông
                                                 </label>
-
                                             </form>
                                         </div>
                                     </div>
@@ -321,46 +381,74 @@ const AllProducts = () => {
                                 <hr />
                                 <div>
                                     <div
-                                        className=" text-black p-4 cursor-pointer flex items-center"
+                                        className="flex cursor-pointer items-center p-4 text-black"
                                         onClick={toggleCollapsePrice}
                                     >
-                                        <h2 className="text-base mr-2 ">Khoảng giá</h2> <ChevronDown size={17} strokeWidth={1.5} />
+                                        <h2 className="mr-2 text-base">Khoảng giá</h2>{" "}
+                                        <ChevronDown size={17} strokeWidth={1.5} />
                                     </div>
 
                                     {/* Nội dung Collapse */}
                                     <div
-                                        className={`transition-max-height duration-500 ease-in-out overflow-hidden ${isOpenPrice ? 'max-h-40' : 'max-h-0'
+                                        className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenPrice ? "max-h-40" : "max-h-0"
                                             }`}
                                     >
-                                        <div className="p-4 ">
+                                        <div className="p-4">
                                             <form>
-                                                <label className="block mb-2">
+                                                <label className="mb-2 block">
                                                     <input
                                                         type="checkbox"
                                                         name="price-range"
                                                         className="mr-2"
-                                                        onChange={(e) => handlePriceChange(150000, 350000, e.target.checked)}
-                                                        checked={priceRange?.min === 150000 && priceRange?.max === 350000}
+                                                        onChange={(e) =>
+                                                            handlePriceChange(
+                                                                150000,
+                                                                350000,
+                                                                e.target.checked,
+                                                            )
+                                                        }
+                                                        checked={
+                                                            priceRange?.min === 150000 &&
+                                                            priceRange?.max === 350000
+                                                        }
                                                     />
                                                     Từ 150.000 - 350.000
                                                 </label>
-                                                <label className="block mb-2">
+                                                <label className="mb-2 block">
                                                     <input
                                                         type="checkbox"
                                                         name="price-range"
                                                         className="mr-2"
-                                                        onChange={(e) => handlePriceChange(350000, 550000, e.target.checked)}
-                                                        checked={priceRange?.min === 350000 && priceRange?.max === 550000}
+                                                        onChange={(e) =>
+                                                            handlePriceChange(
+                                                                350000,
+                                                                550000,
+                                                                e.target.checked,
+                                                            )
+                                                        }
+                                                        checked={
+                                                            priceRange?.min === 350000 &&
+                                                            priceRange?.max === 550000
+                                                        }
                                                     />
                                                     Từ 350.000 - 550.000
                                                 </label>
-                                                <label className="block mb-2">
+                                                <label className="mb-2 block">
                                                     <input
                                                         type="checkbox"
                                                         name="price-range"
                                                         className="mr-2"
-                                                        onChange={(e) => handlePriceChange(550000, Number.MAX_SAFE_INTEGER, e.target.checked)}
-                                                        checked={priceRange?.min === 550000 && priceRange?.max === Number.MAX_SAFE_INTEGER}
+                                                        onChange={(e) =>
+                                                            handlePriceChange(
+                                                                550000,
+                                                                Number.MAX_SAFE_INTEGER,
+                                                                e.target.checked,
+                                                            )
+                                                        }
+                                                        checked={
+                                                            priceRange?.min === 550000 &&
+                                                            priceRange?.max === Number.MAX_SAFE_INTEGER
+                                                        }
                                                     />
                                                     Trên 550.000
                                                 </label>
@@ -378,109 +466,145 @@ const AllProducts = () => {
                                                 <label className="relative flex cursor-pointer items-center">
                                                     <input
                                                         type="checkbox"
-                                                        className=" focus:outline-none focus:ring-2  focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
-                                                        onChange={(e) => handleColor(item.id, e.target.checked)}
-                                                        checked={color_id === item.id}
+                                                        className="peer h-7 w-7 cursor-pointer appearance-none rounded-full border border-slate-300 shadow transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                                        onChange={(e) =>
+                                                            handleColor(item.id, item.name, e.target.checked)
+                                                        }
+                                                        checked={selectedColor?.id === item.id}
                                                         style={{
                                                             backgroundColor: item.color_code,
-
                                                         }}
-
                                                     />
                                                 </label>
-
                                             </div>
-                                        )
-                                        )}
+                                        ))}
                                     </div>
                                 </div>
-                                <div className='mt-4 '>
-                                    <h2 className='mb-2'>Kích Thước</h2>
-                                    <div className="inline-flex items-center ">
+                                <div className="mt-4">
+                                    <h2 className="mb-2">Kích Thước</h2>
+                                    <div className="inline-flex items-center">
                                         {size.map((item, index) => (
-                                            <div key={index} className="flex space-x-2 mr-2">
+                                            <div key={index} className="mr-2 flex space-x-2">
                                                 <label className="relative flex cursor-pointer items-center">
                                                     <input
                                                         type="checkbox"
                                                         className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-                                                        onChange={(e) => handleSize(item.id, e.target.checked)} // Gọi handleSize khi thay đổi
-                                                        checked={size_id === item.id} // Kiểm tra nếu size_id trùng với item.id thì checkbox được chọn
+                                                        onChange={(e) =>
+                                                            handleSize(item.id, item.name, e.target.checked)
+                                                        } // Gọi handleSize khi thay đổi
+                                                        checked={selectedSize?.id === item.id} // Kiểm tra nếu size_id trùng với item.id thì checkbox được chọn
                                                     />
-                                                    <span className="uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                    <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm uppercase text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
                                                         {item.name}
                                                     </span>
                                                 </label>
                                             </div>
                                         ))}
-
-
                                     </div>
                                 </div>
                                 {/* // */}
                             </div>
-
                         </div>
-
                     </div>
 
                     {/* BOX PRODUCTS*/}
-                    <div className=''>
-                        <div className='sticky top-[68px] z-40 pt-2 bg-white '>
-                            <div className='flex justify-between'>
-                                <div>
-                                    <div className="inline-block  mb-3 ml-4 ">Đang dùng bộ lọc:</div>
+                    <div className="mx-2">
+                        <div className="sticky top-10 z-40 bg-white pt-2 xl:top-[68px]">
+                            <div className="flex justify-between">
+                                <div className="text-[12px] xl:text-[14px]">
+                                    <div className="mx-2 mb-3 inline-block text-[13px] xl:ml-4 xl:text-base">
+                                        Đang dùng bộ lọc:
+                                    </div>
                                     {priceRange && (
-                                        <div className="inline-flex items-center bg-slate-100 w-40  justify-center rounded-lg ml-2">
-                                            {priceRange.min} - {priceRange.max}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilter} />
+                                        <div className="ml-2 inline-flex items-center justify-center rounded-lg bg-slate-100">
+                                            {priceRange.min} - {priceRange.max}
+                                            <X
+                                                className="ml-1"
+                                                size={17}
+                                                strokeWidth={1}
+                                                onClick={handleClearFilter}
+                                            />
                                         </div>
                                     )}
                                     {category && (
-                                        <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
-                                            {category}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterCate} />
+                                        <div className="ml-2 inline-flex items-center justify-center rounded-lg bg-slate-100">
+                                            {category}
+                                            <X
+                                                className="ml-1"
+                                                size={17}
+                                                strokeWidth={1}
+                                                onClick={handleClearFilterCate}
+                                            />
                                         </div>
                                     )}
-                                    {color_id && (
-                                        <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
-                                            {color_id}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterColor} />
+                                    {selectedColor && (
+                                        <div className="ml-2 inline-flex items-center justify-center rounded-lg bg-slate-100">
+                                            {selectedColor.name}
+                                            <X
+                                                className="ml-1"
+                                                size={17}
+                                                strokeWidth={1}
+                                                onClick={handleClearFilterColor}
+                                            />
                                         </div>
                                     )}
-                                    {size_id && (
-                                        <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
-                                            {size_id}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterSize} />
+                                    {selectedSize && (
+                                        <div className="ml-2 inline-flex items-center justify-center rounded-lg bg-slate-100">
+                                            {selectedSize.name}
+                                            <X
+                                                className="ml-1"
+                                                size={17}
+                                                strokeWidth={1}
+                                                onClick={handleClearFilterSize}
+                                            />
                                         </div>
                                     )}
-                                    {subcate && (
-                                        <div className="inline-flex items-center bg-slate-100 w-20 justify-center rounded-lg ml-2">
-                                            {subcate}<X className="ml-1" size={17} strokeWidth={1} onClick={handleClearFilterSubcate} />
+                                    {selectedSubcate && (
+                                        <div className="ml-2 inline-flex items-center justify-center rounded-lg bg-slate-100">
+                                            {selectedSubcate.name}
+                                            <X
+                                                className="ml-1"
+                                                size={17}
+                                                strokeWidth={1}
+                                                onClick={handleClearFilterSubcate}
+                                            />
                                         </div>
                                     )}
                                 </div>
-                                <div >
-                                    <div
-                                        className=" text-black  cursor-pointer flex items-center justify-end w-48"
-                                        onClick={toggleCollapseArrange}
-                                    >
-                                        <h2 className="text-base   ">Sắp xếp theo</h2> <ChevronDown size={17} strokeWidth={1.5} />
+                                <div>
+                                    <div className="flex w-40 gap-2 xl:block xl:w-full">
+                                        <div
+                                            onClick={handleFilterMobile}
+                                            className="flex w-full cursor-pointer items-center rounded-lg border border-slate-300 p-1 text-black hover:bg-slate-100 xl:hidden xl:p-2"
+                                        >
+                                            <p className="text-[13px] xl:text-base">Bộ lọc</p>
+                                            <Filter size={17} strokeWidth={1.5} />
+                                        </div>
+                                        <div
+                                            className="flex w-full cursor-pointer items-center rounded-lg border border-slate-300 p-1 text-black hover:bg-slate-100 xl:p-2"
+                                            onClick={toggleCollapseArrange}
+                                        >
+                                            <h2 className="text-[13px] xl:text-base">Sắp xếp </h2>{" "}
+                                            <ChevronDown size={17} strokeWidth={1.5} />
+                                        </div>
                                     </div>
-
                                     {/* Nội dung Collapse */}
                                     <div
-                                        className={` absolute transition-max-height duration-500 ease-in-out overflow-hidden  ${isOpenArrange ? 'max-h-40' : 'max-h-0 '
+                                        className={`transition-max-height absolute right-1 mt-2 overflow-hidden duration-500 ease-in-out ${isOpenArrange ? "max-h-40" : "max-h-0"
                                             }`}
                                     >
-                                        <div className="p-4  bg-white border-2 rounded" >
-
-                                            <label className="block mb-2">
+                                        <div className="rounded border-2 bg-white p-2">
+                                            <label className="mb-2 block">
                                                 <button
-                                                    className={`mr-2 p-1 ${sortOrder === "lowToHigh" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                                                    className={`p-1 text-[12px] xl:text-base ${sortOrder === "lowToHigh" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
                                                     onClick={() => setSortOrder("lowToHigh")}
                                                 >
                                                     Từ thấp đến cao
                                                 </button>
                                             </label>
-                                            <label className="block mb-2">
+                                            <label className="mb-2 block">
                                                 <button
-                                                    className={` mr-2 p-1 ${sortOrder === "highToLow" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                                                    className={`p-1 text-[12px] xl:text-base ${sortOrder === "highToLow" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
                                                     onClick={() => setSortOrder("highToLow")}
                                                 >
                                                     Từ cao đến thấp
@@ -491,15 +615,18 @@ const AllProducts = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-3">
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3">
                             {
                                 // Kiểm tra từng mảng có dữ liệu và chỉ hiển thị mảng có dữ liệu
-                                (filterProductsPrice.length > 0) ? (
-
-                                    filterProductsPrice.map((item, index) => (
-                                        <div key={index || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                                filterProductsPrice.length > 0 ? (
+                                    filterProductsPrice.map((item) => (
+                                        <div
+                                            key={item.id || item.name}
+                                            className="relative ml-1 mt-4 md:ml-2 lg:ml-3 xl:ml-0"
+                                        >
                                             <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
-                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                                <div className="group relative right-0 mb-4 ml-1 h-[60vw] w-[45vw] transition-all duration-500 ease-in-out md:h-[42vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
                                                     <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
                                                         <img
                                                             src={`http://127.0.0.1:8000/storage/${item.image}`}
@@ -508,46 +635,52 @@ const AllProducts = () => {
                                                         />
                                                     </div>
                                                     <div className="relative">
-                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                        <div className="absolute bottom-[25px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 xl:bottom-[30px] xl:space-x-4">
+                                                            <Link
+                                                                to={`/productdetail/${item.id}/subcate/${item.sub_category_id}`}
+                                                                className="translate-y-[30px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-[50] ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2"
+                                                            >
                                                                 <Eye
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
                                                                 />
-                                                            </a>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                            </Link>
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
                                                                 <ShoppingCart
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
+                                                                    onClick={() =>
+                                                                        openModal(item.id, item.sub_category_id)
+                                                                    }
                                                                 />
                                                             </div>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
                                                                 <Heart
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
                                                                 />
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <a className="block overflow-hidden">
-                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                        <div className="truncate text-center text-sm hover:text-yellow-500 md:text-base lg:text-base xl:text-base">
                                                             {item.name}
                                                         </div>
-                                                        <div className="text-center block">
+                                                        <div className="block text-center">
                                                             {item.price_sale !== null ? (
                                                                 <>
-                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                    <span className="mr-1 text-xs text-gray-500 line-through hover:text-yellow-500 md:text-sm lg:text-base xl:text-base">
                                                                         {formatPrice(item.price)}
                                                                     </span>
-                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                    <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
                                                                         {formatPrice(item.price_sale)}
                                                                     </span>
                                                                 </>
                                                             ) : (
-                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
                                                                     {formatPrice(item.price)}
                                                                 </span>
                                                             )}
@@ -557,12 +690,15 @@ const AllProducts = () => {
                                             </div>
                                         </div>
                                     ))
-                                ) : (searchResults.length > 0) ? (
+                                ) : searchResults.length > 0 ? (
                                     // Hiển thị searchResults nếu có dữ liệu
                                     searchResults.map((item) => (
-                                        <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
+                                        <div
+                                            key={item.id}
+                                            className="relative ml-1 mt-4 md:ml-2 lg:ml-3 xl:ml-0"
+                                        >
                                             <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
-                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                                <div className="group relative right-0 mb-4 ml-1 h-[60vw] w-[45vw] transition-all duration-500 ease-in-out md:h-[42vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
                                                     <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
                                                         <img
                                                             src={`http://127.0.0.1:8000/storage/${item.image}`}
@@ -571,46 +707,52 @@ const AllProducts = () => {
                                                         />
                                                     </div>
                                                     <div className="relative">
-                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                        <div className="absolute bottom-[25px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 xl:bottom-[30px] xl:space-x-4">
+                                                            <Link
+                                                                to={`/productdetail/${item.id}/subcate/${item.sub_category_id}`}
+                                                                className="translate-y-[30px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-[50] ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2"
+                                                            >
                                                                 <Eye
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
                                                                 />
-                                                            </a>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                            </Link>
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
                                                                 <ShoppingCart
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
+                                                                    onClick={() =>
+                                                                        openModal(item.id, item.sub_category_id)
+                                                                    }
                                                                 />
                                                             </div>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
                                                                 <Heart
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
                                                                 />
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <a className="block overflow-hidden">
-                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                        <div className="truncate text-center text-sm hover:text-yellow-500 md:text-base lg:text-base xl:text-base">
                                                             {item.name}
                                                         </div>
-                                                        <div className="text-center block">
+                                                        <div className="block text-center">
                                                             {item.price_sale !== null ? (
                                                                 <>
-                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                    <span className="mr-1 text-xs text-gray-500 line-through hover:text-yellow-500 md:text-sm lg:text-base xl:text-base">
                                                                         {formatPrice(item.price)}
                                                                     </span>
-                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                    <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
                                                                         {formatPrice(item.price_sale)}
                                                                     </span>
                                                                 </>
                                                             ) : (
-                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
                                                                     {formatPrice(item.price)}
                                                                 </span>
                                                             )}
@@ -620,12 +762,14 @@ const AllProducts = () => {
                                             </div>
                                         </div>
                                     ))
-                                ) : (getFilteredAndSortedProducts().length > 0) ? (
-                                    // Nếu productNew không có dữ liệu, kiểm tra và hiển thị getFilteredAndSortedProducts()
-                                    getFilteredAndSortedProducts().map((item) => (
-                                        <div key={item.id || item.name} className="relative mt-4 ml-3.5 md:ml-4 lg:ml-3">
-                                            <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
-                                                <div className="group relative mb-4 h-[80vw] w-[45vw] ml-1 right-0 transition-all duration-500 ease-in-out md:h-[60vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                ) : productNew.length > 0 ? (
+                                    productNew.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="relative ml-1 mt-4 md:ml-2 lg:ml-3 xl:ml-0"
+                                        >
+                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                                                <div className="group relative right-0 mb-4 ml-1 h-[60vw] w-[45vw] transition-all duration-500 ease-in-out md:h-[42vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:h-[25vw] xl:w-[16vw]">
                                                     <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
                                                         <img
                                                             src={`http://127.0.0.1:8000/storage/${item.image}`}
@@ -634,46 +778,124 @@ const AllProducts = () => {
                                                         />
                                                     </div>
                                                     <div className="relative">
-                                                        <div className="absolute bottom-[30px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                                            <a className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                        <div className="absolute bottom-[25px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 xl:bottom-[30px] xl:space-x-4">
+                                                            <Link
+                                                                to={`/productdetail/${item.id}/subcate/${item.sub_category_id}`}
+                                                                className="translate-y-[30px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-[50] ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2"
+                                                            >
                                                                 <Eye
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
                                                                 />
-                                                            </a>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                            </Link>
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
                                                                 <ShoppingCart
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
+                                                                    onClick={() =>
+                                                                        openModal(item.id, item.sub_category_id)
+                                                                    }
                                                                 />
                                                             </div>
-                                                            <div className="rounded-full bg-white p-2 hover:bg-black hover:text-white">
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
                                                                 <Heart
                                                                     color="currentColor"
                                                                     strokeWidth="1.5"
-                                                                    className="w-4 h-4 sm:w-8 sm:h-8 md:w-7 md:h-7 lg:w-7 lg:h-7 xl:w-6 xl:h-6"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
                                                                 />
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <a className="block overflow-hidden">
-                                                        <div className="truncate text-center text-sm md:text-base lg:text-base xl:text-base hover:text-yellow-500">
+                                                        <div className="truncate text-center text-sm hover:text-yellow-500 md:text-base lg:text-base xl:text-base">
                                                             {item.name}
                                                         </div>
-                                                        <div className="text-center block">
+                                                        <div className="block text-center">
                                                             {item.price_sale !== null ? (
                                                                 <>
-                                                                    <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                                    <span className="mr-1 text-xs text-gray-500 line-through hover:text-yellow-500 md:text-sm lg:text-base xl:text-base">
                                                                         {formatPrice(item.price)}
                                                                     </span>
-                                                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                    <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
                                                                         {formatPrice(item.price_sale)}
                                                                     </span>
                                                                 </>
                                                             ) : (
-                                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                                <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
+                                                                    {formatPrice(item.price)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : getFilteredAndSortedProducts().length > 0 ? (
+                                    // Nếu productNew không có dữ liệu, kiểm tra và hiển thị getFilteredAndSortedProducts()
+                                    getFilteredAndSortedProducts().map((item) => (
+                                        <div
+                                            key={item.id || item.name}
+                                            className="relative ml-1 mt-4 md:ml-2 lg:ml-3 xl:ml-0"
+                                        >
+                                            <div className="product-carousel grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-7">
+                                                <div className="group relative right-0 mb-4 ml-1 h-[60vw] w-[45vw] transition-all duration-500 ease-in-out md:h-[42vw] md:w-[30vw] lg:h-[28vw] lg:w-[17vw] xl:w-[18vw]">
+                                                    <div className="mb-3 h-[90%] w-full overflow-hidden bg-slate-200 transition-transform duration-500 ease-in-out">
+                                                        <img
+                                                            src={`http://127.0.0.1:8000/storage/${item.image}`}
+                                                            alt={item.name || "Product Image"}
+                                                            className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+                                                        />
+                                                    </div>
+                                                    <div className="relative">
+                                                        <div className="absolute bottom-[25px] left-0 right-0 z-10 flex translate-y-10 transform justify-center space-x-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 xl:bottom-[30px] xl:space-x-4">
+                                                            <Link
+                                                                to={`/productdetail/${item.id}/subcate/${item.sub_category_id}`}
+                                                                className="translate-y-[30px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-[50] ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2"
+                                                            >
+                                                                <Eye
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
+                                                                />
+                                                            </Link>
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
+                                                                <ShoppingCart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
+                                                                    onClick={() =>
+                                                                        openModal(item.id, item.sub_category_id)
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            <div className="translate-y-[35px] transform rounded-full bg-white p-[6px] opacity-0 transition-all duration-500 ease-out hover:bg-black hover:text-white group-hover:translate-y-0 group-hover:opacity-100 lg:p-[5px] xl:lg:p-2">
+                                                                <Heart
+                                                                    color="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    className="h-[14px] w-[14px] sm:h-6 sm:w-6 md:h-5 md:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <a className="block overflow-hidden">
+                                                        <div className="truncate text-center text-sm hover:text-yellow-500 md:text-base lg:text-base xl:text-base">
+                                                            {item.name}
+                                                        </div>
+                                                        <div className="block text-center">
+                                                            {item.price_sale !== null ? (
+                                                                <>
+                                                                    <span className="mr-1 text-xs text-gray-500 line-through hover:text-yellow-500 md:text-sm lg:text-base xl:text-base">
+                                                                        {formatPrice(item.price)}
+                                                                    </span>
+                                                                    <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
+                                                                        {formatPrice(item.price_sale)}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-sm hover:text-yellow-500 md:text-base lg:text-lg xl:text-xl">
                                                                     {formatPrice(item.price)}
                                                                 </span>
                                                             )}
@@ -684,47 +906,299 @@ const AllProducts = () => {
                                         </div>
                                     ))
                                 ) : (
-                                    <p>Chưa có sản phẩm</p>
+                                    <p className="text-center">Chưa có sản phẩm</p>
                                 )
                             }
                         </div>
 
-
-                        <div className="flex justify-center mt-4">
+                        <div className="hidden w-full justify-center p-4 xl:flex">
                             {/* Nút Previous */}
                             <button
-
-                                className="mx-2 p-1 border-2 text-gray-700 rounded-md hover:bg-yellow-300"
+                                className="mx-1 rounded-md text-gray-700 hover:bg-yellow-300"
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
                             >
                                 <ChevronLeft strokeWidth={0.5} />
                             </button>
-
                             {/* Số trang */}
 
-                            <button
-
-
-                                className="mx-1 px-3 py-1 border-2 rounded-md  text-gray-700 hover:bg-yellow-100"
-
-                            >
-                                1
-                            </button>
-
-
+                            <span className="p-2 opacity-60">{` ${currentPage} / ${totalPages}`}</span>
                             {/* Nút Next */}
                             <button
-
-                                className="mx-2 p-1 border-2 text-gray-700 rounded-md hover:bg-yellow-300"
+                                onClick={() =>
+                                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                                }
+                                disabled={currentPage === totalPages}
+                                className="mx-1 rounded-md text-gray-700 hover:bg-yellow-300"
                             >
                                 <ChevronRight strokeWidth={0.5} />
                             </button>
                         </div>
                     </div>
                 </div>
+                <div className="flex w-full justify-center p-4 shadow-lg xl:hidden">
+                    {/* Nút Previous */}
+                    <button
+                        className="mx-1 rounded-md text-gray-700 hover:bg-yellow-300"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft strokeWidth={0.5} />
+                    </button>
+                    {/* Số trang */}
 
-            </div >
+                    <span className="p-2 opacity-60">{` ${currentPage} / ${totalPages}`}</span>
+                    {/* Nút Next */}
+                    <button
+                        onClick={() =>
+                            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                        }
+                        disabled={currentPage === totalPages}
+                        className="mx-1 rounded-md text-gray-700 hover:bg-yellow-300"
+                    >
+                        <ChevronRight strokeWidth={0.5} />
+                    </button>
+                </div>
+            </div>
+            <div>
+                {/* Modal filter mobile */}
+                {isFilterMobile && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="w-11/12 rounded-lg bg-white p-6 sm:w-2/3 md:w-1/2 lg:w-1/3">
+                            {/* Nội dung modal */}
+
+                            <div className="scrollable-content h-[500px] overflow-y-scroll md:h-[500px]">
+                                <div className="mt-5 text-2xl sm:text-lg">Bộ lọc</div>
+                                <div className="sm:w-full md:w-full lg:w-48 xl:w-64">
+                                    {/* Header Collapse */}
+                                    <div
+                                        className="flex cursor-pointer items-center p-4 sm:p-2"
+                                        onClick={toggleCollapseSex}
+                                    >
+                                        <h2 className="mr-2 text-base sm:text-sm">Giới tính</h2>
+                                        <ChevronDown size={17} strokeWidth={1.5} />
+                                    </div>
+
+                                    {/* Nội dung Collapse */}
+                                    <div
+                                        className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenSex ? "max-h-40" : "max-h-0"
+                                            }`}
+                                    >
+                                        <div className="p-4 sm:p-2">
+                                            {categories.map((item, index) => (
+                                                <label
+                                                    key={index}
+                                                    className="mb-2 block text-base sm:text-sm"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        className="mr-2 sm:h-4 sm:w-4"
+                                                        onChange={(e) =>
+                                                            handleCate(item.name, e.target.checked)
+                                                        }
+                                                        checked={category === item.name}
+                                                        name="cate"
+                                                    />
+                                                    {item.name}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div>
+                                        <div
+                                            className="flex cursor-pointer items-center p-4"
+                                            onClick={toggleCollapseShirt}
+                                        >
+                                            <h2 className="mr-2 text-base">Áo</h2>
+                                            <ChevronDown size={17} strokeWidth={1.5} />
+                                        </div>
+
+                                        {/* Nội dung Collapse */}
+                                        <div
+                                            className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenShirt ? "max-h-auto" : "max-h-0"
+                                                }`}
+                                        >
+                                            <div className="p-4">
+                                                {subcates.map((item, index) => (
+                                                    <label key={index} className="mb-2 block">
+                                                        <input
+                                                            type="checkbox"
+                                                            value={item.name}
+                                                            className="mr-2"
+                                                            onChange={(e) =>
+                                                                handleSubCate(
+                                                                    item.id,
+                                                                    item.name,
+                                                                    e.target.checked,
+                                                                )
+                                                            }
+                                                            checked={selectedSubcate?.id === item.id}
+                                                        />
+                                                        {item.name}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div>
+                                            <div
+                                                className="flex cursor-pointer items-center p-4 text-black"
+                                                onClick={toggleCollapsePrice}
+                                            >
+                                                <h2 className="mr-2 text-base">Khoảng giá</h2>{" "}
+                                                <ChevronDown size={17} strokeWidth={1.5} />
+                                            </div>
+
+                                            {/* Nội dung Collapse */}
+                                            <div
+                                                className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenPrice ? "max-h-40" : "max-h-0"
+                                                    }`}
+                                            >
+                                                <div className="p-4">
+                                                    <form>
+                                                        <label className="mb-2 block">
+                                                            <input
+                                                                type="checkbox"
+                                                                name="price-range"
+                                                                className="mr-2"
+                                                                onChange={(e) =>
+                                                                    handlePriceChange(
+                                                                        150000,
+                                                                        350000,
+                                                                        e.target.checked,
+                                                                    )
+                                                                }
+                                                                checked={
+                                                                    priceRange?.min === 150000 &&
+                                                                    priceRange?.max === 350000
+                                                                }
+                                                            />
+                                                            Từ 150.000 - 350.000
+                                                        </label>
+                                                        <label className="mb-2 block">
+                                                            <input
+                                                                type="checkbox"
+                                                                name="price-range"
+                                                                className="mr-2"
+                                                                onChange={(e) =>
+                                                                    handlePriceChange(
+                                                                        350000,
+                                                                        550000,
+                                                                        e.target.checked,
+                                                                    )
+                                                                }
+                                                                checked={
+                                                                    priceRange?.min === 350000 &&
+                                                                    priceRange?.max === 550000
+                                                                }
+                                                            />
+                                                            Từ 350.000 - 550.000
+                                                        </label>
+                                                        <label className="mb-2 block">
+                                                            <input
+                                                                type="checkbox"
+                                                                name="price-range"
+                                                                className="mr-2"
+                                                                onChange={(e) =>
+                                                                    handlePriceChange(
+                                                                        550000,
+                                                                        Number.MAX_SAFE_INTEGER,
+                                                                        e.target.checked,
+                                                                    )
+                                                                }
+                                                                checked={
+                                                                    priceRange?.min === 550000 &&
+                                                                    priceRange?.max === Number.MAX_SAFE_INTEGER
+                                                                }
+                                                            />
+                                                            Trên 550.000
+                                                        </label>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <hr />
+
+                                            <div className="mb-2 mt-3 text-sm">
+                                                <span>Màu Sắc: </span>
+                                                <div className="mt-2 flex space-x-2">
+                                                    {color.map((item, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="inline-flex items-center"
+                                                        >
+                                                            <label className="relative flex cursor-pointer items-center">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="peer h-7 w-7 cursor-pointer appearance-none rounded-full border border-slate-300 shadow transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                                                    onChange={(e) =>
+                                                                        handleColor(
+                                                                            item.id,
+                                                                            item.name,
+                                                                            e.target.checked,
+                                                                        )
+                                                                    }
+                                                                    checked={selectedColor?.id === item.id}
+                                                                    style={{
+                                                                        backgroundColor: item.color_code,
+                                                                    }}
+                                                                />
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="mt-4">
+                                                <h2 className="mb-2">Kích Thước</h2>
+                                                <div className="inline-flex items-center">
+                                                    {size.map((item, index) => (
+                                                        <div key={index} className="mr-2 flex space-x-2">
+                                                            <label className="relative flex cursor-pointer items-center">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
+                                                                    onChange={(e) =>
+                                                                        handleSize(
+                                                                            item.id,
+                                                                            item.name,
+                                                                            e.target.checked,
+                                                                        )
+                                                                    } // Gọi handleSize khi thay đổi
+                                                                    checked={selectedSize?.id === item.id} // Kiểm tra nếu size_id trùng với item.id thì checkbox được chọn
+                                                                />
+                                                                <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm uppercase text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
+                                                                    {item.name}
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Nút đóng modal */}
+                            <div className="flex justify-center">
+                                <button
+                                    onClick={closeFilterMobile}
+                                    className="rounded bg-red-500 px-4 py-2 text-white"
+                                >
+                                    OK
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <ModalAddToCart
+                    isOpenModalAddToCart={isOpenModalAddToCart}
+                    closeModal={closeModal}
+                    productId={selectedProductId}
+                />
+            </div>
         </>
-    )
-}
+    );
+};
 
-export default AllProducts
+export default AllProducts;

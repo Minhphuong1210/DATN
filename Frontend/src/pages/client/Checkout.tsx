@@ -85,11 +85,11 @@ const Checkout = () => {
             console.log(response);
             setPricePromotion(response.data.discount_amount);
             settotal_price_after_discount(response.data.total_price_after_discount);
-           
-            if(response.data.message){
+
+            if (response.data.message) {
                 toast.success(response.data.message)
-                
-            }else{
+
+            } else {
                 toast.error(response.data.error);
             }
             localStorage.setItem('promotion_id', response.data.promotion_id)
@@ -101,14 +101,14 @@ const Checkout = () => {
             }
         }
     }
-    const promotion_id=localStorage.getItem('promotion_id')
+    const promotion_id = localStorage.getItem('promotion_id')
     // console.log(promotion_id);
-    
+
     //chheck Thanh toán thanh công
     const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
     // console.log(promotion_id);
     const checkResponseCode = async () => {
-        
+
         if (!shippingInfo || !total || shippingCost === undefined) {
             console.error("Data is missing:", { shippingInfo, total, shippingCost });
             return;
@@ -154,7 +154,6 @@ const Checkout = () => {
                     commodity_money: (total?.subtotal || 0) + (shippingCost || 0),
                     total_amount: (total?.subtotal || 0) + (shippingCost || 0),
                     shipping_id: shippingInfoo.shippingMethod,
-
                     vnp_TxnReff: paymentData.vnp_TxnRef,
                     promotion_id: promotion_id
 

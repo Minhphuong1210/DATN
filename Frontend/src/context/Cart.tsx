@@ -3,6 +3,7 @@ import axios from "axios";
 import { Cart_detail } from "../interfaces/Cart";
 import { toast } from "react-toastify";
 import { Product } from "../interfaces/Product";
+import { useLoading } from "./Loading";
 
 // Interface cho context của giỏ hàng
 interface CartContextType {
@@ -36,7 +37,7 @@ interface CartProviderProps {
 // CartProvider để quản lý trạng thái giỏ hàng
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<Cart_detail[]>([]);
-
+  const { setLoading } = useLoading()
   // Hàm để thêm sản phẩm vào giỏ hàng
   const addToCart = async (product: Product, color_id: string, size_id: string, quantity: number) => {
     try {
@@ -49,6 +50,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         toast.error('Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng');
         return;
       }
+      setLoading(true)
       await axios.post('/api/cart/add', {
         id: product.id,
         color_id,
@@ -62,9 +64,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         ...prevItems,
         { product, color_id, size_id, quantity }
       ]);
+
       toast.success('Thêm sản phẩm vào giỏ hàng thành công');
     } catch {
       toast.error('Sản phẩm đã hết hàng hoặc có lỗi xảy ra');
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -72,6 +77,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Hàm để xoá sản phẩm khỏi giỏ hàng
   const removeFromCart = async (id: number) => {
     try {
+      setLoading(true)
       const response = await axios.delete(`/api/cart/${id}/delete`);
       toast.success(response.data.message);
       fetchCartItems()
@@ -82,12 +88,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     } catch (error) {
       console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng:", error);
       setCart([]);
+    } finally {
+      setLoading(false)
     }
   };
 
   // Hàm để lấy tất cả sản phẩm trong giỏ hàng từ API
   const fetchCartItems = async () => {
     try {
+      setLoading(true)
       const response = await axios.get("/api/cart");
       if (response.data && Array.isArray(response.data.cart)) {
         setCart(response.data.cart);
@@ -98,12 +107,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu giỏ hàng:", error);
       setCart([]);
+    } finally {
+      setLoading(false)
     }
   };
 
   // Hàm tăng số lượng sản phẩm
   const increaseQuantity = async (id: number) => {
     try {
+      setLoading(true)
       const updatedCart = cart.map(item =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       );
@@ -111,12 +123,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       await axios.put(`/api/cart/${id}/update`, { quantity: updatedCart.find(item => item.id === id)?.quantity });
     } catch (error) {
       console.error("Lỗi khi tăng số lượng sản phẩm:", error);
+    } finally {
+      setLoading(false)
     }
   };
 
   // Hàm giảm số lượng sản phẩm
   const decreaseQuantity = async (id: number) => {
     try {
+      setLoading(true)
       const updatedCart = cart.map(item =>
         item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item
       );
@@ -124,6 +139,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       await axios.put(`/api/cart/${id}/update`, { quantity: updatedCart.find(item => item.id === id)?.quantity });
     } catch (error) {
       console.error("Lỗi khi giảm số lượng sản phẩm:", error);
+    } finally {
+      setLoading(false)
     }
   };
 
