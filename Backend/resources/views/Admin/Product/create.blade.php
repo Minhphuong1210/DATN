@@ -62,9 +62,24 @@
                                             @enderror
                                         </div>
                                         <div class="mb-3">
-                                            <label for="simpleinput" class="form-label">content</label>
-                                            <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" name="content"></textarea>
+                                            <label for="content" class="form-label">Content</label>
+                                            <textarea class="form-control" id="content" name="content"></textarea>
                                         </div>
+                                        <script>
+                                            // Kích hoạt CKEditor
+                                            CKEDITOR.replace('content', {
+                                                language: 'vi',
+                                                toolbar: [
+                                                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+                                                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'] },
+                                                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] },
+                                                    { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                                                    { name: 'colors', items: ['TextColor', 'BGColor'] },
+                                                    { name: 'tools', items: ['Maximize'] },
+                                                ],
+                                                height: 300,
+                                            });
+                                        </script>
                                         <div class="mb-3">
                                             <label for="simpleinput" class="form-label">price_sale</label>
                                             <input type="text" id="simpleinput"
@@ -76,7 +91,7 @@
                                             @enderror
                                         </div>
                                         <div class="mb-3">
-                                            <label for="simpleinput" class="form-label">Danh mục sản phẩm</label>
+                                            <label for="simpleinput" class="form-label">Category</label>
                                             <select class="form-select" aria-label="Default select example"
                                                 name="sub_category_id">
                                                 @foreach ($categories as $cat)
@@ -120,8 +135,7 @@
                                                     <tr class="">
                                                         <td class="d-flex align-items-center">
                                                             <div class="mb-3 mx-3">
-                                                                <label for="simpleinput" class="form-label">Màu
-                                                                    sắc</label>
+                                                                <label for="simpleinput" class="form-label">Color</label>
                                                                 <select class="form-select"
                                                                     aria-label="Default select example"
                                                                     name="products[0][color_id]">
@@ -132,8 +146,7 @@
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3 mx-3">
-                                                                <label for="simpleinput" class="form-label">Kích
-                                                                    thước</label>
+                                                                <label for="simpleinput" class="form-label">Size</label>
                                                                 <select class="form-select"
                                                                     aria-label="Default select example"
                                                                     name="products[0][size_id]">
@@ -144,8 +157,7 @@
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">
-                                                                <label for="simpleinput" class="form-label">Số
-                                                                    lượng</label>
+                                                                <label for="simpleinput" class="form-label">Quantity</label>
                                                                 <input type="text" name="products[0][quantity]"
                                                                     class="form-control">
                                                             </div>

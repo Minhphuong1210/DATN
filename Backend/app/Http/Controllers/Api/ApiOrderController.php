@@ -219,11 +219,11 @@ class ApiOrderController extends Controller
                     $vnpayy = Vnpayy::where('vnp_TxnRef', $vnp_TxnReff)->first();
                     if ($vnpayy) {
                         $order->vnpayy_id = $vnpayy->id;
-                        $order->order_payment=Order::CHO_XAC_NHA;
+                        $order->order_payment = Order::CHO_XAC_NHA;
                         $order->save();
                     }
                 }
-                if($params['promotion_id']){
+                if ($params['promotion_id']) {
                     $promotion = Promotion::query()->where('id', $params['promotion_id'])->first();
                     $promotion->usage_limit -= 1;
                     $promotion->save();
@@ -302,12 +302,28 @@ class ApiOrderController extends Controller
         DB::beginTransaction();
         try {
             if ($request->has('huy_don_hang')) {
-                if ($donHang = Order::DANG_VAN_CHUYEN) {
+                if ($donHang->order_status == 'dang_van_chuyen') {
                     return response()->json([
                         'error' => 'Cập nhật không thành công'
                     ]);
                 }
                 $donHang['order_status'] = Order::HUY_HANG;
+                foreach ($donHang->OrderDetail as $item) {
+                    $soluong = $item['quantity'];
+                    $product_id = $item->product_detail_id;
+
+                    $product_detail = ProductDetail::query()->where('id', $product_id)->first();
+                    if ($product_detail) {
+                        $product_detail->quantity += $soluong;
+                        $product_detail->save();
+
+                    } else {
+                        return response()->json(['message' => 'Không tìm thấy sản phẩm']);
+                    }
+                }
+                // $soluong = $donHang->OrderDetail->quantity;
+                // $product_id =$donHang->OrderDetail->product_detail_id;
+
                 $donHang->save();
 
                 DB::commit();

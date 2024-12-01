@@ -55,7 +55,7 @@ class PromotionController extends Controller
             return response()->json(['error' => 'Bạn đã sử dụng mã khuyến mãi này rồi'], 200);
         }
 
-        }
+        
         $checkUser = Order::query()
             ->where('user_id', $user_id)
             ->where('promotion_id', $promotion->id)
