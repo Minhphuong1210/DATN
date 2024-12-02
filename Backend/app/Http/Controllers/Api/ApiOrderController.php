@@ -320,6 +320,22 @@ class ApiOrderController extends Controller
                     ]);
                 }
                 $donHang['order_status'] = Order::HUY_HANG;
+                foreach ($donHang->OrderDetail as $item) {
+                    $soluong = $item['quantity'];
+                    $product_id = $item->product_detail_id;
+
+                    $product_detail = ProductDetail::query()->where('id', $product_id)->first();
+                    if ($product_detail) {
+                        $product_detail->quantity += $soluong;
+                        $product_detail->save();
+
+                    } else {
+                        return response()->json(['message' => 'Không tìm thấy sản phẩm']);
+                    }
+                }
+                // $soluong = $donHang->OrderDetail->quantity;
+                // $product_id =$donHang->OrderDetail->product_detail_id;
+
                 $donHang->save();
 
                 DB::commit();
