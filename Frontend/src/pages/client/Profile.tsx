@@ -12,9 +12,6 @@ const Profile = () => {
             setName(user.name ?? "Anonymous");
         }
     }, []);
-
-
-
     return (
         <>
             <div className="mx-[150px] mb-96">

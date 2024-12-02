@@ -144,11 +144,15 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
             Route::put('/{id}/update', [UserController::class, 'update'])->name('update');
             Route::delete('/{id}/destroy', [UserController::class, 'destroy'])->name('destroy');
         });
+
         Route::prefix('comment')->as('comment.')->group(function () {
             Route::get('comment', [CommentController::class, 'index'])->name('index');
             Route::put('{id}/status', [CommentController::class, 'update'])->name('update');
 
         });
     });
+
     
+    });
+   
 });
