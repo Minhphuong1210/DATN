@@ -48,7 +48,7 @@ class ApiWishlistController extends Controller
             return response()->json(['message' => 'Sản phẩm đã được thêm vào danh sách yêu thích'], 201);
         }
 
-        return response()->json(['message' => 'Sản phẩm đã tồn tại trong danh sách yêu thích'], 409);
+        return response()->json(['error' => 'Sản phẩm đã tồn tại trong danh sách yêu thích'], 200);
     }
 
     // Xóa sản phẩm khỏi danh sách yêu thích

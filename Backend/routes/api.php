@@ -43,8 +43,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // API xóa sản phẩm khỏi giỏ hàng
     Route::delete('/cart/{id}/delete', [CartController::class, 'destroy']);
     //Sản phẩm gần đây
- Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed']);
- Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed']);
+ Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed'])->middleware('auth:sanctum');
+ Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed'])->middleware('auth:sanctum');
 
 
 });
@@ -119,3 +119,17 @@ Route::post('filterProduct',[ProductController::class,'filterProduct']);
 Route::get('productSubcate/{id}',[ApiProductController::class,'subcateProduct']);
 Route::get('Cate/{id}',[ApiProductController::class,'cateProduct']);
 Route::put('updatevnpay/{vnp_TxnRef}',[PaymentController::class,'updateVnpay']);
+
+Route::get('forgot_password',[ApiAuthController::class, 'forgot_password']);
+Route::post('check_forgot_password',[ApiAuthController::class, 'check_forgot_password']);
+// từ đây có thể xử lí thường
+Route::get('reset_password/{token}',[ApiAuthController::class, 'reset_password'])->name('account.reset_password');
+Route::post('reset_password/{token}',[ApiAuthController::class, 'check_reset_password']);
+
+
+
+
+
+// Error: Class "App\Http\Controllers\Api\Auth" not found in file C:\laragon\www\DATN\Backend\app\Http\Controllers\Api\ProductController.php on line 239
+
+

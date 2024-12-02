@@ -23,7 +23,9 @@ import Profile from './pages/client/Profile';
 import PrivateRoute from './components/client/PrivateRoute/PrivateRoute';
 import ScrollToTop from './components/ScrollToTop';
 import ProductsCate from './pages/client/ProductsCate';
-
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import ProductView from './pages/client/ProductView';
 function App() {
   return (
     <>
@@ -34,6 +36,8 @@ function App() {
         <Route path='/' element={<LayoutClient />} >
           <Route index element={<Home />} />
           <Route path='productdetail/:id/subcate/:idd' element={<ProductDetail />} />
+          <Route path='/forgotpassword' element={<ForgotPassword />} />
+          <Route path='/resetpassword/:token' element={<ResetPassword />} />
           <Route element={<PrivateRoute />}>
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
@@ -42,6 +46,7 @@ function App() {
             <Route path="wishlist" element={<ProductWishlist />} />
             <Route path="profile" element={<Profile />} >
               <Route path="order" element={<Order />} />
+              <Route path="/profile/productview" element={<ProductView />} />
               <Route index element={<AccountUpdate />} />
             </Route>
           </Route>

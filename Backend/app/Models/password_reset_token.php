@@ -13,6 +13,7 @@ class password_reset_token extends Model
         'token',
         'created_at'
     ];
+    
     // so sánh xem 2 email cods giống nhau không
     public function user(){
         return $this->hasOne(User::class , 'email','email');
