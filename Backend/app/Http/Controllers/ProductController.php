@@ -61,7 +61,7 @@ class ProductController extends Controller
             $params['is_show_home'] = $request->has('is_show_home') ? 1 : 0;
             $params['is_active'] = $request->has('is_active') ? 1 : 0;
 
-         
+
 //             $params['product_code'] = $request->name . '-' . $category_id . '-' . Str::random(3);
 
 
@@ -127,11 +127,12 @@ class ProductController extends Controller
         $subcategory = SubCategory::all();
         $color = ProductColor::all();
         $size = ProductSize::all();
+        $categories=Category::all();
         // $productDetai = $product->ProductDetail;
         // = $product->images;
 
         // dd($product, $subcategory, $color, $size,$productDetai,$images);
-        return view('Admin.Product.edit', compact('product', 'subcategory', 'color', 'size'));
+        return view('Admin.Product.edit', compact('product', 'subcategory', 'color', 'size','categories'));
     }
 
     /**

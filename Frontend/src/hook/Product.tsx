@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { Comment, ImageProd, Product } from "../interfaces/Product";
+import { Comment, ImageProd, Product, ProductView } from "../interfaces/Product";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useLoading } from "../context/Loading";
@@ -10,6 +10,7 @@ export const useProduct = () => {
     const [expiresTimeProducts, setExpiresTimeProducts] = useState();
     const [product, setProduct] = useState<Product>();
     const [productsHots, setProductsHots] = useState<Product[]>([]);
+    const [productView, setproductViews] = useState<ProductView[]>([]);
     const [imgsProduct, setImgsProduct] = useState<ImageProd>();
     const [productsSale, setProductsSale] = useState<Product[]>([]);
     const [comments, setComments] = useState<Comment[]>([]);
@@ -94,5 +95,18 @@ export const useProduct = () => {
     }, [id, idd]);
     // thêm bình luận
 
-    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory, imgsProduct, expiresTimeProducts };
+    const getProductView = async () => {
+        try {
+            const response = await axios.get('/api/products/recently-viewed');
+            setproductViews(response.data); // Dữ liệu trả về đúng cấu trúc log
+            console.log(response.data);
+        } catch (error) {
+            toast.error((error as AxiosError)?.message || 'Lỗi khi tải sản phẩm đã xem.');
+        }
+    };
+
+    useEffect(() => {
+        getProductView();
+    }, []);
+    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory, imgsProduct, expiresTimeProducts, productView, getProductView };
 };

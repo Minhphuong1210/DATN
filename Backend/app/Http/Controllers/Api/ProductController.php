@@ -9,7 +9,7 @@ use App\Models\Product;
 use App\Models\ProductDetail;
 use App\Models\ProductView;
 use App\Models\SubCategory;
-
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -236,18 +236,22 @@ class ProductController extends Controller
     // Hàm để lấy danh sách sản phẩm đã xem gần đây
     public function getRecentlyViewed(Request $request)
     {
-        $user = $request->user(); // Lấy người dùng hiện tại
-        if (!$user) {
+        $user_id = Auth::id();
+        // Lấy người dùng hiện tại
+        // return response()->json([
+        //     'user_id' => $user_id
+        // ],200);
+        if (!$user_id) {
             return response()->json([
                 'message' => 'Bạn chưa đăng nhập vui lòng đăng nhập'
-            ]);
+            ],200);
         }
 
-        $request->validate([
-            'product' => 'required'
-        ]);
+        // $request->validate([
+        //     'product' => 'required'
+        // ]);
         // Lấy danh sách sản phẩm đã xem gần đây của người dùng
-        $products = ProductView::where('user_id', $user->id)
+        $products = ProductView::where('user_id', $user_id)
             ->orderBy('viewed_at', 'desc')
             ->take(5) // Lấy 5 sản phẩm gần nhất
             ->with('product') // Eager load chi tiết sản phẩm
@@ -310,7 +314,7 @@ class ProductController extends Controller
                     'message' => 'Không có sản phẩm chúng tôi sẽ đổ sản các sản phẩm ra để bạn chọn'
                 ], 200);
             }
-        
+
             // Trả về kết quả khi có sản phẩm
             return response()->json([
                 'message' => 'Lọc thành công',

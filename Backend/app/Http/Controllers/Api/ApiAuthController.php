@@ -120,7 +120,7 @@ class ApiAuthController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
-            'password' => 'required',
+            // 'password' => 'required',
             'address' => 'required',
             'phone' => 'required'
         ]);
@@ -184,7 +184,7 @@ class ApiAuthController extends Controller
             $thoiGianHetHan = password_reset_token::where('token', $token)->delete();
             return response()->json(['message'=>'token đã hết hạn']);
         }
-        
+
         // // cách 1 cách 2 sang model
         // $user = User::where('email', $tokenData->email)->firstOrFail();
         // $user = $tokenData->user;
