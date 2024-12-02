@@ -125,13 +125,14 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $subcategory = SubCategory::all();
+        $categories = Category::all();
         $color = ProductColor::all();
         $size = ProductSize::all();
         // $productDetai = $product->ProductDetail;
         // = $product->images;
 
         // dd($product, $subcategory, $color, $size,$productDetai,$images);
-        return view('Admin.Product.edit', compact('product', 'subcategory', 'color', 'size'));
+        return view('Admin.Product.edit', compact('product', 'subcategory', 'color', 'size','categories'));
     }
 
     /**

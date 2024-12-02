@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
@@ -142,6 +143,11 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
             Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
             Route::put('/{id}/update', [UserController::class, 'update'])->name('update');
             Route::delete('/{id}/destroy', [UserController::class, 'destroy'])->name('destroy');
+        });
+        Route::prefix('comment')->as('comment.')->group(function () {
+            Route::get('comment', [CommentController::class, 'index'])->name('index');
+            Route::put('{id}/status', [CommentController::class, 'update'])->name('update');
+
         });
     });
     

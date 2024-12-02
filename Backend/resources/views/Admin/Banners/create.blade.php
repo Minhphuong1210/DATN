@@ -18,7 +18,7 @@
                         <div class="col-lg-12">
                             <form action="{{ route('admins.banner.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <div class="row">
+                                <div class="row d-flex flex-column">
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="title" class="form-label">Tiêu đề</label>
@@ -44,6 +44,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                
 
                                 <button type="submit" class="btn btn-primary justify-content-center">Thêm mới</button>
 
