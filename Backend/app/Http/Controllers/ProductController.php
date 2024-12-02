@@ -120,6 +120,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $subcategory = SubCategory::all();
+        $categories = Category::all();
         $color = ProductColor::all();
         $size = ProductSize::all();
 
