@@ -95,7 +95,6 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
 
 
 
-
   return (
     <div
       className={`sticky top-0 z-50 w-full bg-white p-[1px] px-[6px] lg:p-2`}

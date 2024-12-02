@@ -53,7 +53,7 @@
                                         <td>{{ number_format($item->price) }}</td>
                                         <td>{{ number_format($item->price_sale) }}</td>
                                         <td>{{ $item->description }}</td>
-                                        <td>{{ Str::words($item->content, 50) }}</td>
+                                        <td>{!! Str::limit($item->content, 50) !!}</td>
                                         @php
                                             $statusFields = [
                                                 'is_sale' => 'Sale',
