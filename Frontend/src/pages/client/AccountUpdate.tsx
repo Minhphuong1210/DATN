@@ -34,7 +34,7 @@ const AccountUpdate = () => {
                             name="name"
                             placeholder='Nhập tên'
                             className='w-full p-2 border border-gray-300 rounded-md'
-                            value={user.name}
+                            value={user.name ?? ""}
                             onChange={handleChange}
                         />
                     </div>
@@ -45,7 +45,7 @@ const AccountUpdate = () => {
                             name="email"
                             placeholder='Nhập email'
                             className='w-full p-2 border border-gray-300 rounded-md'
-                            value={user.email}
+                            value={user.email ?? ""}
                             onChange={handleChange}
                         />
                     </div>
@@ -56,7 +56,7 @@ const AccountUpdate = () => {
                             name="phone"
                             placeholder='Nhập số điện thoại'
                             className='w-full p-2 border border-gray-300 rounded-md'
-                            value={user.phone}
+                            value={user.phone ?? ""}
                             onChange={handleChange}
                         />
                     </div>
@@ -67,10 +67,9 @@ const AccountUpdate = () => {
                             name="address"
                             placeholder='Nhập địa chỉ'
                             className='w-full p-2 border border-gray-300 rounded-md'
-                            value={user.address}
+                            value={user.address ?? ""}
                             onChange={handleChange}
-                        />
-                    </div>
+                        /></div>
                     <button className='bg-yellow-300 text-white px-4 py-2 rounded' type="submit">Cập nhật</button>
                 </form>
             </div>
