@@ -11,7 +11,7 @@ import { useLoading } from "../../../../context/Loading";
 
 import { useCart } from "../../../../context/Cart";
 import { Badge } from "@mui/material";
-import ModalCart from "../../ModalCart/ModalCart";
+
 import MenuHeader from "./Menu/MenuHeaderDesktop";
 import MenuMobile from "./Menu/MenuMobile";
 // import { useLoading } from "../../../../context/Loading";
@@ -24,7 +24,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [openMenu, setOpenMenu] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpenCart, setsOpenCart] = useState(false);
+
   const [isOpenUser, setIsOpenUser] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { totalQuantity } = useCart();
@@ -34,7 +34,6 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [isAnimaton, setIsAnimaton] = useState(false);
 
 
-  const [cartCount, setCartCount] = useState(0); // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
 
 
   const handleOpenCart = () => {
@@ -46,9 +45,9 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   };
 
 
-//     setsOpenCart(false)
-//   }
-// Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
+  //     setsOpenCart(false)
+  //   }
+  // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
   const handleMenu = () => {
     if (openMenu) {
       // Khi đóng menu, bắt đầu hiệu ứng
@@ -93,6 +92,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
       setIsAnimaton(false);
     }
   }, [openMenu]);
+
 
 
   return (
@@ -254,9 +254,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               />
             ) : null}
             <div
-              className="relative"
-              onMouseEnter={handleOpenCart}
-              onMouseLeave={handleCloseCart}
+
             >
               <Badge badgeContent={totalQuantity} color="primary">
                 <a href="/cart">
@@ -278,13 +276,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           />
         )}
 
-        {isOpenCart && (
-          <ModalCart
-            handleMouseEnterCart={handleOpenCart}
-            handleMouseLeaveCart={handleCloseCart}
-            isOpenModalCart={isOpenCart}
-          />
-        )}
+
       </div>
     </div>
   );

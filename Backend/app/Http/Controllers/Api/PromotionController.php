@@ -33,6 +33,8 @@ class PromotionController extends Controller
         }
         $user_id = Auth::id();
         $promotion_id = $promotion->id;
+
+
         $checkPromotion=UserPromotion::query()
         ->where('user_id', $user_id)
         ->where('promotion_id', $promotion->id)
@@ -104,6 +106,13 @@ class PromotionController extends Controller
             return response()->json(['message' => 'bạn chưa đăng nhập']);
         }
         $promotion_id = $request->promotion_id;
+        $UesPromotion1lan = UserPromotion::query()
+        ->where('user_id', $user_id)
+        ->where('promotion_id', $promotion_id)
+        ->exists();
+        if($UesPromotion1lan){
+            return response()->json(['error' => 'bạn đã nhận mã này rồi']);
+        }
         $addPromotion = UserPromotion::create([
             'user_id' => $user_id,
             'promotion_id' => $promotion_id,
@@ -123,7 +132,7 @@ class PromotionController extends Controller
     $userPromotions = UserPromotion::where('user_id', $user_id)->get();
     $promotions = [];
     foreach ($userPromotions as $userPromotion) {
-        $promotions[] = $userPromotion->promotion; 
+        $promotions[] = $userPromotion->promotion;
     }
     return response()->json([
         'message' => 'Hiển thị thành công',
