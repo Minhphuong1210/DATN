@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import '../../css/Checkout.css'
-import { Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
+import { Checkbox, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
 import ShippingForm from '../../components/client/checkout/ShippingForm';
 import PaymentForm from '../../components/client/checkout/PaymentForm';
 import Confirmation from '../../components/client/checkout/Confirmation';
@@ -14,9 +14,12 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { Order } from '../../interfaces/oder';
+import { usePromotion } from '../../hook/usePromotion';
 
 const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng ', 'Phương thức thanh toán'];
 const Checkout = () => {
+    const { promotionsUser } = usePromotion()
+
 
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
@@ -108,9 +111,9 @@ const Checkout = () => {
     }
 
 
-    const promotion_id=localStorage.getItem('promotion_id')
+    const promotion_id = localStorage.getItem('promotion_id')
     console.log(promotion_id);
-    
+
 
     //chheck Thanh toán thanh công
     const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
@@ -159,7 +162,7 @@ const Checkout = () => {
                     email: shippingInfoo.email,
                     note: shippingInfoo.note,
                     commodity_money: (total?.subtotal || 0) + (shippingCost || 0),
-                    total_amount: (total?.subtotal || 0) + (shippingCost || 0),
+                    total_amount: (total?.subtotal || 0),
                     shipping_id: shippingInfoo.shippingMethod,
                     vnp_TxnReff: paymentData.vnp_TxnRef,
                     promotion_id: promotion_id
@@ -374,20 +377,27 @@ const Checkout = () => {
                                         </button>
                                     </div>
                                     <div className="mb-6 pb-6 border-b border-gray-200">
-                                        <div className="-mx-2 flex items-end justify-end">
+                                        <div className=" flex items-start justify-end mt-5">
                                             <div className="flex-grow px-2 lg:max-w-xs">
-                                                <div>
-                                                    <TextField
-                                                        label="Nhập mã khuyến mãi"
-                                                        fullWidth
-                                                        margin="normal"
-                                                        value={apply}
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="demo-simple-select-label">Mã giảm giá</InputLabel>
+                                                    <Select
+                                                        labelId="demo-simple-select-label"
+                                                        id="demo-simple-select"
+
+                                                        label="Mã giảm giá"
                                                         onChange={handleChange}
-                                                    />
-                                                </div>
+                                                    >
+                                                        <MenuItem value=''>Chọn mã giảm giá</MenuItem>
+                                                        {promotionsUser.map((item) => (
+                                                            <MenuItem value={item.code}>{item.code}</MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+
                                             </div>
                                             <div className="px-2 mb-2">
-                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[15px] font-semibold" onClick={Apply}>Áp Dụng</button>
+                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[14px] " onClick={Apply}>Áp Dụng</button>
                                             </div>
                                         </div>
                                     </div>

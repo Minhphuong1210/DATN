@@ -96,11 +96,18 @@ const ModalAddToCart = ({
         size_id: string,
     ) => {
         try {
+            // Chỉ lấy id của color và size (không có name)
+            const colorId = color_id.id; // Chỉ lấy id của color
+            const sizeId = size_id.id; // Chỉ lấy id của size
 
-            await addToCart(product, color_id, size_id, quantity);
-            setIsOpenModalAddToCart(false)
+            // Thực hiện thêm sản phẩm vào giỏ hàng với các tham số cần thiết
+            await addToCart(product, colorId, sizeId, quantity);
+
+            // Đóng modal sau khi thêm thành công
+            setIsOpenModalAddToCart(false);
         } catch (error) {
-            console.error(error);
+            // Xử lý lỗi khi có vấn đề xảy ra
+            console.error("Error adding to cart:", error);
         }
     };
 

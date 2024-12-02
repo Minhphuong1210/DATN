@@ -11,7 +11,7 @@ import { useLoading } from "../../../../context/Loading";
 
 import { useCart } from "../../../../context/Cart";
 import { Badge } from "@mui/material";
-import ModalCart from "../../ModalCart/ModalCart";
+
 import MenuHeader from "./Menu/MenuHeaderDesktop";
 import MenuMobile from "./Menu/MenuMobile";
 // import { useLoading } from "../../../../context/Loading";
@@ -24,7 +24,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [openMenu, setOpenMenu] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpenCart, setsOpenCart] = useState(false);
+
   const [isOpenUser, setIsOpenUser] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { totalQuantity } = useCart();
@@ -34,7 +34,6 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   const [isAnimaton, setIsAnimaton] = useState(false);
 
 
-  const [cartCount, setCartCount] = useState(0); // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
 
 
   const handleOpenCart = () => {
@@ -46,9 +45,9 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
   };
 
 
-//     setsOpenCart(false)
-//   }
-// Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
+  //     setsOpenCart(false)
+  //   }
+  // Thêm state để quản lý số lượng sản phẩm trong giỏ hàng
   const handleMenu = () => {
     if (openMenu) {
       // Khi đóng menu, bắt đầu hiệu ứng
@@ -94,24 +93,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
     }
   }, [openMenu]);
 
-    // Hàm lấy dữ liệu giỏ hàng từ API
-    const fetchCartCount = async () => {
-      try {
-        if (!token) {
-          setCartCount(0);
-          return} ; // Nếu chưa đăng nhập thì không gọi API
-        const response = await axios.get("/api/cart"); // Gọi API giỏ hàng
-        const cartItems = response.data.cart; // Lấy danh sách sản phẩm trong giỏ hàng
-        const totalItems = cartItems.reduce((total: number, item: any) => total + item.quantity, 0); // Tính tổng số lượng
-        setCartCount(totalItems);
-      } catch (error) {
-        console.error("Failed to fetch cart count:", error);
-      }
-    };
-  
-    useEffect(() => {
-      fetchCartCount(); // Gọi hàm để lấy dữ liệu giỏ hàng
-    }, []);
+
 
 
   return (
@@ -273,9 +255,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               />
             ) : null}
             <div
-              className="relative"
-              onMouseEnter={handleOpenCart}
-              onMouseLeave={handleCloseCart}
+
             >
               <Badge badgeContent={totalQuantity} color="primary">
                 <a href="/cart">
@@ -297,13 +277,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
           />
         )}
 
-        {isOpenCart && (
-          <ModalCart
-            handleMouseEnterCart={handleOpenCart}
-            handleMouseLeaveCart={handleCloseCart}
-            isOpenModalCart={isOpenCart}
-          />
-        )}
+
       </div>
     </div>
   );
