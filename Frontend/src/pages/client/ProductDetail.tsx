@@ -27,9 +27,14 @@ const ProductDetail: React.FC = () => {
     const { color, size } = useColor();
     const [selectedImage, setSelectedImage] = useState(null);
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
-
+    const {addProductView} = useProduct();
     const { addToCart } = useCart();
 
+    useEffect(() => {
+        if (product) {
+            addProductView(product.id);
+        }   
+    }, [product]);
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',

@@ -43,11 +43,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // API xóa sản phẩm khỏi giỏ hàng
     Route::delete('/cart/{id}/delete', [CartController::class, 'destroy']);
     //Sản phẩm gần đây
- Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed'])->middleware('auth:sanctum');
+;
  Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed'])->middleware('auth:sanctum');
 
 
 });
+Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed']);
 // lấy sản phẩm product
 Route::resource('/products', ProductController::class);
 // lấy sản phẩm category

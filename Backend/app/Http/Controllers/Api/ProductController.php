@@ -184,10 +184,17 @@ class ProductController extends Controller
     // Sản phẩm đã xem gần đây
     public function addRecentlyViewed(Request $request)
     {
-        $user = $request->user(); // Lấy người dùng hiện tại
-        if (!$user) {
+        $request->validate([
+            'user_id' => 'required',
+            'product_id' => 'required',
+        ]);
+        $user_id = $request->user_id;
+
+        // Lấy người dùng hiện tại
+        if (!$user_id) {
             return response()->json([
-                'message' => 'Bạn chưa đăng nhập vui lòng đăng nhập'
+                'message' => 'Bạn chưa đăng nhập vui lòng đăng nhập',
+                'user_id'=>$user_id,
             ], 404);
         }
         $productId = $request->input('product_id');
@@ -209,28 +216,34 @@ class ProductController extends Controller
         // }
 
         // Xóa bản ghi cũ nếu sản phẩm này đã có trong danh sách
-        ProductView::where('user_id', $user->id)
-            ->where('product_id', $productId)
-            ->delete();
+        // ProductView::where('user_id', $user_id)
+        //     ->where('product_id', $productId)
+        //     ->delete();
 
         // Tạo bản ghi mới
-        ProductView::create([
-            'user_id' => $user->id,
+      $productView=  ProductView::create([
+            'user_id' => $user_id,
             'product_id' => $productId,
         ]);
 
+        if ($productView){
+            return response()->json(['message' => 'Thêm thành công']);
+        }else{
+            return response()->json(['message' => 'Thêm không thành công']);
+        }
+
         // Giới hạn danh sách sản phẩm đã xem gần đây (ví dụ: chỉ giữ lại 5 sản phẩm gần nhất)
-        $recentlyViewed = ProductView::where('user_id', $user->id)
-            ->orderBy('viewed_at', 'desc')
-            ->take(5)
-            ->pluck('id');
+        // $recentlyViewed = ProductView::where('user_id', $user_id)
+        //     ->orderBy('viewed_at', 'desc')
+        //     ->take(5)
+        //     ->pluck('id');
 
         // Xóa các sản phẩm cũ hơn ngoài giới hạn
-        ProductView::where('user_id', $user->id)
-            ->whereNotIn('id', $recentlyViewed)
-            ->delete();
+        // ProductView::where('user_id', $user_id)
+        //     ->whereNotIn('id', $recentlyViewed)
+        //     ->delete();
 
-        return response()->json(['message' => 'Đã thêm vào danh sách đã xem gần đây']);
+
     }
 
     // Hàm để lấy danh sách sản phẩm đã xem gần đây
@@ -252,7 +265,7 @@ class ProductController extends Controller
         // ]);
         // Lấy danh sách sản phẩm đã xem gần đây của người dùng
         $products = ProductView::where('user_id', $user_id)
-            ->orderBy('viewed_at', 'desc')
+            ->orderBy('created_at', 'desc')
             ->take(5) // Lấy 5 sản phẩm gần nhất
             ->with('product') // Eager load chi tiết sản phẩm
             ->get();

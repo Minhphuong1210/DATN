@@ -26,6 +26,7 @@ import ProductsCate from './pages/client/ProductsCate';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ProductView from './pages/client/ProductView';
+import News from './pages/client/News';
 function App() {
   return (
     <>
@@ -46,13 +47,14 @@ function App() {
             <Route path="wishlist" element={<ProductWishlist />} />
             <Route path="profile" element={<Profile />} >
               <Route path="order" element={<Order />} />
-              <Route path="/profile/productview" element={<ProductView />} />
+              <Route path="productview" element={<ProductView />} />
               <Route index element={<AccountUpdate />} />
             </Route>
           </Route>
           <Route path="/contact" element={<Contact />} />
           <Route path="/allproducts" element={<AllProducts />} />
           <Route path="/search" element={<SearchProduct />} />
+          <Route path="/news" element={<News />} />
           <Route path="products/cate/:id/:name" element={<ProductsCate />} />
         </Route>
 
