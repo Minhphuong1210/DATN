@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useOder } from "../../hook/useOder";
 import CancelMyOrder from "../../modalConfirm/CancelMyoOrder";
-import { PenLine } from "lucide-react";
-import { Link } from "react-router-dom";
 import Comment from "../../components/client/Comment/Comment";
 import { toast } from "react-toastify";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 interface OrderItem {
     id: string;
     image: string;
@@ -15,18 +15,23 @@ interface OrderItem {
     quantity: number;
 }
 
-
 const Order: React.FC = () => {
     const { myOrder, setMyOrder, getMyOrder } = useOder();
-    console.log(myOrder);
-
     const [isModalVisible, setModalVisible] = useState(false);
     const [isModalComment, setModalComment] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
     const [selectedProductId, setSelectedProductId] = useState(null);
 
-    const getStatusColor = (status: string) => {
+    // Thêm state cho phân trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const [ordersPerPage] = useState(2);
 
+    const totalPages = Math.ceil(myOrder.length / ordersPerPage);
+    const indexOfLastOrder = currentPage * ordersPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+    const currentOrders = myOrder.slice(indexOfFirstOrder, indexOfLastOrder);
+
+    const getStatusColor = (status: string) => {
         switch (status) {
             case "Đang chuẩn bị":
             case "Đã xác nhận":
@@ -42,17 +47,14 @@ const Order: React.FC = () => {
             default:
                 return "bg-gray-300";
         }
-
     };
 
     const handleCancelOrder = async (id: string, action: "confirm" | "cancel") => {
         try {
             const payload = action === "confirm" ? { da_nhan_hang: "1" } : { huy_don_hang: "1" };
             const response = await axios.put(`/api/donhangs/${id}/update`, payload);
-console.log(response.data.error);
 
             if (response.status === 200) {
-                // Update order status in myOrder state
                 setMyOrder((prevOrders) =>
                     prevOrders.map((order) =>
                         order.id === id
@@ -60,10 +62,11 @@ console.log(response.data.error);
                             : order
                     )
                 );
+                getMyOrder();
             }
-            if(response.data.message){
+            if (response.data.message) {
                 toast.success(response.data.message);
-            }else{
+            } else {
                 toast.error(response.data.error);
             }
         } catch (error) {
@@ -71,7 +74,6 @@ console.log(response.data.error);
         }
     };
 
-    // mở comfirm HỦY HÀNG 
     const openCancelModal = (orderId: string) => {
         setSelectedOrderId(orderId);
         setModalVisible(true);
@@ -79,63 +81,52 @@ console.log(response.data.error);
     const confirmCancelOrder = async () => {
         if (selectedOrderId) {
             await handleCancelOrder(selectedOrderId, "cancel");
-            // Optionally fetch myOrder data again or call an API to refresh
-            await getMyOrder();  // if you have a fetch function
         }
         setModalVisible(false);
     };
 
-
     const getStatusButton = (status: string, orderId: string) => {
         if (status === "Đang vận chuyển") {
             return (
-
                 <button
                     className="rounded bg-green-300 px-3 py-2 text-white"
                     onClick={() => handleCancelOrder(orderId, "confirm")}
                 >
                     Đã nhận hàng
                 </button>
-
             );
         } else if (status === "Chờ xác nhận" || status === "Đã xác nhận") {
             return (
-
                 <button
                     className="px-4 py-2 bg-red-500 text-white  rounded"
                     onClick={() => openCancelModal(orderId)}
                 >
                     Hủy đơn
                 </button>
-
             );
-        }
-        else if (status === "Đã nhận hàng") {
+        } else if (status === "Đã nhận hàng") {
             return (
-                <button
-                    className="px-4 py-2 bg-yellow-400 text-black  rounded hover:bg-yellow-300 "
-                >
+                <button className="px-4 py-2 bg-yellow-400 text-black  rounded hover:bg-yellow-300 ">
                     Mua lại
                 </button>
-            )
+            );
         }
     };
+
     const getStatusTop = (status: string) => {
         if (status === "Đã nhận hàng") {
-            return (
-                <span className="text-sm text-red-600 ">Hoàn thành</span>
-            )
+            return <span className="text-sm text-red-600">Hoàn thành</span>;
         }
-    }
+    };
 
-
-    //Mở comment
+    // Mở comment
     const openComment = (id) => {
         setSelectedProductId(id);
         setModalComment(true);
     };
+
     // Nhóm các đơn hàng theo id
-    const groupedOrders = myOrder.reduce<Record<string, OrderItem[]>>((acc, item) => {
+    const groupedOrders = currentOrders.reduce<Record<string, OrderItem[]>>((acc, item) => {
         if (!acc[item.id]) {
             acc[item.id] = [];
         }
@@ -145,18 +136,28 @@ console.log(response.data.error);
     return (
         <div className="col-span-4">
             <div className="overflow-hidden">
-
-                <div className=" mx-auto px-4">
+                <div className=" mx-auto px-4 relative h-[650px]">
                     {/* Search Bar */}
                     <div className="mb-4">
-                        <input type="text" placeholder="Bạn có thể tìm kiếm theo ID đơn hàng hoặc Tên Sản phẩm" className=" text-[15px] w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <input
+                            type="text"
+                            placeholder="Bạn có thể tìm kiếm theo ID đơn hàng hoặc Tên Sản phẩm"
+                            className=" text-[15px] w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                     </div>
+
                     {/* Order Item */}
                     {Object.keys(groupedOrders).map((id) => (
                         <div key={id} className="border border-gray-300 rounded-md p-4 mb-4">
-                            <div className="flex justify-end items-center mb-2">
+                            <div className="flex justify-between items-center mb-2">
+                                <div className=" space-x-2 text-stone-500">
+                                    <span>Mã đơn hàng:</span>
+                                    <span>ORD_12_1733310081</span>
+                                </div>
                                 <div className="flex space-x-2">
-                                    <span className={`rounded text-sm text-white ${getStatusColor(groupedOrders[Number(id)][0].orderStatus)}`}>
+                                    <span
+                                        className={`rounded text-sm text-white ${getStatusColor(groupedOrders[Number(id)][0].orderStatus)}`}
+                                    >
                                         {groupedOrders[Number(id)][0].orderStatus}
                                     </span>
                                     {getStatusTop(groupedOrders[Number(id)][0].orderStatus)}
@@ -171,17 +172,15 @@ console.log(response.data.error);
                                     <div className="flex-1">
                                         <p className="text-gray-800">{item.product_name}</p>
                                         <div className="text-sm text-gray-500">Phân loại hàng: Dài 33cm</div>
-
-                                        <div>
-                                            {item.id_product}
-                                        </div>
-                                        <div className="text-sm text-gray-500">x{item.quantity}</div>
+                                        <div className="text-sm text-gray-500">Sl:x{item.quantity}</div>
                                     </div>
-                                    <button onClick={() => openComment(item.id_product)} className="px-4 py-2 text-gray-700 rounded border-2 hover:bg-gray-100">
+                                    <button
+                                        onClick={() => openComment(item.id_product)}
+                                        className="px-4 py-2 text-gray-700 rounded border-2 hover:bg-gray-100"
+                                    >
                                         Đánh Giá Sản Phẩm
                                     </button>
                                 </div>
-
                             ))}
 
                             <hr className="my-2" />
@@ -189,20 +188,41 @@ console.log(response.data.error);
                                 <div className="flex justify-end">
                                     <p className="mr-2">Thành tiền:</p>
                                     <p className="text-xl text-red-600">
-                                        {/* Tổng giá tiền của các sản phẩm trong nhóm */}
                                         {groupedOrders[Number(id)].reduce((total, item) => total + item.price, 0)}đ
                                     </p>
                                 </div>
                                 <div className="flex space-x-2 mt-2 justify-end text-[15px]">
-                                    {getStatusButton(groupedOrders[Number(id)][0].orderStatus, (id))}
+                                    {getStatusButton(groupedOrders[Number(id)][0].orderStatus, id)}
                                     <button className="px-4 py-2 text-gray-700 rounded border-2 hover:bg-gray-100">
                                         Liên Hệ Shop
                                     </button>
-
                                 </div>
                             </div>
                         </div>
                     ))}
+                    {/* Phân trang */}
+                    <div className="absolute bottom-0 flex w-full justify-center p-4 shadow-lg">
+                        {/* Nút Previous */}
+                        <button
+                            className="mx-1 rounded-md text-gray-700 hover:bg-yellow-300"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft strokeWidth={0.5} />
+                        </button>
+
+                        {/* Hiển thị số trang */}
+                        <span className="p-2 opacity-60">{`${currentPage} / ${totalPages}`}</span>
+
+                        {/* Nút Next */}
+                        <button
+                            className="mx-1 rounded-md text-gray-700 hover:bg-yellow-300"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            <ChevronRight strokeWidth={0.5} />
+                        </button>
+                    </div>
                 </div>
                 <CancelMyOrder
                     isVisible={isModalVisible}
