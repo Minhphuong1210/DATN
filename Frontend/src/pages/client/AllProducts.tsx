@@ -19,6 +19,7 @@ import { useModalAddCartProvider } from "../../context/MoDalAddToCart";
 import ModalAddToCart from "../../components/client/Home/ModalAddToCart/ModalAddToCart";
 import { useLoading } from "../../context/Loading";
 import { Product } from "../../interfaces/Product";
+import { toast } from "react-toastify";
 
 interface PriceRange {
     min: number;
@@ -236,7 +237,12 @@ const AllProducts = () => {
     useEffect(() => {
         fetchProducts();
     }, []);
-
+    useEffect(() => {
+        // Kiểm tra khi danh sách sản phẩm được cập nhật
+        if (filterProductsPrice.length > 0) {
+            toast.success(`Tìm thấy ${filterProductsPrice.length} sản phẩm!`);
+        }
+    }, [filterProductsPrice]); // Chỉ chạy khi `filterProductsPrice` thay đổi
     return (
         <>
             <div className="mt-2 bg-gray-50 px-5 pt-1 lg:mx-[100px] xl:mx-[150px] xl:mt-3 xl:py-5">
@@ -300,7 +306,7 @@ const AllProducts = () => {
                                         className="flex cursor-pointer items-center p-4"
                                         onClick={toggleCollapseShirt}
                                     >
-                                        <h2 className="mr-2 text-base">Áo</h2>
+                                        <h2 className="mr-2 text-base">Áo, Quần</h2>
                                         <ChevronDown size={17} strokeWidth={1.5} />
                                     </div>
 
@@ -334,51 +340,6 @@ const AllProducts = () => {
 
                                 <hr className="bg-black" />
 
-                                <div>
-                                    <div
-                                        className="flex cursor-pointer items-center p-4 text-black"
-                                        onClick={toggleCollapseTrousers}
-                                    >
-                                        <h2 className="mr-2 text-base">Quần</h2>{" "}
-                                        <ChevronDown size={17} strokeWidth={1.5} />
-                                    </div>
-
-                                    {/* Nội dung Collapse */}
-                                    <div
-                                        className={`transition-max-height overflow-hidden duration-500 ease-in-out ${isOpenTrousers ? "max-h-40" : "max-h-0"
-                                            }`}
-                                    >
-                                        <div className="p-4">
-                                            <form>
-                                                <label className="mb-2 block">
-                                                    <input
-                                                        type="checkbox"
-                                                        value="option1"
-                                                        className="mr-2"
-                                                    />
-                                                    Quần Polo
-                                                </label>
-                                                <label className="mb-2 block">
-                                                    <input
-                                                        type="checkbox"
-                                                        value="option2"
-                                                        className="mr-2"
-                                                    />
-                                                    Quần sơ mi
-                                                </label>
-                                                <label className="mb-2 block">
-                                                    <input
-                                                        type="checkbox"
-                                                        value="option2"
-                                                        className="mr-2"
-                                                    />
-                                                    Quần phông
-                                                </label>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                <hr />
                                 <div>
                                     <div
                                         className="flex cursor-pointer items-center p-4 text-black"

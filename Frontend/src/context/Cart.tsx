@@ -37,7 +37,7 @@ interface CartProviderProps {
 // CartProvider để quản lý trạng thái giỏ hàng
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<Cart_detail[]>([]);
-  const [Message,setMessage] = useState('');
+  const [Message, setMessage] = useState('');
   const { setLoading } = useLoading()
   // Hàm để thêm sản phẩm vào giỏ hàng
   const addToCart = async (product: Product, color_id: string, size_id: string, quantity: number) => {
@@ -59,17 +59,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         quantity,
         price: product.price,
       });
-    
-      // Thêm sản phẩm vào giỏ hàng trong state của context
-      setCart(prevItems => [
-        ...prevItems,
-        { product, color_id, size_id, quantity }
-      ]);
 
-      console.log(response.data.error);
-      if(response.data.message){
+      // Thêm sản phẩm vào giỏ hàng trong state của context
+      if (response.data.message) {
+        setCart(prevItems => [
+          ...prevItems,
+          { product, color_id, size_id, quantity }
+        ]);
+
         toast.success(response.data.message);
-      }else{
+      } else {
         toast.error(response.data.error);
       }
     } catch {
@@ -128,10 +127,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setCart(updatedCart);
       const response = await axios.put(`/api/cart/${id}/update`, { quantity: updatedCart.find(item => item.id === id)?.quantity });
       //  console.log(response.data.message);
-      
-      if(response.data.message){
+
+      if (response.data.message) {
         toast.success(response.data.message);
-      }else{
+      } else {
         toast.error(response.data.error);
         return;
       }
