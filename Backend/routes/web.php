@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/showLogin', [AuthController::class, 'showLogin'])->name('showLogin');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/admin/orders/details/{id}', [OrderController::class, 'getOrderDetails'])->name('admins.orders.details');
 
 Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
@@ -42,11 +43,13 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/create', [OrderController::class, 'create'])->name('create');
             Route::post('/store', [OrderController::class, 'store'])->name('store');
+            // Route::get('/show/{id}', [OrderController::class, 'show'])->name('show');
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('show');
             Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('edit');
             Route::put('/{id}/update', [OrderController::class, 'update'])->name('update');
             Route::put('/{id}/updatePayment', [OrderController::class, 'updatePayment'])->name('updatePayment');
             Route::delete('/{id}/destroy', [OrderController::class, 'destroy'])->name('destroy');
+            
         });
 
         // Category Routes
@@ -144,7 +147,6 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
             Route::put('/{id}/update', [UserController::class, 'update'])->name('update');
             Route::delete('/{id}/destroy', [UserController::class, 'destroy'])->name('destroy');
         });
-
         Route::prefix('comment')->as('comment.')->group(function () {
             Route::get('comment', [CommentController::class, 'index'])->name('index');
             Route::put('{id}/status', [CommentController::class, 'update'])->name('update');
@@ -152,7 +154,12 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
         });
     });
 
+    
+});
 
-    });
+
+
+
+
 
 
