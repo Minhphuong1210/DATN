@@ -139,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ isMobile }) => {
               ))}
 
               <li className="hovermenuNav">
-                <a href="#" className="hover:text-slate-600">
+                <a href="news" className="hover:text-slate-600">
                   TIN TỨC
                 </a>
               </li>

@@ -154,12 +154,8 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
         });
     });
 
-    
-});
 
 
-
-
-
+    });
 
 
