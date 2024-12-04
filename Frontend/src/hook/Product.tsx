@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
-
+interface AvgComment {
+    avgComment: number;
+    startComment:number
+}
 export const useProduct = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [expiresTimeProducts, setExpiresTimeProducts] = useState();
@@ -17,6 +20,10 @@ export const useProduct = () => {
     const [ProductBycategorys, setProductBycategory] = useState<Product[]>([]);
     const { loading, setLoading } = useLoading();
     const { id, idd } = useParams();
+    const [avgComments, setAvgComments] = useState<AvgComment[]>([]);
+    const [StartComments, setStartComments] = useState<AvgComment[]>([]);
+
+// console.log(avgComments);
 
 
     // để nhiều cái này bị lỗi api là 429
@@ -45,6 +52,10 @@ export const useProduct = () => {
             const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
             setProduct(response.data.Product);
             setImgsProduct(response.data.Product.images)
+            setAvgComments(response.data.avgComment)
+            setStartComments(response.data.startComment)
+            // console.log(response.data.avgComment);
+
         } catch (error) {
             toast.error((error as AxiosError)?.message);
         } finally {
@@ -108,5 +119,5 @@ export const useProduct = () => {
     useEffect(() => {
         getProductView();
     }, []);
-    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory, imgsProduct, expiresTimeProducts, productView, getProductView };
+    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory, imgsProduct, expiresTimeProducts, productView, getProductView, avgComments,StartComments };
 };

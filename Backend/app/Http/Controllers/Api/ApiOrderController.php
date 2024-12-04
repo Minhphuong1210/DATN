@@ -230,7 +230,7 @@ class ApiOrderController extends Controller
                     $vnpayy = Vnpayy::where('vnp_TxnRef', $vnp_TxnReff)->first();
                     if ($vnpayy) {
                         $order->vnpayy_id = $vnpayy->id;
-                        $order->order_payment = Order::CHO_XAC_NHA;
+                        $order->order_payment = Order::DA_THANH_TOAN;
                         $order->save();
                     }
                 }
