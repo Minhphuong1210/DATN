@@ -4,6 +4,7 @@ import { OderProducts, OderTotal, Order } from "../interfaces/oder";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
 import { useLocation, useParams } from "react-router-dom";
+import { useCart } from "../context/Cart";
 // import ConfirmModal from "../components/ConfirmModal"; // Đảm bảo đường dẫn đúng tới component modal
 interface DataType {
     id: string;
@@ -15,16 +16,17 @@ interface DataType {
     orderStatus: string;
 }
 export const useOder = () => {
+    const { fetchCartItems } = useCart();
     const [oders, serOders] = useState<OderProducts[]>([]);
     const [total, serTotal] = useState<OderTotal>();
     const { loading, setLoading } = useLoading();
-    const [apply, setApply] = useState()
+    const [apply, setApply] = useState();
     const [myOrder, setMyOrder] = useState<DataType[]>([]);
-    const [isThankPayment, setThankPayment] = useState(false)
+    const [isThankPayment, setThankPayment] = useState(false);
     const getAllOder = async () => {
         try {
             setLoading(true);
-            const resposive = await axios.get('/api/donhangs/create');
+            const resposive = await axios.get("/api/donhangs/create");
             console.log(resposive.data.cart);
             serOders(resposive.data.cart);
         } catch (error) {
@@ -40,7 +42,7 @@ export const useOder = () => {
     const getTotal = async () => {
         try {
             setLoading(true);
-            const resposive = await axios.get('/api/donhangs/create');
+            const resposive = await axios.get("/api/donhangs/create");
             serTotal(resposive.data);
         } catch (error) {
             console.log(error);
@@ -52,15 +54,16 @@ export const useOder = () => {
         getTotal();
     }, []);
 
-    
-    const promotion_id=localStorage.getItem('promotion_id')
-    if(promotion_id==undefined){
-        promotion_id==null
+    const promotion_id = localStorage.getItem("promotion_id");
+    if (promotion_id == undefined) {
+        promotion_id == null;
     }
 
-
-
-    const handleSubmitOrder = async (info: any, totalPayment: number, shippingCost: number) => {
+    const handleSubmitOrder = async (
+        info: any,
+        totalPayment: number,
+        shippingCost: number,
+    ) => {
         try {
             const orderData: Order = {
                 username: info.username,
@@ -71,24 +74,22 @@ export const useOder = () => {
                 commodity_money: total?.subtotal || 0,
                 total_amount: (total?.subtotal ?? 0) + shippingCost,
                 shipping_id: info.shippingMethod,
-                vnp_TxnReff:null,
-                promotion_id:promotion_id,
+                vnp_TxnReff: null,
+                promotion_id: promotion_id,
             };
             setLoading(true);
-            const response= await axios.post('/api/donhangs/store', orderData);
+            const response = await axios.post("/api/donhangs/store", orderData);
             // localStorage.removeItem('activeStep');
             // localStorage.removeItem('shippingInfo');
             // localStorage.removeItem('promotion_id');
-            console.log(response);
-            
-            if(response.data.success){
-                
-                localStorage.removeItem('activeStep');
-                localStorage.removeItem('shippingInfo');
-                localStorage.removeItem('promotion_id');
+            if (response.data.success) {
+                localStorage.removeItem("activeStep");
+                localStorage.removeItem("shippingInfo");
+                localStorage.removeItem("promotion_id");
                 toast.success(response.data.success);
                 setThankPayment(true);
-            }else{
+                fetchCartItems()
+            } else {
                 toast.error(response.data.error);
             }
         } catch (error) {
@@ -96,19 +97,18 @@ export const useOder = () => {
         } finally {
             setLoading(false);
         }
-    }
+    };
     const applyDiscount = async (value: any) => {
         try {
-            await axios.post('/api/applyPromotion', value)
+            await axios.post("/api/applyPromotion", value);
         } catch (error) {
             console.log(error);
-
         }
-    }
+    };
     const getMyOrder = async () => {
         try {
-            const response = await axios.get('/api/donhangs')
-            setMyOrder(response.data.chitietDonHang)
+            const response = await axios.get("/api/donhangs");
+            setMyOrder(response.data.chitietDonHang);
         } catch (error) {
             console.log(error);
         }
@@ -125,7 +125,8 @@ export const useOder = () => {
         apply,
         applyDiscount,
         myOrder,
-        setMyOrder, getMyOrder,
+        setMyOrder,
+        getMyOrder,
         isThankPayment,
         setThankPayment,
     };

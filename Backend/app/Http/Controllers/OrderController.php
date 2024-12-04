@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\ProductDetail;
 use Auth;
 use Illuminate\Http\Request;
@@ -22,8 +23,8 @@ class OrderController extends Controller
             $key_trang_thai = $key;
             $value_trang_thai = $value;
         }
-        $trangThaiThanhToan=Order::TRANG_THAI_THANH_TOAN;
-        return view('Admin.Orders.index', compact('listDonHang', 'trangThaiDonHang', 'key_trang_thai', 'value_trang_thai','trangThaiThanhToan'));
+        $trangThaiThanhToan = Order::TRANG_THAI_THANH_TOAN;
+        return view('Admin.Orders.index', compact('listDonHang', 'trangThaiDonHang', 'key_trang_thai', 'value_trang_thai', 'trangThaiThanhToan'));
     }
 
     /**
@@ -45,17 +46,37 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    // public function show(Request $request)
+    // {
+    //     $orderDetails = Order::with('user')->find($request->id);
+    //     return response()->json([
+    //     'data' => $orderDetails,
+    //     ]);
+    // }
+    public function show(Request $request)
     {
-        $donHang = Order::query()->findOrFail($id);
-        $user_id  = $donHang->user_id ;
-
-        $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
-        $trangThaiThanhToan = Order::TRANG_THAI_THANH_TOAN;
-        $productDetails_id = $donHang->OrderDetail->pluck('product_detail_id')->toArray();
-            $productDetails = ProductDetail::whereIn('id', $productDetails_id)->get();
-            $orderDetails = $donHang->OrderDetail;
-        return view('Admin.Orders.show', compact('donHang', 'trangThaiDonHang', 'trangThaiThanhToan','productDetails'));
+        $orderDetails = Order::with(['user', 'shipping'])->find($request->id);
+        if (!$orderDetails) {
+            return response()->json([
+                'error' => 'Đơn hàng không tồn tại.'
+            ], 404);
+        }
+        return response()->json([
+            'data' => [
+                'code_order' => $orderDetails->code_order,
+                'commodity_money' => $orderDetails->commodity_money,
+                'total_amount' => $orderDetails->total_amount,
+                'order_status' => $orderDetails->order_status,
+                'order_payment' => $orderDetails->order_payment,
+                'user_id' => $orderDetails->user->id ?? null,
+                'username' => $orderDetails->user->name ?? 'Không rõ',
+                'phone' => $orderDetails->user->phone,
+                'email' => $orderDetails->user->email,
+                'address' => $orderDetails->user->address,
+                'cost' => $orderDetails->shipping->cost,
+                'price' =>$orderDetails->price,
+            ]
+        ]);
     }
 
     /**
@@ -75,7 +96,7 @@ class OrderController extends Controller
         $donHang = Order::query()->findOrFail($id);
         $currentTrangThai = $donHang->order_status;
         // dd($currentTrangThai);
-      
+
         $newTrangThai = $request->input('order_status');
         $trangThais = array_keys(Order::TRANG_THAI_DON_HANG);
         // kiếm tra nếu đơn hàng đã bị hủy thì không được thay đổi trạng thái nữa
@@ -91,7 +112,8 @@ class OrderController extends Controller
         return redirect()->route('admins.orders.index')->with('success', 'cập nhật trạng thái thành công');
     }
 
-    public function updatePayment(Request $request, string $id){
+    public function updatePayment(Request $request, string $id)
+    {
         $donHang = Order::query()->findOrFail($id);
         if ($request->input('order_payment') === 'da_thanh_toan') {
             $donHang->order_payment = Order::DA_THANH_TOAN;
@@ -106,4 +128,5 @@ class OrderController extends Controller
     {
         //
     }
+
 }

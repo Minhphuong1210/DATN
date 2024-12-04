@@ -7,7 +7,7 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-2">Tấtcả banner</h5>
+                    <h5 class="card-title mb-2">Tất cả banner</h5>
                     <a  href="{{ route('admins.banner.create') }}" class="btn btn-success ml-auto">Thêm mới banner</a>
                 </div>
                 @if (session('success'))

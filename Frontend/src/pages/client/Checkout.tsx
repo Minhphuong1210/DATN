@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import '../../css/Checkout.css'
-import { Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
+import { Checkbox, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Step, StepLabel, Stepper, TextField, Typography } from '@mui/material'
 import ShippingForm from '../../components/client/checkout/ShippingForm';
 import PaymentForm from '../../components/client/checkout/PaymentForm';
 import Confirmation from '../../components/client/checkout/Confirmation';
@@ -14,14 +14,20 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { Order } from '../../interfaces/oder';
+import { usePromotion } from '../../hook/usePromotion';
+import { useLoading } from '../../context/Loading';
+import LoadingPage from '../../components/loading/LoadingPage';
+import { useCart } from '../../context/Cart';
+
 
 const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng ', 'Phương thức thanh toán'];
 const Checkout = () => {
-
+    const { promotionsUser } = usePromotion()
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
         return savedStep !== null ? JSON.parse(savedStep) : 0;
     });
+    const { fetchCartItems } = useCart();
     const { oders, total, handleSubmitOrder, isThankPayment } = useOder();
     const [shippingCost, setShippingCost] = useState<number>(0);
     const [paymentMethod, setPaymentMethod] = useState<string>('');
@@ -42,6 +48,7 @@ const Checkout = () => {
     const [PricePromotion, setPricePromotion] = useState<string | null>(null);
     const [price_after_discountPromotion, settotal_price_after_discount] = useState<string | null>(null);
     const tongthanhtoan = totalPayment - (PricePromotion ? parseFloat(PricePromotion) : 0);
+    const { setLoading, } = useLoading()
     const [shippingInfo, setShippingInfo] = useState({
         username: '',
         address: '',
@@ -108,9 +115,8 @@ const Checkout = () => {
     }
 
 
-    const promotion_id=localStorage.getItem('promotion_id')
-    console.log(promotion_id);
-    
+    const promotion_id = localStorage.getItem('promotion_id')
+
 
     //chheck Thanh toán thanh công
     const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
@@ -142,16 +148,27 @@ const Checkout = () => {
         if (txnRef && vnp_ResponseCode === "00" && !isChecked.current) {
             isChecked.current = true; // Đánh dấu đã gọi API
             try {
+                setIsConfirmOrder(true); // Mở modal khi bắt đầu gọi API
+                setLoading(true);
+                // Đặt thời gian tối thiểu cho loading
+                const delay = new Promise((resolve) => setTimeout(resolve, 3000));
+
+                // Gọi API đầu tiên
                 const { data } = await axios.put(`/api/updatevnpay/${txnRef}`, {
                     paymentData: paymentData,
                 }, {
                     headers: {
                         'Content-Type': 'application/json',
-                    }
+                    },
                 });
-                // call tếp api
+
+                // Đợi thời gian loading và API hoàn tất
+                await delay;
+
+                // Hiển thị thông báo từ API đầu tiên sau khi loading xong
                 setMessage(data.message);
-                toast.success(data.message);
+
+                // Chuẩn bị dữ liệu cho API thứ hai
                 const orderData: Order = {
                     username: shippingInfoo.username,
                     phone: shippingInfoo.phone,
@@ -159,21 +176,25 @@ const Checkout = () => {
                     email: shippingInfoo.email,
                     note: shippingInfoo.note,
                     commodity_money: (total?.subtotal || 0) + (shippingCost || 0),
-                    total_amount: (total?.subtotal || 0) + (shippingCost || 0),
+                    total_amount: (total?.subtotal || 0),
                     shipping_id: shippingInfoo.shippingMethod,
                     vnp_TxnReff: paymentData.vnp_TxnRef,
-                    promotion_id: promotion_id
+                    promotion_id: promotion_id,
                 };
-                // console.log(orderData);
-                await axios.post('/api/donhangs/store', orderData)
-                // Xử lý kết quả từ API thứ hai
-                toast.success("Đặt hàng thành công thành công!");
-                setIsConfirmOrder(true);
+
+                await axios.post('/api/donhangs/store', orderData);
+                // Hiển thị thông báo thành công sau khi hoàn tất
+                toast.success(data.message);
+                fetchCartItems()
+                // Xóa dữ liệu trong localStorage
                 localStorage.removeItem('activeStep');
                 localStorage.removeItem('shippingInfo');
                 localStorage.removeItem('promotion_id');
             } catch (error) {
+                // Hiển thị thông báo lỗi sau khi loading xong
                 toast.error("Thanh toán thất bại!");
+            } finally {
+                setLoading(false); // Đóng trạng thái loading sau khi hoàn tất
             }
         }
     };
@@ -309,7 +330,22 @@ const Checkout = () => {
             default:
                 return 'Unknown step';
         }
+
     };
+    const [loadingPageg, setLoadingg] = useState(true);
+
+    useEffect(() => {
+
+        const timer = setTimeout(() => {
+            setLoadingg(false);
+        }, 4000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loadingPageg) {
+        return <LoadingPage />;
+    }
     return (
         <>
 
@@ -374,20 +410,27 @@ const Checkout = () => {
                                         </button>
                                     </div>
                                     <div className="mb-6 pb-6 border-b border-gray-200">
-                                        <div className="-mx-2 flex items-end justify-end">
+                                        <div className=" flex items-start justify-end mt-5">
                                             <div className="flex-grow px-2 lg:max-w-xs">
-                                                <div>
-                                                    <TextField
-                                                        label="Nhập mã khuyến mãi"
-                                                        fullWidth
-                                                        margin="normal"
-                                                        value={apply}
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="demo-simple-select-label">Mã giảm giá</InputLabel>
+                                                    <Select
+                                                        labelId="demo-simple-select-label"
+                                                        id="demo-simple-select"
+
+                                                        label="Mã giảm giá"
                                                         onChange={handleChange}
-                                                    />
-                                                </div>
+                                                    >
+                                                        <MenuItem value=''>Chọn mã giảm giá</MenuItem>
+                                                        {promotionsUser.map((item) => (
+                                                            <MenuItem value={item.code}>{item.code}</MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+
                                             </div>
                                             <div className="px-2 mb-2">
-                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[15px] font-semibold" onClick={Apply}>Áp Dụng</button>
+                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[14px] " onClick={Apply}>Áp Dụng</button>
                                             </div>
                                         </div>
                                     </div>
@@ -490,7 +533,6 @@ const Checkout = () => {
                                         </div>
                                         <ConfirmModal
                                             isVisible={isConfirmOrder || isThankPayment}
-
                                             onCancel={() => setIsConfirmOrder(false)}
                                             savedShippingInfo={savedShippingInfo}
                                             shippingInfo={shippingInfo}

@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
+import { faL, faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
-import { Eye, Heart, ShoppingCart, User } from "lucide-react";
+import { ChevronDown, Eye, Heart, ShoppingCart, User } from "lucide-react";
 import { useProduct } from "../../hook/Product";
 import { Colors, Product, Sizes } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
@@ -16,6 +16,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 // import required modules
 import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
+import ModalVoucher from "../../components/ModalVoucher/ModalVoucher";
+import { usePromotion } from "../../hook/usePromotion";
 
 const ProductDetail: React.FC = () => {
     const { product, comments, ProductBycategorys } = useProduct();
@@ -27,7 +29,18 @@ const ProductDetail: React.FC = () => {
     const { color, size } = useColor();
     const [selectedImage, setSelectedImage] = useState(null);
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
+
     const {addProductView} = useProduct();
+
+    const [openVoucher, setOpenVoucher] = useState(false)
+    const { promotions, addPromotion } = usePromotion();
+    const handleOpenVoucher = () => {
+        setOpenVoucher(true);
+    }
+    const handleCloseVoucher = () => {
+        setOpenVoucher(false);
+    }
+
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -84,6 +97,11 @@ const ProductDetail: React.FC = () => {
 
     };
 
+    //Promotion
+
+    const handleAddPromotion = (id: string) => {
+        addPromotion(id);
+    };
     return (
         <>
             {product && (
@@ -275,12 +293,26 @@ const ProductDetail: React.FC = () => {
                                 <button className=" text-[13px] xl:text-base w-[300px] rounded-sm bg-yellow-400 px-10 py-3" onClick={() => handleAddToCart(product, selectColor.id, selectSize.id, quantity)}>
                                     Thêm vào giỏ hàng
                                 </button>
+                            </div>
+                            <div>
+                                <div onClick={handleOpenVoucher} className="mt-5 flex items-center gap-1">Voucher và khuyến mãi<ChevronDown /></div>
+                                <div className="flex gap-4 overflow-y-scroll md:overflow-auto md:overflow-x-scroll w-[450px] scrollable-content">
+                                    {promotions.map((item) => (
+                                        <div key={item.id} className="  bg-yellow-100 p-2 rounded-lg mt-2 flex justify-between items-center px-5">
+                                            <div className="w-[200px]" >
+                                                <div>Giảm {item.discount}</div>
+                                                <p className="text-[14px] opacity-50">Hết hạn sau:{new Date(item.end_date).toLocaleDateString('vi-VN')}</p>
+                                            </div>
+                                            <button onClick={() => handleAddPromotion(item.id)} className="bg-red-500 py-1 px-3 rounded-lg text-white text-[13px]">Nhận</button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <ModalVoucher
 
-                                {/* <button className="rounded-sm bg-yellow-400 px-10 py-3" onClick={() => { handleAddToCart(product, setSelectColor, setsize_id
-
-                                ) }} >
-                                    Thêm vào giỏ hàng
-                                </button> */}
+                                    handleCloseVoucher={handleCloseVoucher}
+                                    openVoucher={openVoucher}
+                                    promotions={promotions}
+                                />
                             </div>
                         </div>
                     </div>
