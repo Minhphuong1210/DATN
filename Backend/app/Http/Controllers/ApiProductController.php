@@ -23,7 +23,7 @@ class ApiProductController extends Controller
     public function productDetail(string $id, string $sub_category_id)
     {
         $product = Product::query()->with('discount')->findOrFail($id);
-        if(!$product){
+        if (!$product) {
             return response()->json([
                 'message' => 'không có sản phẩm',
             ], 404);
@@ -48,7 +48,11 @@ class ApiProductController extends Controller
             ->whereNull('parent_id')
             ->with('replies.user')
             ->get();
-        $commentsArray = $comments->map(function ($comment) {
+        $startComment = Comment::where('product_id', $id)->whereNull('parent_id')->count();
+        $totalComment = Comment::where('product_id', $id)->whereNull('parent_id')->get();
+        $sumTotalComment = $totalComment->sum('rating');
+        $avgComment = $sumTotalComment / $startComment;
+        $commentsArray = $comments->map(function ($comment){
             return [
                 'id' => $comment->id,
                 'content' => $comment->comment,
@@ -58,6 +62,7 @@ class ApiProductController extends Controller
                     'id' => $comment->user->id,
                     'name' => $comment->user->name,
                 ],
+               
                 'replies' => $comment->replies->map(function ($reply) {
                     return [
                         'id' => $reply->id,
@@ -78,7 +83,8 @@ class ApiProductController extends Controller
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
             'comments' => $commentsArray,
-
+            'avgComment' => $avgComment,
+            'startComment'=>$startComment,
         ], 200);
 
     }
@@ -167,41 +173,43 @@ class ApiProductController extends Controller
         return response()->json($data);
     }
 
-    public function subcateProduct(String $id){
+    public function subcateProduct(string $id)
+    {
         $subcate = SubCategory::findOrFail($id);
-        $productcate=$subcate->product;
-        if($productcate){
+        $productcate = $subcate->product;
+        if ($productcate) {
             return response()->json([
                 'message' => 'thành công',
-                'productcate'=>$productcate
-            ],200);
-        }else{
+                'productcate' => $productcate
+            ], 200);
+        } else {
             return response()->json([
                 'message' => 'Không có sản phẩm',
 
-            ],404);
+            ], 404);
         }
 
     }
 
-    public function cateProduct(String $id){
+    public function cateProduct(string $id)
+    {
         $category = Category::findOrFail($id);
         $subcategory_ids = $category->subCategories->pluck('id');
         // return response()->json([
         //     'message' => 'thành công',
         //     'CateProduct'=>$subcategory_ids
         // ],200);
-        $CateProduct = Product::query()->whereIn('sub_category_id',$subcategory_ids)->get();
-        if($CateProduct){
+        $CateProduct = Product::query()->whereIn('sub_category_id', $subcategory_ids)->get();
+        if ($CateProduct) {
             return response()->json([
                 'message' => 'thành công',
-                'CateProduct'=>$CateProduct
-            ],200);
-        }else{
+                'CateProduct' => $CateProduct
+            ], 200);
+        } else {
             return response()->json([
                 'message' => 'Không có sản phẩm',
 
-            ],404);
+            ], 404);
         }
 
     }

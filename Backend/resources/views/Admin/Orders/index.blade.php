@@ -9,10 +9,44 @@
     <div class="row">
         <div class="col-xl-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <h5 class="card-title align-content-center mb-0">Danh sách đơn hàng </h5>
-
-                </div><!-- end card header -->
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Danh sách đơn hàng</h5>
+                    
+                    <div class="d-flex gap-3">
+                        <!-- Tìm theo trạng thái thanh toán -->
+                        <form action="{{ route('admins.orders.search_OrderStatus') }}" method="post" class="d-flex align-items-center">
+                            @csrf
+                            <select class="form-select me-2" aria-label="Tìm theo trạng thái thanh toán" name="order_payment">
+                                <option selected>Tìm theo trạng thái thanh toán</option>
+                                @foreach ($trangThaiThanhToan as $key => $trangThaiThanhToans)
+                                    <option value="{{ $key }}">
+                                        {{ $key == 'chua_thanh_toan' ? 'Thanh toán khi nhận hàng' : 'Thanh toán online' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="btn btn-primary">Tìm</button>
+                        </form>
+                
+                        <!-- Tìm theo trạng thái đơn hàng -->
+                        <form action="{{ route('admins.orders.search_OrderPayment') }}" method="post" class="d-flex align-items-center">
+                            @csrf
+                            <select class="form-select me-2" aria-label="Tìm theo trạng thái đơn hàng" name="order_status">
+                                <option selected>Tìm theo trạng thái đơn hàng</option>
+                                @foreach ($trangThaiDonHang as $key => $trangThaiDonHangs)
+                                    <option value="{{ $key }}">{{ $trangThaiDonHangs }}</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="btn btn-primary">Tìm</button>
+                        </form>
+                
+                        <!-- Tìm kiếm theo từ khóa -->
+                        <form action="{{ route('admins.orders.search') }}" method="post" class="d-flex align-items-center">
+                            @csrf
+                            <input type="text" class="form-control me-2" name="key" placeholder="Nhập từ khóa...">
+                            <button type="submit" class="btn btn-primary">Tìm</button>
+                        </form>
+                    </div>
+                </div> <!-- end card header -->
 
                 <div class="card-body">
                     <div class="card-body">
@@ -78,20 +112,10 @@
                                             </td>
 
                                             <td>
-                                                @if ($item->order_payment == 'cho_xac_nha')
-                                                    <form action="{{ route('admins.orders.updatePayment', $item->id) }}"
-                                                        method="post"
-                                                        onsubmit="return confirm('Bạn có chắc chắn đã nhận?');">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        thanh toán onl
-                                                        <button type="submit" class="btn btn-light" name="order_payment"
-                                                            value="da_thanh_toan">đã nhận</button>
-                                                    </form>
-                                                @elseif ($item->order_payment == 'da_thanh_toan')
-                                                    <p>Đã thanh toán</p>
+                                                @if ($item->order_payment == 'chua_thanh_toan')
+                                                <p>thanh toán khi nhận hàng</p>
                                                 @else
-                                                    <p>thanh toán khi nhận hàng</p>
+                                                <p>thanh toán onl</p>
                                                 @endif
 
                                             </td>

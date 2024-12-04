@@ -9,19 +9,27 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
-
+interface AvgComment {
+    avgComment: number;
+    startComment:number
+}
 export const useProduct = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [expiresTimeProducts, setExpiresTimeProducts] = useState();
-  const [product, setProduct] = useState<Product>();
-  const [productsHots, setProductsHots] = useState<Product[]>([]);
-  const [productView, setproductViews] = useState<ProductView[]>([]);
-  const [imgsProduct, setImgsProduct] = useState<ImageProd>();
-  const [productsSale, setProductsSale] = useState<Product[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [ProductBycategorys, setProductBycategory] = useState<Product[]>([]);
-  const { loading, setLoading } = useLoading();
-  const { id, idd } = useParams();
+
+    const [products, setProducts] = useState<Product[]>([]);
+    const [expiresTimeProducts, setExpiresTimeProducts] = useState();
+    const [product, setProduct] = useState<Product>();
+    const [productsHots, setProductsHots] = useState<Product[]>([]);
+    const [productView, setproductViews] = useState<ProductView[]>([]);
+    const [imgsProduct, setImgsProduct] = useState<ImageProd>();
+    const [productsSale, setProductsSale] = useState<Product[]>([]);
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [ProductBycategorys, setProductBycategory] = useState<Product[]>([]);
+    const { loading, setLoading } = useLoading();
+    const { id, idd } = useParams();
+    const [avgComments, setAvgComments] = useState<AvgComment[]>([]);
+    const [StartComments, setStartComments] = useState<AvgComment[]>([]);
+
+// console.log(avgComments);
 const [userId, setUserId] = useState<number | null>(null);
   // để nhiều cái này bị lỗi api là 429
   const fetchProducts = async () => {
@@ -42,26 +50,27 @@ const [userId, setUserId] = useState<number | null>(null);
     fetchProducts();
   }, []);
 
+
   // Lấy sản phẩm theo ID
-  const getProductById = async (id: string, idd: string) => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `/api/productDetai/${id}/subcate/${idd}`,
-      );
-      setProduct(response.data.Product);
-      setImgsProduct(response.data.Product.images);
-    } catch (error) {
-      toast.error((error as AxiosError)?.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    if (id && idd) {
-      getProductById(id, idd);
-    }
-  }, [id, idd]);
+//   const getProductById = async (id: string, idd: string) => {
+//     try {
+//       setLoading(true);
+//       const response = await axios.get(
+//         `/api/productDetai/${id}/subcate/${idd}`,
+//       );
+//       setProduct(response.data.Product);
+//       setImgsProduct(response.data.Product.images);
+//     } catch (error) {
+//       toast.error((error as AxiosError)?.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+//   useEffect(() => {
+//     if (id && idd) {
+//       getProductById(id, idd);
+//     }
+//   }, [id, idd]);
 
   // Lấy bình luận theo sản phẩm
   const getComment = async (id: string) => {
@@ -103,11 +112,33 @@ const [userId, setUserId] = useState<number | null>(null);
       getProductBycategory(id, idd);
     }
   }, [id, idd]);
+    // Lấy sản phẩm theo ID
+    const getProductById = async (id: string, idd: string) => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
+            setProduct(response.data.Product);
+            setImgsProduct(response.data.Product.images)
+            setAvgComments(response.data.avgComment)
+            setStartComments(response.data.startComment)
+            // console.log(response.data.avgComment);
+
+        } catch (error) {
+            toast.error((error as AxiosError)?.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        if (id && idd) {
+            getProductById(id, idd);
+        }
+    }, [id, idd]);
+
+ 
   // thêm bình luận
 
   const checkToken = localStorage.getItem('user')
-  
-  
   useEffect (()=>{
     const userID = JSON.parse(checkToken)
     if(checkToken){
@@ -142,23 +173,9 @@ const [userId, setUserId] = useState<number | null>(null);
     }
   };
 
-  useEffect(() => {
-    getProductView();
-  }, []);
-  return {
-    products,
-    product,
-    loading,
-    productsHots,
-    productsSale,
-    comments,
-    getComment,
-    ProductBycategorys,
-    getProductBycategory,
-    imgsProduct,
-    expiresTimeProducts,
-    productView,
-    getProductView,
-    addProductView,
-  };
+    useEffect(() => {
+        getProductView();
+    }, []);
+    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory, imgsProduct, expiresTimeProducts, productView, getProductView, avgComments,StartComments };
+
 };

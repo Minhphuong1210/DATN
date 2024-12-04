@@ -41,6 +41,9 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
         // Orders Routes
         Route::prefix('orders')->as('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::post('/search', [OrderController::class, 'index'])->name('search');
+            Route::post('/search_OrderStatus', [OrderController::class, 'index'])->name('search_OrderStatus');
+            Route::post('/search_OrderPayment', [OrderController::class, 'index'])->name('search_OrderPayment');
             Route::get('/create', [OrderController::class, 'create'])->name('create');
             Route::post('/store', [OrderController::class, 'store'])->name('store');
             // Route::get('/show/{id}', [OrderController::class, 'show'])->name('show');
@@ -149,13 +152,14 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
         });
         Route::prefix('comment')->as('comment.')->group(function () {
             Route::get('comment', [CommentController::class, 'index'])->name('index');
+            Route::post('/traloi/{id}',[CommentController::class,'traloi'])->name('traloi');
             Route::put('{id}/status', [CommentController::class, 'update'])->name('update');
-
         });
     });
 
 
 
-    });
+});
+
 
 

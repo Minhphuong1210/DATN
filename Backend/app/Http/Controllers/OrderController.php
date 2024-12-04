@@ -14,11 +14,31 @@ class OrderController extends Controller
      * Display a listing of the resource.
      */
 
-    public function index()
+    public function index(Request $request)
     {
-        $listDonHang = Order::query()->orderByDesc('id')->get();
+        $q=Order::query();
+
+       
+        
         // dd($listDonHang);
+        if($request->key){
+            $listDonHang=$q->where('code_order',$request->key)
+            ->orWhere('username',$request->key)
+            ->orWhere('address',$request->key)
+            ->orWhere('email',$request->key)
+            ->get();
+        }else if($request->order_status){
+            $listDonHang=$q->where('order_status',$request->order_status)->get();
+        }else if($request->order_payment){
+            $listDonHang=$q->where('order_payment',$request->order_payment)->get();
+        }
+        else{
+            $listDonHang = $q->orderByDesc('id')->get();
+        }
         $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
+        $trangThaiThanhToan=Order::TRANG_THAI_THANH_TOAN;
+        // dd($trangThaiThanhToan);
+        // dd($trangThaiDonHang);
         foreach ($trangThaiDonHang as $key => $value) {
             $key_trang_thai = $key;
             $value_trang_thai = $value;

@@ -20,7 +20,7 @@ import ModalVoucher from "../../components/ModalVoucher/ModalVoucher";
 import { usePromotion } from "../../hook/usePromotion";
 
 const ProductDetail: React.FC = () => {
-    const { product, comments, ProductBycategorys } = useProduct();
+    const { product, comments, ProductBycategorys, avgComments,StartComments } = useProduct();
     const [selectSize, setSelectSize] = useState<Sizes>({ id: '', name: '' });
     const [selectColor, setSelectColor] = useState<Colors>({ id: '', name: '', color_code: '' });
     const [quantity, setQuantity] = useState(1);
@@ -102,6 +102,8 @@ const ProductDetail: React.FC = () => {
     const handleAddPromotion = (id: string) => {
         addPromotion(id);
     };
+    // console.log(avgComments);
+    
     return (
         <>
             {product && (
@@ -162,7 +164,7 @@ const ProductDetail: React.FC = () => {
                             </div>
                             <div className="flex items-center">
                                 <div className="flex items-center mr-3">
-                                    <span>4.0</span>
+                                   
                                     <span className="ml-2 mr-2 flex text-[12px] xl:text-[14px]">
                                         <FontAwesomeIcon icon={faStarSolid} />
                                         <FontAwesomeIcon icon={faStarSolid} />
@@ -330,12 +332,11 @@ const ProductDetail: React.FC = () => {
                                 className={`hovermenuNav hover:text-yellow-500 ${showComment ? "text-yellow-500" : "text-gray-800"
                                     } hover:bg-blue-700}`}
                             >
-                                <button onClick={showOnlyComment}>Đánh giá</button>
+                                <button onClick={showOnlyComment}>Đánh giá (<span>{avgComments}</span>)</button>
                             </h1>
                         </div>
                         {showDescription && (
-                            <p className="mb-8 text-sm lg:text-lg opacity-85  lg:mx-20 lg:mt-8">
-                                {product.content}
+                               <p className="mb-8 text-sm lg:text-lg opacity-85  lg:mx-20 lg:mt-8" dangerouslySetInnerHTML={{ __html: product ? product.content : 'Loading content...' }}>     
                             </p>
                         )}
 
@@ -343,14 +344,16 @@ const ProductDetail: React.FC = () => {
                             <div className="mb-10 border-2 lg:mt-8">
                                 <div className="flex flex-col items-center justify-center p-5 ">
                                     <div>ĐÁNH GIÁ SẢN PHẨM</div>
-                                    <span>5.0</span>
+                                    <span>
+                                        {avgComments}
+                                    </span>
                                     <span className="ml-2 mr-2 flex text-[14px]">
                                         <FontAwesomeIcon icon={faStarSolid} />
                                         <FontAwesomeIcon icon={faStarSolid} />
                                         <FontAwesomeIcon icon={faStarSolid} />
                                         <FontAwesomeIcon icon={faStarSolid} />
                                         <FontAwesomeIcon icon={faStarRegular} />
-                                        <span className="text-xs">| 1900 đánh giá</span>
+                                        <span className="text-xs">| {StartComments} đánh giá</span>
                                     </span>
                                 </div>
                                 <div className="ml-2 lg:mx-20 h-[500px] overflow-y-scroll">
