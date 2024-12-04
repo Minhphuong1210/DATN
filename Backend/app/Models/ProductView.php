@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductView extends Model
 {
-   
+
     use HasFactory;
     protected $table = 'product_views';
 
-    protected $fillable = ['user_id', 'product_id', 'viewed_at'];
+    protected $fillable = ['user_id', 'product_id'];
 
     public function product()
     {

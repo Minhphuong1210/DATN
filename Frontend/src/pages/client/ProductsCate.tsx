@@ -2,8 +2,6 @@ import { ChevronDown, ChevronLeft, ChevronRight, Eye, Filter, Heart, ShoppingCar
 import React, { useEffect, useState } from 'react'
 import { useCategory } from '../../hook/useCategory';
 import { useColor } from '../../hook/Color';
-import { Product } from '../../interfaces/Product';
-import { useLoading } from '../../context/Loading';
 import { toast } from 'react-toastify';
 import { useModalAddCartProvider } from '../../context/MoDalAddToCart';
 import ModalAddToCart from '../../components/client/Home/ModalAddToCart/ModalAddToCart';

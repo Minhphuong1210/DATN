@@ -78,7 +78,14 @@
                                 <tbody>
                                     @foreach ($listDonHang as $item)
                                         <tr>
-                                            <th scope="row">{{ $item->code_order }}</th>
+                                            <td>
+                                                <a href="javascript:void(0);"
+                                                    onclick="loadOrderDetails({{ $item->id }})">
+                                                    {{ $item->code_order }}
+                                                </a>
+                                            </td>
+
+
 
 
                                             <td>{{ $item->created_at->format('d-m-y') }}</td>
@@ -152,5 +159,98 @@
                 selectElement.value = selectElement.getAttribute('data-default-value');
             }
         }
+
+
+      
+        function loadOrderDetails(orderId) {
+    const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+    modal.show();
+
+    const url = `/admins/orders/show/${orderId}`; // Đường dẫn phù hợp với định nghĩa route
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Lỗi: Không thể tải dữ liệu (Mã lỗi: ${response.status})`);
+            }
+            return response.json(); // Chuyển đổi response thành JSON
+        })
+        .then(result => {
+            const data = result.data; // Lấy dữ liệu từ thuộc tính "data"
+
+            if (!data) {
+                throw new Error("Dữ liệu không hợp lệ.");
+            }
+
+            // Hiển thị thông tin đơn hàng
+            document.getElementById('orderDetailsContent').innerHTML = `
+                <h5 class="text-primary">Chi tiết đơn hàng</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr><th>Mã đơn hàng</th><td>${data.code_order}</td></tr>
+                            <tr><th>Tên người dùng</th><td>${data.username}</td></tr>
+                            <tr><th>Số điện thoại</th><td>${data.phone}</td></tr>
+                            <tr><th>Email</th><td>${data.email}</td></tr>
+                            <tr><th>Địa chỉ</th><td>${data.address}</td></tr>
+                            <tr><th>Trạng thái đơn hàng</th><td>${data.order_status}</td></tr>
+                            <tr><th>Trạng thái thanh toán</th><td>${data.order_payment}</td></tr>
+                            <tr><th>Tiền hàng</th><td>${data.commodity_money.toLocaleString()} VNĐ</td></tr>
+                            <tr><th>Tiền vận chuyển</th><td>${data.cost.toLocaleString()} VNĐ</td></tr>
+                            <tr><th>Tổng tiền</th><td>${data.total_amount.toLocaleString()} VNĐ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h6>Sản phẩm trong đơn hàng:</h6>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Tổng tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${
+                            Array.isArray(data.products) && data.products.length > 0
+                                ? data.products.map(product => `
+                                    <tr>
+                                        <td>${product.product_detail_id}</td>
+                                        <td>${product.price.toLocaleString()} VNĐ</td>
+                                        <td>${product.quantity}</td>
+                                        <td>${product.total_amount.toLocaleString()} VNĐ</td>
+                                    </tr>
+                                  `).join('')
+                                : '<tr><td colspan="4" class="text-center">Không có sản phẩm nào trong đơn hàng.</td></tr>'
+                        }
+                    </tbody>
+                </table>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('orderDetailsContent').innerHTML =
+                `<p class="text-danger">Lỗi: ${error.message}</p>`;
+        });
+}
+
     </script>
 @endsection
+<!-- Modal Chi tiết Đơn hàng -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Nội dung chi tiết đơn hàng sẽ được tải vào đây bằng AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
