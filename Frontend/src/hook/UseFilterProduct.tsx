@@ -31,14 +31,14 @@ export const useFilterProducts = (
                 category,
             });
 
-            const products = response.data.products?.data || [];
-            const responseMessage = response.data.message || null;
+            const products = response.data.products?.data || []; // Lấy danh sách sản phẩm
+            const responseMessage = response.data.message || null; // Lấy thông điệp phản hồi
 
-            setFilterProductsPrice(products);
-            setMessage(responseMessage);
-
-            if (responseMessage) {
-                toast.success(responseMessage); // Chỉ gọi toast nếu message có giá trị
+            // Nếu không có sản phẩm trả về
+            if (!products.length) {
+                toast.error(responseMessage);
+            } else {
+                setFilterProductsPrice(products); // Cập nhật danh sách sản phẩm
             }
         } catch (error) {
             console.error("Error fetching filtered products:", error);

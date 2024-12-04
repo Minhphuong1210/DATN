@@ -11,7 +11,7 @@ import { PhoneCall } from "lucide-react";
 import LoadingPage from "../components/loading/LoadingPage";
 
 const LayoutClient: React.FC = () => {
-  const { loading } = useLoading()
+  const { loading, loadingPage } = useLoading()
   const [windowSize, setWindowSize] = useState<{
     width?: number;
     height?: number;
@@ -42,22 +42,6 @@ const LayoutClient: React.FC = () => {
       setMobile(false);
     }
   }, [windowSize]);
-
-  const [loadingPage, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Giả lập việc tải dữ liệu (có thể là gọi API hoặc tải tài nguyên khác)
-    const timer = setTimeout(() => {
-      setLoading(false); // Sau 2 giây, set loading thành false
-    }, 1000);
-
-    return () => clearTimeout(timer); // Dọn dẹp timer khi component unmount
-  }, []);
-
-  if (loadingPage) {
-    return <LoadingPage />;
-  }
-
 
   return (
     <>
