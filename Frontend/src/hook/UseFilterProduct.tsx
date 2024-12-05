@@ -12,15 +12,15 @@ export const useFilterProducts = (
     category: string | null
 ) => {
     const [filterProductsPrice, setFilterProductsPrice] = useState<Product[]>([]);
-    const [message, setMessage] = useState<string | null>(null);
+    const [filterProductsSubate, setFilterProductsSubate] = useState<Product[]>([]);
+
 
     const FilterProductsByPrice = async () => {
         // Nếu không có bất kỳ điều kiện nào, không gọi API
         if (!min_price && !max_price && !color_id && !size_id && !subcate && !category) {
-            setFilterProductsPrice([]); // Đặt dữ liệu rỗng khi không có filter
+            setFilterProductsPrice([]); 
             return;
         }
-
         try {
             const response = await axios.post("/api/filterProduct", {
                 min_price,
@@ -31,14 +31,14 @@ export const useFilterProducts = (
                 category,
             });
 
-            const products = response.data.products?.data || []; // Lấy danh sách sản phẩm
-            const responseMessage = response.data.message || null; // Lấy thông điệp phản hồi
+            const products = response.data.products?.data || []; 
+            const responseMessage = response.data.message || null; 
 
             // Nếu không có sản phẩm trả về
             if (!products.length) {
                 toast.error(responseMessage);
             } else {
-                setFilterProductsPrice(products); // Cập nhật danh sách sản phẩm
+                setFilterProductsPrice(products);
             }
         } catch (error) {
             console.error("Error fetching filtered products:", error);
@@ -51,5 +51,35 @@ export const useFilterProducts = (
         FilterProductsByPrice();
     }, [min_price, max_price, category, color_id, size_id, subcate]);
 
-    return { filterProductsPrice, FilterProductsByPrice };
+
+
+    const FilterProductsBySubCate = async () => {
+       
+        try {
+            const response = await axios.post("/api/filterProduct", {
+                color_id,
+                size_id,
+                subcate,
+
+            });
+
+            const products = response.data.products?.data || []; 
+            const responseMessage = response.data.message || null; 
+
+            // Nếu không có sản phẩm trả về
+            if (!products.length) {
+                toast.error(responseMessage);
+            } else {
+                setFilterProductsSubate(products); 
+            }
+        } catch (error) {
+            console.error("Error fetching filtered products:", error);
+            toast.error("Lỗi khi tải sản phẩm!");
+        }
+    };
+    useEffect(() => {
+        FilterProductsBySubCate();
+    }, [color_id, size_id, subcate]);
+
+    return { filterProductsPrice, filterProductsSubate, FilterProductsByPrice, FilterProductsBySubCate };
 };

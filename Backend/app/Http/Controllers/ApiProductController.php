@@ -44,14 +44,21 @@ class ApiProductController extends Controller
         }
         $product->increment('view');
         $product->images;
+      
         $comments = Comment::where('product_id', $id)
             ->whereNull('parent_id')
             ->with('replies.user')
             ->get();
-        $startComment = Comment::where('product_id', $id)->whereNull('parent_id')->count();
-        $totalComment = Comment::where('product_id', $id)->whereNull('parent_id')->get();
-        $sumTotalComment = $totalComment->sum('rating');
-        $avgComment = $sumTotalComment / $startComment;
+        
+            $startComment = Comment::where('product_id', $id)->whereNull('parent_id')->count();
+            $totalComment = Comment::where('product_id', $id)->whereNull('parent_id')->get();
+            $sumTotalComment = $totalComment->sum('rating');
+            if($startComment !=0){
+                $avgComment = $sumTotalComment / $startComment;
+
+            }
+        
+       
         $commentsArray = $comments->map(function ($comment){
             return [
                 'id' => $comment->id,
@@ -83,8 +90,8 @@ class ApiProductController extends Controller
             'Product' => $product,
             'ProductSubCategory' => $productSubCategory,
             'comments' => $commentsArray,
-            'avgComment' => $avgComment,
-            'startComment'=>$startComment,
+            'avgComment' => $avgComment ?? 0,
+            'startComment'=>$startComment ?? 0,
         ], 200);
 
     }

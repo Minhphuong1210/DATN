@@ -24,7 +24,6 @@ const Cart = () => {
     const handlecheckNav = (event: any) => {
         for (let item of cart) {
             // console.log(item);
-            
             if (item.quantity > item.product_detail.quantity) {
                 event.preventDefault();
                 toast.error(`Số lượng sản phẩm ${item.NameProduct} , vượt quá số lượng có sẵn trong kho`);

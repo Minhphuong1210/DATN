@@ -17,8 +17,8 @@ export const useCategory = () => {
             const response = await axios.get(`/api/subcategory`);
             return response.data.data
         }
-
     })
+
 
     const { data: productBySubCateId = [] } = useQuery<Product[]>({
         queryKey: ["productByCateId", id],

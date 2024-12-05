@@ -34,13 +34,13 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
     };
 
     // Hàm xử lý sự kiện click thêm/xóa sản phẩm khỏi danh sách yêu thích
-    const handleFavoriteClick = async (productId: string, isFavorite: boolean) => {
-        if (isFavorite) {
-            await removeFromFavorites(productId);
-        } else {
-            await addToFavorites(productId);
-        }
-    };
+    // const handleFavoriteClick = async (productId: string, isFavorite: boolean) => {
+    //     if (isFavorite) {
+    //         await removeFromFavorites(productId);
+    //     } else {
+    //         await addToFavorites(productId);
+    //     }
+    // };
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
