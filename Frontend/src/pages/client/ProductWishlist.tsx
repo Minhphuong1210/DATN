@@ -45,13 +45,13 @@ const ProductWishlist: React.FC<Props> = () => {
                                         alt={product.imageUrl}
                                         className="h-full w-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                                     />
-                                    <div className="sale-badge absolute right-0 top-0 mx-1 my-2 rounded-md bg-red-500 px-2 py-1 text-white">
+                                   
                                         {product.product.discount_id !== null && (
                                             <div className='absolute top-0 right-0 my-3 mx-3 py-1 px-2 rounded-md bg-red-500 text-white sale-badge'>
                                                 {product.product.discount.discount_percent}%
                                             </div>
                                         )}
-                                    </div>
+                                   
                                 </div>
                                 <div className="relative">
                                     <div className="absolute bottom-[30px] left-0 right-0 z-10 flex justify-center space-x-4 opacity-0 transition-all duration-300 group-hover:opacity-100">

@@ -1,11 +1,12 @@
-import { ChevronDown, ChevronLeft, ChevronRight, Eye, Filter, Heart, ShoppingCart } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Eye, Filter, Heart, ShoppingCart, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useCategory } from '../../hook/useCategory';
 import { useColor } from '../../hook/Color';
 import { toast } from 'react-toastify';
 import { useModalAddCartProvider } from '../../context/MoDalAddToCart';
 import ModalAddToCart from '../../components/client/Home/ModalAddToCart/ModalAddToCart';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useFilterProducts } from '../../hook/UseFilterProduct';
 interface PriceRange {
     min: number;
     max: number;
@@ -23,9 +24,25 @@ const ProductsCate = () => {
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const [isFilterMobile, setIsFilterMobile] = useState(false);
-
-    const { isOpenModalAddToCart, setIsOpenModalAddToCart } =
-        useModalAddCartProvider();
+    const [selectedColor, setSelectedColor] = useState<{
+        id: string;
+        name: string;
+    } | null>(null);
+    const [selectedSize, setSellectedSize] = useState<{
+        id: string;
+        name: string;
+    } | null>(null);
+    const { id } = useParams()
+    const { filterProductsSubate } = useFilterProducts(
+        null,
+        null,
+        selectedColor?.id || "",
+        selectedSize?.id || null,
+        id || null,
+        null
+    );
+    console.log('Danh sách sản phẩm từ API:', filterProductsSubate);
+    const { isOpenModalAddToCart, setIsOpenModalAddToCart } = useModalAddCartProvider();
     const [selectedProductId, setSelectedProductId] = useState<{
         id: string;
         idSub: string;
@@ -62,9 +79,8 @@ const ProductsCate = () => {
         if (
             !selectedPriceRange.range1 &&
             !selectedPriceRange.range2 &&
-            !selectedPriceRange.range3 &&
-            !size_id &&
-            !color_id
+            !selectedPriceRange.range3
+
         ) {
             return products; // Nếu không có checkbox nào được chọn, trả về tất cả sản phẩm.
         }
@@ -82,14 +98,9 @@ const ProductsCate = () => {
                 (selectedPriceRange.range2 && price >= 350000 && price <= 550000) ||
                 (selectedPriceRange.range3 && price >= 550000);
 
-            // Kiểm tra size
-            const isInSizeRange = size_id ? product.size_id === size_id : true;
-
-            // Kiểm tra màu
-            const isInColorRange = color_id ? product.color_id === color_id : true;
 
             // Trả về true nếu cả ba điều kiện (giá, size và màu) đều đúng
-            return isInPriceRange && isInSizeRange && isInColorRange;
+            return isInPriceRange;
         });
     };
     const sortProducts = (products) => {
@@ -117,45 +128,53 @@ const ProductsCate = () => {
     };
 
     // Hàm xử lý thay đổi size checkbox
-    const handleSizeCheckboxChange = (size_id: string, isChecked: boolean) => {
+    const handleColor = (
+        color_id: string,
+        color_name: string,
+        isChecked: boolean,
+    ) => {
         if (isChecked) {
-            setSizeID(size_id);
+            setSelectedColor({ id: color_id, name: color_name });
         } else {
-            setSizeID(null);
+            setSelectedColor(null);
         }
     };
 
-    // Hàm xử lý thay đổi color checkbox
-    const handleColorCheckboxChange = (color_id: string, isChecked: boolean) => {
+    const handleSize = (
+        size_id: string,
+        size_name: string,
+        isChecked: boolean,
+    ) => {
         if (isChecked) {
-            setColorID(color_id);
+            setSellectedSize({ id: size_id, name: size_name });
         } else {
-            setColorID(null);
+            setSellectedSize(null);
         }
     };
 
     // Lọc sản phẩm theo các tiêu chí đã chọn
-    const filteredProducts = sortProducts(filterByPriceSizeAndColor(productBySubCateId));
+    const filteredProducts = sortProducts(filterByPriceSizeAndColor(filterProductsSubate));
 
     useEffect(() => {
         // Kiểm tra xem có sản phẩm nào được lọc và có điều kiện lọc được áp dụng không
         const hasFiltersApplied =
             selectedPriceRange.range1 ||
             selectedPriceRange.range2 ||
-            selectedPriceRange.range3 ||
-            size_id ||
-            color_id;
+            selectedPriceRange.range3;
+
 
         // Hiển thị thông báo chỉ khi có sản phẩm bị lọc và điều kiện lọc được áp dụng
         if (filteredProducts.length === 0 && hasFiltersApplied) {
             toast.info('Không có sản phẩm phù hợp với tiêu chí lọc!');
         }
-    }, [filteredProducts, selectedPriceRange, size_id, color_id]);
+    }, [filteredProducts, selectedPriceRange]);
 
 
 
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+
 
     // const handleClearFilter = () => {
     //     setPriceRange(null);
@@ -164,12 +183,12 @@ const ProductsCate = () => {
     // const handleClearFilterCate = () => {
     //     setCate(null);
     // }
-    // const handleClearFilterColor = () => {
-    //     setColorID(null);
-    // }
-    // const handleClearFilterSize = () => {
-    //     setSizeID(null);
-    // }
+    const handleClearFilterColor = () => {
+        setSelectedColor(null);
+    };
+    const handleClearFilterSize = () => {
+        setSellectedSize(null);
+    };
     // const handleClearFilterSubcate = () => {
     //     setSubcateID(null);
     // }
@@ -272,18 +291,15 @@ const ProductsCate = () => {
                                             <div key={index} className="inline-flex items-center">
                                                 <label className="relative flex cursor-pointer items-center">
                                                     <input
-
-                                                        className=" focus:outline-none focus:ring-2  focus:ring-offset-2 peer h-7 w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
                                                         type="checkbox"
-                                                        checked={color_id === item.id}
+                                                        className="peer h-7 w-7 cursor-pointer appearance-none rounded-full border border-slate-300 shadow transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
                                                         onChange={(e) =>
-                                                            handleColorCheckboxChange(item.id, e.target.checked)
+                                                            handleColor(item.id, item.name, e.target.checked)
                                                         }
+                                                        checked={selectedColor?.id === item.id}
                                                         style={{
                                                             backgroundColor: item.color_code,
-
                                                         }}
-
                                                     />
                                                 </label>
 
@@ -301,11 +317,10 @@ const ProductsCate = () => {
                                                     <input
                                                         type="checkbox"
                                                         className="peer h-9 w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-300 hover:shadow-md"
-
-                                                        checked={size_id === item.id}
                                                         onChange={(e) =>
-                                                            handleSizeCheckboxChange(item.id, e.target.checked)
-                                                        }
+                                                            handleSize(item.id, item.name, e.target.checked)
+                                                        } // Gọi handleSize khi thay đổi
+                                                        checked={selectedSize?.id === item.id} // Kiểm tra nếu size_id trùng với item.id thì checkbox được chọn
                                                     />
                                                     <span className="uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
                                                         {item.name}
@@ -328,9 +343,36 @@ const ProductsCate = () => {
                     <div className=' col-span-3 flex flex-col '>
                         <div className='sticky top-0 z-40 bg-white'>
                             <div className='flex justify-between mx-2'>
-                                <div>
-                                    <div className="inline-block mb-3 ">Đang dùng bộ lọc:</div>
+                                <div className="text-[12px] xl:text-[14px]">
+                                    <div className="mx-2 mb-3 inline-block text-[13px] xl:ml-4 xl:text-base">
+                                        Đang dùng bộ lọc:
+                                    </div>
+
+                                    {selectedColor && (
+                                        <div className="ml-2 inline-flex items-center justify-center rounded-lg bg-slate-100">
+                                            {selectedColor.name}
+                                            <X
+                                                className="ml-1"
+                                                size={17}
+                                                strokeWidth={1}
+                                                onClick={handleClearFilterColor}
+                                            />
+                                        </div>
+                                    )}
+                                    {selectedSize && (
+                                        <div className="ml-2 inline-flex items-center justify-center rounded-lg bg-slate-100">
+                                            {selectedSize.name}
+                                            <X
+                                                className="ml-1"
+                                                size={17}
+                                                strokeWidth={1}
+                                                onClick={handleClearFilterSize}
+                                            />
+                                        </div>
+                                    )}
+
                                 </div>
+
                                 <div className=""> {/* Đẩy phần tử này sang phải */}
                                     <div className="xl:block flex w-40 xl:w-full gap-2">
                                         <div

@@ -13,6 +13,7 @@ interface OrderItem {
     price: number;
     product_name: string;
     quantity: number;
+    codeOder: string
 }
 
 const Order: React.FC = () => {
@@ -145,14 +146,12 @@ const Order: React.FC = () => {
                             className=" text-[15px] w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-
-                    {/* Order Item */}
                     {Object.keys(groupedOrders).map((id) => (
                         <div key={id} className="border border-gray-300 rounded-md p-4 mb-4">
                             <div className="flex justify-between items-center mb-2">
                                 <div className=" space-x-2 text-stone-500">
                                     <span>Mã đơn hàng:</span>
-                                    <span>ORD_12_1733310081</span>
+                                    <span>{groupedOrders[id][0]?.codeOder || "Không có mã"}</span>
                                 </div>
                                 <div className="flex space-x-2">
                                     <span

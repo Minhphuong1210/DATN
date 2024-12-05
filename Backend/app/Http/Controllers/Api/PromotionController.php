@@ -125,6 +125,7 @@ class PromotionController extends Controller
     }
     public function getPromotion()
     {
+        
     $user_id = Auth::id();
     if (!$user_id) {
         return response()->json(['message' => 'Bạn chưa đăng nhập']);

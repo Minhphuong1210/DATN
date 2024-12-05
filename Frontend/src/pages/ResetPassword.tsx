@@ -79,7 +79,7 @@ const ResetPassword = () => {
                                         type="password"
                                         onChange={handleChange} value={password}
                                         className="w-full md:w-[400px] xl:w-full text-sm  rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                        placeholder="Nhập mật khẩu"
+                                       
                                     // {...register("password", { required: "Mật khẩu là bắt buộc" })}
                                     />
                                     {/* {errors.password && (

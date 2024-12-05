@@ -5,10 +5,26 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const useFavorites = () => {
+    const [userId, setUserId] = useState<number | null>(null);
     const [favorites, setFavorites] = useState<Product[]>([]);
     const navigate = useNavigate()
     const [message, setMessage] = useState('')
     // Lấy danh sách sản phẩm yêu thích từ API Laravel khi component được mount
+   
+    const checkUser = localStorage.getItem('user');
+    
+    useEffect(() => {
+        if (checkUser) {
+            try {
+                const userID = JSON.parse(checkUser);
+                if (userID && userID.id) {
+                    setUserId(userID.id);
+                }
+            } catch (error) {
+                console.error("Failed to parse the token:", error);
+            }
+        }
+    }, [checkUser]); 
     useEffect(() => {
         const fetchFavorites = async () => {
             try {
@@ -22,17 +38,12 @@ const useFavorites = () => {
         fetchFavorites();
     }, []);
 
-    
+  
     const addToFavorites = async (productId: string) => {
-        const isAlreadyFavorite = favorites.some(product => product.id === productId);
-
-        // if (isAlreadyFavorite) {
-        //     toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
-        //     return;
-        // }
-
+        
+        
         try {
-          const responAdd=  await axios.post('/api/wishlist/add', { product_id: productId });
+          const responAdd=  await axios.post('/api/wishlist/add', { product_id: productId, user_id:userId});
             const response = await axios.get('/api/wishlist');
             setFavorites(response.data);
             // console.log(responAdd);
@@ -49,6 +60,7 @@ const useFavorites = () => {
                 toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
             } else {
                 toast.error((error as AxiosError)?.message);
+        
             }
         }
     };
