@@ -101,43 +101,7 @@ const Home = () => {
                 </div>
 
                 {/* SP SALE */}
-                <div className="bg-[#fcb017c5] lg:mx-[90px] xl:mx-[150px]">
-                    <div className="flex justify-center gap-1 lg:gap-4 bg-white py-2 lg:p-4">
-                        {/* Banner 1 */}
-                        <div className="flex items-center overflow-hidden rounded-md border border-black">
-                            <div className="flex items-center justify-center ">
-                                <div className=" text-sm lg:text-3xl font-bold text-red-500">%</div>
-                            </div>
-                            <div className="flex flex-col items-start justify-center p-4">
-                                <p className=" text-sm  lg:text-lg font-bold text-red-500">Giảm Đến</p>
-                                <p className="text-sm lg:text-2xl font-bold text-black">200K</p>
-                            </div>
-                        </div>
-
-                        {/* Banner 2 */}
-                        <div className="flex items-center overflow-hidden rounded-md border border-black " >
-                            <div className="flex items-center justify-center ">
-                                <div className="text-sm lg:text-lg font-bold text-red-500">FREE</div>
-                            </div>
-                            <div className="flex flex-col items-start justify-center p-4">
-                                <p className=" text-sm lg:text-lg font-bold text-black">
-                                    MIỄN PHÍ VẬN CHUYỂN
-                                </p>
-                                <p className="text-xs lg:text-sm text-gray-500">ĐƠN HÀNG TỪ 498K →</p>
-                            </div>
-                        </div>
-
-                        {/* Banner 3 */}
-                        <div className="flex items-center overflow-hidden rounded-md border border-black">
-                            <div className="flex items-center justify-center ">
-                                <div className=" text-sm lg:text-3xl font-bold text-red-500">📦</div>
-                            </div>
-                            <div className="flex flex-col items-start justify-center p-4">
-                                <p className=" text-sm  lg:text-lg font-bold text-red-500">ĐỔI TRẢ</p>
-                                <p className="text-sm lg:text-2xl font-bold text-black">15 NGÀY →</p>
-                            </div>
-                        </div>
-                    </div>
+                <div className=" lg:mx-[90px] xl:mx-[150px]">
                     <div className="mt-4 grid xl:grid-cols-4  ">
                         <div className="col-span-1"></div>
                         <div className="col-span-2">
@@ -154,10 +118,10 @@ const Home = () => {
                             </p>
                         </div>
                         <div className="col-span-1 flex lg:flex lg:items-end lg:mb-3 xl:items-center ">
-                            <p className=" mr-4 xl:text-lg  text-black">
+                            {/* <p className=" mr-4 xl:text-lg  text-black">
                                 Kết thúc sau
-                            </p>
-                            <div className="flex gap-2 justify-center">
+                            </p> */}
+                            {/* <div className="flex gap-2 justify-center">
                                 <div className="rounded-md bg-red-500  px-1 py-1  xl:px-3 xl:py-2 text-[13px] xl:text-base text-white">
                                     {remainingTime.hours.toString().padStart(2, "0")}
                                 </div>
@@ -169,7 +133,7 @@ const Home = () => {
                                 <div className="rounded-md bg-red-500  px-1 py-1 xl:px-3 xl:py-2 text-[13px] xl:text-base text-white">
                                     {remainingTime.seconds.toString().padStart(2, "0")}
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <ProductCarousel productsHot={productsSale} />
@@ -217,6 +181,42 @@ const Home = () => {
                                 alt=""
                                 className="h-full w-full rounded-3xl object-cover transition-transform duration-300 ease-in-out transform hover:scale-105"
                             />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex justify-center gap-1 lg:gap-4 bg-white py-2 lg:p-4">
+                    {/* Banner 1 */}
+                    <div className="flex items-center overflow-hidden rounded-md border border-black">
+                        <div className="flex items-center justify-center ">
+                            <div className=" text-sm lg:text-3xl font-bold text-red-500">%</div>
+                        </div>
+                        <div className="flex flex-col items-start justify-center p-4">
+                            <p className=" text-sm  lg:text-lg font-bold text-red-500">Giảm Đến</p>
+                            <p className="text-sm lg:text-2xl font-bold text-black">200K</p>
+                        </div>
+                    </div>
+
+                    {/* Banner 2 */}
+                    <div className="flex items-center overflow-hidden rounded-md border border-black " >
+                        <div className="flex items-center justify-center ">
+                            <div className="text-sm lg:text-lg font-bold text-red-500">FREE</div>
+                        </div>
+                        <div className="flex flex-col items-start justify-center p-4">
+                            <p className=" text-sm lg:text-lg font-bold text-black">
+                                MIỄN PHÍ VẬN CHUYỂN
+                            </p>
+                            <p className="text-xs lg:text-sm text-gray-500">ĐƠN HÀNG TỪ 498K →</p>
+                        </div>
+                    </div>
+
+                    {/* Banner 3 */}
+                    <div className="flex items-center overflow-hidden rounded-md border border-black">
+                        <div className="flex items-center justify-center ">
+                            <div className=" text-sm lg:text-3xl font-bold text-red-500">📦</div>
+                        </div>
+                        <div className="flex flex-col items-start justify-center p-4">
+                            <p className=" text-sm  lg:text-lg font-bold text-red-500">ĐỔI TRẢ</p>
+                            <p className="text-sm lg:text-2xl font-bold text-black">15 NGÀY →</p>
                         </div>
                     </div>
                 </div>

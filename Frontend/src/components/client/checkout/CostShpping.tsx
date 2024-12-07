@@ -2,6 +2,7 @@ import React from 'react';
 import { Typography } from '@mui/material';
 import { Order } from '../../../interfaces/oder';
 import { Shipping } from '../../../interfaces/Shipping';
+import useFormatPrice from '../../../hook/useFormatPrice';
 
 
 
@@ -16,7 +17,7 @@ interface ConfirmationProps {
 const CostShipping: React.FC<ConfirmationProps> = ({ shippingInfo, shippings, onCostChange }) => {
     const selectedShipping = shippings.find(shipp => shipp.id.toString() === shippingInfo.shippingMethod);
     const cost = selectedShipping ? selectedShipping.cost : 0;
-
+    const { formatPrice } = useFormatPrice()
     // Gọi hàm callback khi cost thay đổi
     React.useEffect(() => {
         onCostChange(cost);
@@ -24,7 +25,7 @@ const CostShipping: React.FC<ConfirmationProps> = ({ shippingInfo, shippings, on
 
     return (
         <div>
-            <Typography><strong></strong> {cost} VNĐ</Typography>
+            <Typography><strong></strong> {formatPrice(cost)} VNĐ</Typography>
         </div>
     );
 };

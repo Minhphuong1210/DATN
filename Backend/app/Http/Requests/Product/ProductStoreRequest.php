@@ -40,13 +40,25 @@ class ProductStoreRequest extends FormRequest
         $validator->after(function ($validator) {
             $products = $this->input('products');
             $existingVariants = [];
+            $duplicateVariants = [];
+
+            // Lặp qua tất cả các sản phẩm và kiểm tra sự trùng lặp về kích thước và màu sắc
             foreach ($products as $productVariant) {
                 $variantKey = $productVariant['size_id'] . '-' . $productVariant['color_id'];
-                if (in_array($variantKey, $existingVariants)) {
-                    $validator->errors()->add('products', 'Kích thước và màu sắc bị trùng: ');
-                }
 
-                $existingVariants[] = $variantKey;
+                // Kiểm tra xem có trùng lặp không
+                if (in_array($variantKey, $existingVariants)) {
+                    // Nếu trùng lặp, thêm vào danh sách các sản phẩm trùng lặp
+                    $duplicateVariants[] = $variantKey;
+                } else {
+                    // Nếu không trùng lặp, thêm vào danh sách các variants đã xuất hiện
+                    $existingVariants[] = $variantKey;
+                }
+            }
+
+            // Nếu có sản phẩm trùng lặp, thêm lỗi vào validator
+            if (!empty($duplicateVariants)) {
+                $validator->errors()->add('products', 'Có các sản phẩm trùng kích thước và màu sắc.');
             }
         });
     }

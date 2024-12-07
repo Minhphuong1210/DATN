@@ -52,7 +52,7 @@ Route::middleware(['auth:sanctum', 'auth.admin'])->group(function () {
             Route::put('/{id}/update', [OrderController::class, 'update'])->name('update');
             Route::put('/{id}/updatePayment', [OrderController::class, 'updatePayment'])->name('updatePayment');
             Route::delete('/{id}/destroy', [OrderController::class, 'destroy'])->name('destroy');
-            
+
         });
 
         // Category Routes

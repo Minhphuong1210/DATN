@@ -15,7 +15,7 @@ class ApiWishlistController extends Controller
     public function addProductToWishlist(Request $request)
     {
         $userId = Auth::id();
-        
+
         if(!$userId){
             return response()->json([
                 'message'=>'Bạn chưa đăng nhập',
@@ -60,7 +60,7 @@ class ApiWishlistController extends Controller
                 'message'=>'Tài Khoản không tồn tại',
             ],404);
         }
-       
+
         $wishlist = Wishlist::where('user_id', $userId)->first();
 
         if ($wishlist) {
@@ -78,20 +78,23 @@ class ApiWishlistController extends Controller
     }
 
     // Lấy danh sách yêu thích của user
-    public function getWishlist()
+    public function getWishlist(Request $request)
     {
-        $wishlist = Wishlist::where('user_id', Auth::id())->first();
+        $request-> validate([
+            'user_id'=>'required',
+        ]);
+        $wishlist = Wishlist::where('user_id', $request->user_id)->first();
 
         if ($wishlist) {
             $wishlistDetails = WishlistsDetail::where('wishlist_id', $wishlist->id)
                                                ->with('product')
                                                ->with('product.discount') // Load thông tin sản phẩm
                                                ->get();
-        
+
             foreach ($wishlistDetails as $key => $wishlistDetail) {
                 // Sử dụng sản phẩm liên kết với wishlistDetail
                 $wishlistDetail->imageUrl = 'http://127.0.0.1:8000/storage/' . $wishlistDetail->product->image;
-            }        
+            }
             return response()->json($wishlistDetails, 200);
         }
 

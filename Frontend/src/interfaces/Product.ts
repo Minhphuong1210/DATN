@@ -62,16 +62,16 @@ export interface Discount {
 }
 
 export interface ProductView {
+    id: number;
+    product: {
         id: number;
-        product: {
-            id: number;
-            name: string;
-            image: string;
-            price: number;
-            price_sale?: number;
-            discount: Discount;
-        };
-        product_id: number;
-        user_id: number;
-        viewed_at: string;
+        name: string;
+        image: string;
+        price: number;
+        price_sale?: number;
+        discount: Discount;
+    };
+    product_id: number;
+    user_id: number;
+    viewed_at: string;
 }

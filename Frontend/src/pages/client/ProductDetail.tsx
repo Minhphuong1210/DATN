@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faL, faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
-import { ChevronDown, Eye, Heart, ShoppingCart, User } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, Heart, ShoppingCart, User } from "lucide-react";
 import { useProduct } from "../../hook/Product";
 import { Colors, Product, Sizes } from "../../interfaces/Product";
 import { useColor } from "../../hook/Color";
@@ -14,13 +14,43 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import "../../css/slickvoucher.css";
+
 // import required modules
 import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
 import ModalVoucher from "../../components/ModalVoucher/ModalVoucher";
 import { usePromotion } from "../../hook/usePromotion";
+import Slider from "react-slick";
 
 const ProductDetail: React.FC = () => {
-    const { product, comments, ProductBycategorys, avgComments,StartComments } = useProduct();
+
+
+    const settings = {
+        dots: false,  // Tắt dots
+        infinite: true,  // Cho phép vòng lặp
+        speed: 500,  // Thời gian chuyển tiếp giữa các phần tử
+        slidesToShow: 1,
+        arrows: true,
+
+        responsive: [
+            {
+                breakpoint: 1024,  // Với màn hình lớn
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 600,  // Với màn hình nhỏ hơn
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                },
+            },
+        ],
+    }; const { product, comments, ProductBycategorys, avgComments, StartComments } = useProduct();
     const [selectSize, setSelectSize] = useState<Sizes>({ id: '', name: '' });
     const [selectColor, setSelectColor] = useState<Colors>({ id: '', name: '', color_code: '' });
     const [quantity, setQuantity] = useState(1);
@@ -30,7 +60,7 @@ const ProductDetail: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
-    const {addProductView} = useProduct();
+    const { addProductView } = useProduct();
 
     const [openVoucher, setOpenVoucher] = useState(false)
     const { promotions, addPromotion } = usePromotion();
@@ -46,7 +76,7 @@ const ProductDetail: React.FC = () => {
     useEffect(() => {
         if (product) {
             addProductView(product.id);
-        }   
+        }
     }, [product]);
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -65,10 +95,11 @@ const ProductDetail: React.FC = () => {
 
     const handleChangeSize = (event: ChangeEvent<HTMLInputElement>, sizeName: string) => {
         setSelectSize({
-            id: event.target.value,
-            name: sizeName
+            id: String(event.target.value),
+            name: sizeName,
         });
     };
+
 
     const handleChangeColor = (event: ChangeEvent<HTMLInputElement>, colorName: string) => {
         setSelectColor({
@@ -103,7 +134,7 @@ const ProductDetail: React.FC = () => {
         addPromotion(id);
     };
     // console.log(avgComments);
-    
+
     return (
         <>
             {product && (
@@ -159,109 +190,108 @@ const ProductDetail: React.FC = () => {
                         </div>
 
                         <div>
-                            <div className="text-[16px]">
-                                {product.name}
-                            </div>
-                            <div className="flex items-center">
-                                <div className="flex items-center mr-3">
-                                   
-                                    <span className="ml-2 mr-2 flex text-[12px] xl:text-[14px]">
-                                        <FontAwesomeIcon icon={faStarSolid} />
-                                        <FontAwesomeIcon icon={faStarSolid} />
-                                        <FontAwesomeIcon icon={faStarSolid} />
-                                        <FontAwesomeIcon icon={faStarSolid} />
-                                        <FontAwesomeIcon icon={faStarRegular} />
-                                    </span>
-                                    <span className="text-xs">| Đã bán: {product.soldQuantity}</span>
+                            <div className="space-y-2">
+                                <div className="text-[16px]">
+                                    {product.name}
                                 </div>
-                                <div className=" text-[13px] xl:text-sm">
-                                    Tình trạng:
-                                    {product.stock > 0 ? (
-                                        <span className="text-[13px] xl:text-sm font-bold text-green-500 ml-1">Còn hàng</span>
+                                <div className="flex items-center">
+                                    <div className="flex items-center mr-3">
+
+                                        <span className=" mr-2 flex text-[12px] xl:text-[14px]">
+                                            <FontAwesomeIcon icon={faStarSolid} />
+                                            <FontAwesomeIcon icon={faStarSolid} />
+                                            <FontAwesomeIcon icon={faStarSolid} />
+                                            <FontAwesomeIcon icon={faStarSolid} />
+                                            <FontAwesomeIcon icon={faStarRegular} />
+                                        </span>
+                                        <span className="text-xs">| Đã bán: {product.soldQuantity}</span>
+                                    </div>
+                                    <div className=" text-[13px] xl:text-sm">
+                                        Tình trạng:
+                                        {product.stock > 0 ? (
+                                            <span className="text-[13px] xl:text-sm font-bold text-green-500 ml-1">Còn hàng</span>
+                                        ) : (
+                                            <span className="text-[13px] xl:text-sm font-bold text-red-500 ml-1">Hết hàng</span>
+                                        )
+                                        }
+                                    </div>
+                                </div>
+                                <div className="text-lg font-bold">
+                                    {product.price_sale !== null ? (
+                                        <>
+                                            <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                                {formatPrice(product.price)}
+                                            </span>
+                                            <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                {formatPrice(product.price_sale)}
+                                            </span>
+                                        </>
                                     ) : (
-                                        <span className="text-[13px] xl:text-sm font-bold text-red-500 ml-1">Hết hàng</span>
-                                    )
-                                    }
-                                </div>
-                            </div>
-                            <div className="text-lg font-bold">
-                                {product.price_sale !== null ? (
-                                    <>
-                                        <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
+                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
                                             {formatPrice(product.price)}
                                         </span>
-                                        <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                            {formatPrice(product.price_sale)}
-                                        </span>
-                                    </>
-                                ) : (
-                                    <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
-                                        {formatPrice(product.price)}
-                                    </span>
-                                )}
+                                    )}
 
-                            </div>
-                            <form action="">
-                                <div>
-                                    <div className="mb-2 flex justify-start items-center text-[13px] xl:text-sm md:block gap-3">
-                                        <span className="hover:text-yellow-400 md:mr-11">
-                                            <Link to="">Giúp bạn chọn size</Link>
-                                        </span>
-                                        <span className="hover:text-yellow-400">
-                                            <a href="">Bảng size</a>
-                                        </span>
-                                        <span></span>
-                                    </div>
-                                    <div className="mb-2 mt-3 text-sm">
-                                        <span>Màu Sắc: {selectColor.name} </span>
-                                        <div className="mt-2 flex space-x-2">
-                                            {color.map((color, index) => {
-                                                return (
-                                                    <div key={index} className="inline-flex items-center">
-                                                        <label className="relative flex cursor-pointer items-center">
-                                                            <input
-                                                                type="radio"
-                                                                name={color.name}
-                                                                value={color.id}
-                                                                checked={selectColor.id === color.id}
-                                                                onChange={(event) => handleChangeColor(event, color.name)}
-                                                                className="peer h-6 w-6 xl:h-7 xl:w-7 cursor-pointer appearance-none border border-slate-300 shadow transition-all hover:shadow-md rounded-full"
-                                                                style={{ backgroundColor: color.color_code }}
-                                                            />
-                                                        </label>
-
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className=" items-center text-sm md:block md:mr-11 md:mt-3">
-                                            <span className="md:mr-11 text-sm  mb-8">Kích thước: {selectSize.name}</span>
-                                            <div className="flex space-x-2 mt-2">
-                                                {size.map((size, index) => {
-                                                    return (
-                                                        <label key={index} className="relative flex cursor-pointer items-center">
-                                                            <input
-                                                                type="radio"
-                                                                name={size.name}
-                                                                value={size.id}
-                                                                checked={selectSize.id === size.id}
-                                                                onChange={(event) => handleChangeSize(event, size.name)}
-                                                                className="peer h-7 w-7 xl:h-9 xl:w-9 cursor-pointer appearance-none border border-slate-300 shadow transition-all checked:bg-yellow-500 hover:bg-zinc-400 hover:shadow-md"
-                                                            />
-                                                            <span className=" uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-[12px] xl:text-sm text-gray-500 opacity-100 transition-colors peer-checked:text-black peer-checked:opacity-100">
-                                                                {size.name}
-                                                            </span>
-                                                        </label>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
-                            </form>
+
+                                <div className="mb-2 flex justify-start items-center text-[13px] xl:text-sm md:block gap-3">
+                                    <span className="hover:text-yellow-400 md:mr-11">
+                                        <Link to="">Giúp bạn chọn size</Link>
+                                    </span>
+                                    <span className="hover:text-yellow-400">
+                                        <a href="">Bảng size</a>
+                                    </span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <div className="mb-2 mt-3 text-sm">
+                                <span>Màu Sắc: {selectColor.name} </span>
+                                <div className="mt-2 flex space-x-2">
+                                    {color.map((color, index) => {
+                                        return (
+                                            <div key={index} className="inline-flex items-center">
+                                                <label className="relative flex cursor-pointer items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name={color.name}
+                                                        value={color.id}
+                                                        checked={selectColor.id === color.id}
+                                                        onChange={(event) => handleChangeColor(event, color.name)}
+                                                        className="peer h-6 w-6 cursor-pointer appearance-none rounded-full border border-slate-300 shadow transition-all hover:shadow-md focus:outline-none focus:ring-2 md:h-7 md:w-7"
+                                                        style={{ backgroundColor: color.color_code }}
+                                                    />
+                                                </label>
+
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div>
+                                <div className=" items-center text-sm md:block md:mr-11 md:mt-3">
+                                    <span className="md:mr-11 text-sm  mb-8">Kích thước: {selectSize.name}</span>
+                                    <div className="flex space-x-2 mt-2">
+                                        {size.map((size, index) => (
+                                            <label key={index} className="relative flex cursor-pointer items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    name={size.name}
+                                                    value={size.id}
+                                                    checked={selectSize?.name === size.name}
+                                                    onChange={(event) => handleChangeSize(event, size.name)}
+                                                    className={`peer h-6 w-6 cursor-pointer appearance-none border border-slate-300 shadow transition-all 
+                                                        bg-white hover:shadow-md ${selectSize.name === size.name ? 'bg-yellow-300' : ''} md:h-9 md:w-9`} />
+                                                <span className="uppercase pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-[12px] xl:text-sm text-gray-500 transition-colors peer-checked:text-black">
+                                                    {size.name}
+                                                </span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div className=" flex items-center mt-5">
                                 <div className="mr-2 text-[14px] xl:text-base">Mô tả:</div>
 
@@ -298,16 +328,28 @@ const ProductDetail: React.FC = () => {
                             </div>
                             <div>
                                 <div onClick={handleOpenVoucher} className="mt-5 flex items-center gap-1">Voucher và khuyến mãi<ChevronDown /></div>
-                                <div className="flex gap-4 overflow-y-scroll md:overflow-auto md:overflow-x-scroll w-[450px] scrollable-content">
-                                    {promotions.map((item) => (
-                                        <div key={item.id} className="  bg-yellow-100 p-2 rounded-lg mt-2 flex justify-between items-center px-5">
-                                            <div className="w-[200px]" >
-                                                <div>Giảm {item.discount}</div>
-                                                <p className="text-[14px] opacity-50">Hết hạn sau:{new Date(item.end_date).toLocaleDateString('vi-VN')}</p>
+                                <div className="w-[450px]">
+                                    <Slider className="custom-slider" {...settings}>
+                                        {promotions.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className="bg-yellow-100 p-2 rounded-lg mt-2  gap-5 px-5"
+                                            >
+                                                <div className="w-[200px]">
+                                                    <div>Giảm {item.discount}</div>
+                                                    <p className="text-[14px] opacity-50">
+                                                        Hết hạn sau: {new Date(item.end_date).toLocaleDateString('vi-VN')}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleAddPromotion(item.id)}
+                                                    className="bg-red-500 py-1 px-3 rounded-lg text-white text-[13px]"
+                                                >
+                                                    Nhận
+                                                </button>
                                             </div>
-                                            <button onClick={() => handleAddPromotion(item.id)} className="bg-red-500 py-1 px-3 rounded-lg text-white text-[13px]">Nhận</button>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </Slider>
                                 </div>
                                 <ModalVoucher
 
@@ -336,7 +378,7 @@ const ProductDetail: React.FC = () => {
                             </h1>
                         </div>
                         {showDescription && (
-                               <p className="mb-8 text-sm lg:text-lg opacity-85  lg:mx-20 lg:mt-8" dangerouslySetInnerHTML={{ __html: product ? product.content : 'Loading content...' }}>     
+                            <p className="mb-8 text-sm lg:text-lg opacity-85  lg:mx-20 lg:mt-8" dangerouslySetInnerHTML={{ __html: product ? product.content : 'Loading content...' }}>
                             </p>
                         )}
 
@@ -356,39 +398,43 @@ const ProductDetail: React.FC = () => {
                                         <span className="text-xs">| {StartComments} đánh giá</span>
                                     </span>
                                 </div>
-                                <div className="ml-2 lg:mx-20 h-[500px] overflow-y-scroll">
-
-                                    {comments.map((comment) => (
-                                        <div className="mb-3" key={comment.id}>
-                                            <div className="flex items-center">
-                                                <div className="mr-2">
-                                                    <User
-                                                        size={25}
-                                                        strokeWidth={1.5}
-                                                        className="rounded-full bg-slate-300 p-1"
-                                                    />
+                                <div className="ml-2 lg:mx-20 h-[450px] overflow-y-scroll scrollable-content">
+                                    {comments.length > 0 ? (
+                                        comments.map((comment) => (
+                                            <div className="mb-3" key={comment.id}>
+                                                <div className="flex items-center">
+                                                    <div className="mr-2">
+                                                        <User
+                                                            size={25}
+                                                            strokeWidth={1.5}
+                                                            className="rounded-full bg-slate-300 p-1"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <div>{comment.user.name}</div>
+                                                        <span className="flex text-[10px]">
+                                                            {Array.from({ length: 5 }, (_, index) => (
+                                                                <FontAwesomeIcon
+                                                                    key={index}
+                                                                    icon={index < comment.rating ? faStarSolid : faStarRegular}
+                                                                />
+                                                            ))}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <div>{comment.user.name}</div>
-                                                    <span className="flex text-[10px]">
-                                                        {Array.from({ length: 5 }, (_, index) => (
-                                                            <FontAwesomeIcon
-                                                                key={index}
-                                                                icon={index < comment.rating ? faStarSolid : faStarRegular}
-                                                            />
-                                                        ))}
-                                                    </span>
+
+                                                <div className="ml-8 mb-1">{comment.content}</div>
+                                                <div className="ml-8 text-sm opacity-70 mt-1">
+                                                    Ngày đăng: {new Date(comment.created_at).toLocaleDateString()}
                                                 </div>
                                             </div>
-
-                                            <div className="ml-8 mb-1">
-                                                {comment.content}
-                                            </div>
-                                            <div className="ml-8 text-sm opacity-70 mt-1">
-                                                Ngày đăng: {new Date(comment.created_at).toLocaleDateString()}
-                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="flex items-center justify-center text-gray-800">
+                                            Không có đánh giá nào.
                                         </div>
-                                    ))}
+                                    )}
+
 
                                     <hr className="mr-2 mt-3" />
 

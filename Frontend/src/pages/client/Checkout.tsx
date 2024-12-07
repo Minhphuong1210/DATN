@@ -18,10 +18,12 @@ import { usePromotion } from '../../hook/usePromotion';
 import { useLoading } from '../../context/Loading';
 import LoadingPage from '../../components/loading/LoadingPage';
 import { useCart } from '../../context/Cart';
+import useFormatPrice from '../../hook/useFormatPrice';
 
 
 const steps = ['Thông tin giao hàng', 'Xác nhận đơn hàng ', 'Phương thức thanh toán'];
 const Checkout = () => {
+    const { formatPrice } = useFormatPrice()
     const { promotionsUser } = usePromotion()
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
@@ -57,6 +59,19 @@ const Checkout = () => {
         note: '',
         shippingMethod: '',
     });
+    useEffect(() => {
+        const storedShippingInfo = JSON.parse(localStorage.getItem('user'));
+        if (storedShippingInfo) {
+            setShippingInfo({
+                username: storedShippingInfo.name || '',
+                address: storedShippingInfo.address || '',
+                email: storedShippingInfo.email || '',
+                phone: storedShippingInfo.phone || '',
+                note: storedShippingInfo.note || '',
+                shippingMethod: storedShippingInfo.shippingMethod || '',
+            });
+        }
+    }, []);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         const checkResponseCode = () => {
@@ -122,7 +137,6 @@ const Checkout = () => {
     const isChecked = useRef(false); // Dùng useRef để theo dõi lần gọi API
     // console.log(promotion_id);
     const checkResponseCode = async () => {
-
         if (!shippingInfo || !total || shippingCost === undefined) {
             console.error("Data is missing:", { shippingInfo, total, shippingCost });
             return;
@@ -248,13 +262,12 @@ const Checkout = () => {
     const handleNext = async () => {
         // Kiểm tra điều kiện cho activeStep = 0
         if (activeStep === 0) {
-            const errorMessage = validateShippingInfo(shippingInfo);
-            if (errorMessage) {
-                setError(errorMessage);
+            const errors = validateShippingInfo(shippingInfo);
+            if (Object.keys(errors).length > 0) {  // Kiểm tra xem có lỗi nào không
+                setError(errors);
                 return;
             } else {
                 setError(null);
-                // Lưu thông tin vào localStorage
                 localStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
             }
         }
@@ -268,6 +281,7 @@ const Checkout = () => {
             setActiveStep((prevStep) => prevStep + 1); // Tăng bước bình thường
         }
     };
+
 
     const savedShippingInfo = JSON.parse(localStorage.getItem('shippingInfo'));
     const handleBack = () => {
@@ -349,203 +363,201 @@ const Checkout = () => {
     return (
         <>
 
+            <div className='bg-slate-100'>
 
-            <div className="min-w-screen min-h-screen bg-gray-50 py-5 md:mx-[150px] lg:mx-[150px]">
-                <div className="px-5">
-                    <div className="mb-2">
-
-                    </div>
-                    <div className="mb-2">
-                        <h1 className="text-3xl md:text-5xl font-bold text-gray-600">Checkout.</h1>
-                    </div>
-                    <div className="mb-5 text-gray-400">
-                        <a href="/" className="focus:outline-none hover:underline text-gray-500">Home</a> / <a href="cart" className="focus:outline-none hover:underline text-gray-500">Cart</a> / <span className="text-gray-600">Checkout</span>
-                    </div>
-                </div>
-                <div className="w-full bg-white border-t border-b border-gray-200 px-5 py-10 text-gray-800">
-
-                    {oders.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center">
-                            <div className="mt-6 flex flex-col items-center">
-                                <PackageX size={200} strokeWidth="0.1" className="opacity-50" />
-                                <span className="text-gray-500">Không có sản phẩm nào trong giỏ hàng.</span>
-                            </div>
+                <div className="min-w-screen min-h-screen  pt-2 md:mx-[150px] lg:mx-[150px]">
+                    <div className=" px-5 py-1 pt-1 xl:mt-3 bg-white xl:py-5">
+                        <div className="">
+                            <h1 className="text-xl font-bold text-gray-600  xl:text-2xl">
+                                Thanh toán.
+                            </h1>
                         </div>
-                    ) : (
-                        <div className="w-full">
-                            <div className="-mx-3 md:flex items-start">
-                                <div className="px-3 md:w-7/12 lg:pr-10">
-                                    {currentProducts.map((oder, index) => (
-                                        <div key={index} className="w-full mx-auto text-gray-800 font-light mb-6 border-b border-gray-200 pb-6">
-                                            <div className="w-full flex items-center">
-                                                <div className="overflow-hidden rounded-lg w-16 h-16 bg-gray-50 border border-gray-200">
-                                                    <img src={oder.ImageProduct} />
-                                                </div>
-                                                <div className="flex-grow pl-3">
-                                                    <h6 className="font-semibold uppercase text-gray-600">{oder.NameProduct}</h6>
-                                                    <p className="text-gray-400">x {oder.quantity}, Size: {oder.sizeName}, Màu: {oder.colorName}</p>
+                    </div>
 
-                                                </div>
-                                                <div>
-                                                    <span className="font-semibold text-gray-600 text-xl">{oder.price}</span><span className="font-semibold text-gray-600 text-sm">.00</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <div className="flex justify-center mt-4 ">
-                                        <button
-                                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                            disabled={currentPage === 1}
-                                            className="mx-2 p-1 border-2 text-gray-700 rounded-md hover:bg-yellow-300"
-                                        >
-                                            <ChevronLeft strokeWidth={0.5} />
-                                        </button>
-                                        <span className="p-2 opacity-60">{` ${currentPage} / ${totalPages}`}</span>
-                                        <button
-                                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                                            disabled={currentPage === totalPages}
-                                            className="mx-2 p-1  border-2 text-gray-700 rounded-md hover:bg-yellow-300"
-                                        >
-                                            <ChevronRight strokeWidth={0.5} />
-                                        </button>
-                                    </div>
-                                    <div className="mb-6 pb-6 border-b border-gray-200">
-                                        <div className=" flex items-start justify-end mt-5">
-                                            <div className="flex-grow px-2 lg:max-w-xs">
-                                                <FormControl fullWidth>
-                                                    <InputLabel id="demo-simple-select-label">Mã giảm giá</InputLabel>
-                                                    <Select
-                                                        labelId="demo-simple-select-label"
-                                                        id="demo-simple-select"
-
-                                                        label="Mã giảm giá"
-                                                        onChange={handleChange}
-                                                    >
-                                                        <MenuItem value=''>Chọn mã giảm giá</MenuItem>
-                                                        {promotionsUser.map((item) => (
-                                                            <MenuItem value={item.code}>{item.code}</MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-
-                                            </div>
-                                            <div className="px-2 mb-2">
-                                                <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[14px] " onClick={Apply}>Áp Dụng</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {total && (
-                                        <div className="mb-6 pb-6 border-b border-gray-200 text-gray-800">
-                                            <div className="w-full flex mb-3 items-center">
-                                                <div className="flex-grow">
-                                                    <span className="text-gray-600">Tổng tiền sản phẩm</span>
-                                                </div>
-                                                <div className="pl-3">
-                                                    <span className="font-semibold">{total.subtotal}</span>
-                                                </div>
-                                            </div>
-                                            <div className="w-full flex items-center">
-                                                <div className="flex-grow">
-                                                    <span className="text-gray-600">Phí vận chuyển </span>
-                                                </div>
-                                                <div className="pl-3">
-                                                    <span className="font-semibold">
-                                                        <CostShipping
-                                                            shippingInfo={shippingInfo}
-                                                            shippings={shippings}
-                                                            onCostChange={setShippingCost}
-                                                        />
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="w-full flex items-center">
-                                                <div className="flex-grow">
-                                                    <span className="text-gray-600">Tiền Khuyến mại</span>
-                                                </div>
-                                                <div className="pl-3">
-                                                    <span className="font-semibold">
-                                                        {PricePromotion}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                    <div className="mb-6 pb-6 border-b border-gray-200 md:border-none text-gray-800 text-xl">
-                                        <div className="w-full flex items-center">
-                                            <div className="flex-grow">
-                                                <span className="text-gray-600">Tổng thanh toán</span>
-                                            </div>
-                                            <div className="pl-3">
-
-                                                <span className="font-semibold">{tongthanhtoan.toFixed(2)}</span> <span className="font-semibold text-gray-400 text-sm">VND</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                    <div className="w-full bg-white border-t border-b border-gray-200 px-5 py-10 text-gray-800 pb-10">
+                        {oders.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center">
+                                <div className="mt-6 flex flex-col items-center">
+                                    <PackageX size={200} strokeWidth="0.1" className="opacity-50" />
+                                    <span className="text-gray-500">Không có sản phẩm nào trong giỏ hàng.</span>
                                 </div>
-                                <div className="px-3 md:w-5/12">
-                                    <div className="w-full mx-auto rounded-lg bg-white border border-gray-200 p-3 text-gray-800 font-light mb-6">
+                            </div>
+                        ) : (
+                            <div className="w-full">
+                                <div className="-mx-3 md:flex items-start">
+                                    <div className="px-3 md:w-7/12 lg:pr-10">
+                                        {currentProducts.map((oder, index) => (
+                                            <div key={index} className="w-full mx-auto text-gray-800 font-light mb-6 border-b border-gray-200 pb-6">
+                                                <div className="w-full flex items-center">
+                                                    <div className="overflow-hidden rounded-lg w-16 h-16 bg-gray-50 border border-gray-200">
+                                                        <img src={oder.ImageProduct} />
+                                                    </div>
+                                                    <div className="flex-grow pl-3">
+                                                        <h6 className="font-semibold uppercase text-gray-600">{oder.NameProduct}</h6>
+                                                        <p className="text-gray-400">x {oder.quantity}, Size: {oder.sizeName}, Màu: {oder.colorName}</p>
 
-                                        <div>
-                                            <Stepper activeStep={activeStep}>
-                                                {steps.map((label, index) => (
-                                                    <Step key={index}>
-                                                        <StepLabel>{label}</StepLabel>
-                                                    </Step>
-                                                ))}
-                                            </Stepper>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold text-gray-600 text-xl">{formatPrice(oder.price)}</span><span className="font-semibold text-gray-600 text-sm">.00</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <div className="flex justify-center mt-4 ">
+                                            <button
+                                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                                disabled={currentPage === 1}
+                                                className="mx-2 p-1 border-2 text-gray-700 rounded-md hover:bg-yellow-300"
+                                            >
+                                                <ChevronLeft strokeWidth={0.5} />
+                                            </button>
+                                            <span className="p-2 opacity-60">{` ${currentPage} / ${totalPages}`}</span>
+                                            <button
+                                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                                disabled={currentPage === totalPages}
+                                                className="mx-2 p-1  border-2 text-gray-700 rounded-md hover:bg-yellow-300"
+                                            >
+                                                <ChevronRight strokeWidth={0.5} />
+                                            </button>
+                                        </div>
+                                        <div className="mb-6 pb-6 border-b border-gray-200">
+                                            <div className=" flex items-start justify-end mt-5">
+                                                <div className="flex-grow px-2 lg:max-w-xs">
+                                                    <FormControl fullWidth>
+                                                        <InputLabel id="demo-simple-select-label">Mã giảm giá</InputLabel>
+                                                        <Select
+                                                            labelId="demo-simple-select-label"
+                                                            id="demo-simple-select"
+
+                                                            label="Mã giảm giá"
+                                                            onChange={handleChange}
+                                                        >
+                                                            <MenuItem value=''>Chọn mã giảm giá</MenuItem>
+                                                            {promotionsUser.map((item) => (
+                                                                <MenuItem value={item.code}>{item.code}</MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                    </FormControl>
+
+                                                </div>
+                                                <div className="px-2 mb-2">
+                                                    <button className=" w-full max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300  text-black rounded-md px-5 py-[14px] " onClick={Apply}>Áp Dụng</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {total && (
+                                            <div className="mb-6 pb-6 border-b border-gray-200 text-gray-800">
+                                                <div className="w-full flex mb-3 items-center">
+                                                    <div className="flex-grow">
+                                                        <span className="text-gray-600">Tổng tiền sản phẩm</span>
+                                                    </div>
+                                                    <div className="pl-3">
+                                                        <span className="font-semibold">{formatPrice(total.subtotal)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full flex items-center">
+                                                    <div className="flex-grow">
+                                                        <span className="text-gray-600">Phí vận chuyển </span>
+                                                    </div>
+                                                    <div className="pl-3">
+                                                        <span className="font-semibold">
+                                                            <CostShipping
+                                                                shippingInfo={shippingInfo}
+                                                                shippings={shippings}
+                                                                onCostChange={setShippingCost}
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full flex items-center">
+                                                    <div className="flex-grow">
+                                                        <span className="text-gray-600">Tiền Khuyến mại</span>
+                                                    </div>
+                                                    <div className="pl-3">
+                                                        <span className="font-semibold">
+                                                            {formatPrice(PricePromotion)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="mb-6 pb-6 border-b border-gray-200 md:border-none text-gray-800 text-xl">
+                                            <div className="w-full flex items-center">
+                                                <div className="flex-grow">
+                                                    <span className="text-gray-600">Tổng thanh toán</span>
+                                                </div>
+                                                <div className="pl-3">
+
+                                                    <span className="font-semibold text-red-500">{formatPrice(tongthanhtoan.toFixed(2))}</span> <span className="font-semibold text-gray-400 text-sm">VND</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div className="px-3 md:w-5/12">
+                                        <div className="w-full mx-auto rounded-lg bg-white border border-gray-200 p-3 text-gray-800 font-light mb-6">
 
                                             <div>
-                                                {activeStep === steps.length ? (
-                                                    <Typography>
+                                                <Stepper activeStep={activeStep}>
+                                                    {steps.map((label, index) => (
+                                                        <Step key={index}>
+                                                            <StepLabel>{label}</StepLabel>
+                                                        </Step>
+                                                    ))}
+                                                </Stepper>
 
-                                                        <Confirmation
-                                                            shippingInfo={shippingInfo}
-                                                            // paymentMethod={paymentMethod}
-                                                            shippings={shippings}
-                                                        />
+                                                <div>
+                                                    {activeStep === steps.length ? (
+                                                        <Typography>
 
-                                                    </Typography>
-                                                ) : (
-                                                    <div>
-                                                        {getStepContent(activeStep)}
+                                                            <Confirmation
+                                                                shippingInfo={shippingInfo}
+                                                                // paymentMethod={paymentMethod}
+                                                                shippings={shippings}
+                                                            />
 
-                                                        <div style={{ marginTop: '20px' }}>
-                                                            <button className='mr-6 opacity-70'
-                                                                disabled={activeStep === 0}
-                                                                onClick={handleBack}
-                                                            >
-                                                                Quay lại
-                                                            </button>
+                                                        </Typography>
+                                                    ) : (
+                                                        <div>
+                                                            {getStepContent(activeStep)}
 
-                                                            {activeStep !== 2 || (activeStep === 2 && vnpResponseCode === '00') ? (
-                                                                <button
-                                                                    onClick={handleNext}
-                                                                    className="max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300 rounded-md px-5 py-2"
+                                                            <div style={{ marginTop: '20px' }}>
+                                                                <button className='mr-6 opacity-70'
+                                                                    disabled={activeStep === 0}
+                                                                    onClick={handleBack}
                                                                 >
-                                                                    {activeStep === steps.length - 1 ? 'Hoàn tất' : 'Tiếp theo'}
+                                                                    Quay lại
                                                                 </button>
-                                                            ) : null}
+
+                                                                {activeStep !== 2 || (activeStep === 2 && vnpResponseCode === '00') ? (
+                                                                    <button
+                                                                        onClick={handleNext}
+                                                                        className="max-w-xs mx-auto border border-transparent bg-yellow-400 hover:bg-yellow-300 rounded-md px-5 py-2"
+                                                                    >
+                                                                        {activeStep === steps.length - 1 ? 'Hoàn tất' : 'Tiếp theo'}
+                                                                    </button>
+                                                                ) : null}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    )}
+                                                </div>
                                             </div>
+                                            <ConfirmModal
+                                                isVisible={isConfirmOrder || isThankPayment}
+                                                onCancel={() => setIsConfirmOrder(false)}
+                                                savedShippingInfo={savedShippingInfo}
+                                                shippingInfo={shippingInfo}
+                                                totalPayment={totalPayment}
+                                                shippingCost={shippingCost}
+                                            />
                                         </div>
-                                        <ConfirmModal
-                                            isVisible={isConfirmOrder || isThankPayment}
-                                            onCancel={() => setIsConfirmOrder(false)}
-                                            savedShippingInfo={savedShippingInfo}
-                                            shippingInfo={shippingInfo}
-                                            totalPayment={totalPayment}
-                                            shippingCost={shippingCost}
-                                        />
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                </div>
-            </div >
+                        )}
+                    </div>
+                </div >
+            </div>
         </>
     )
 }

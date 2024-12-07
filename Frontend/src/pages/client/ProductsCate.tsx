@@ -205,22 +205,13 @@ const ProductsCate = () => {
     };
     return (
         <>
-            <div className="mt-2 bg-gray-50 px-2 pt-1 xl:mx-[150px] xl:mt-3 xl:py-5">
-                <div className="mb-2">
-                    <h1 className="text-xl font-bold text-gray-600 xl:text-2xl">
-                        Sản phẩm
-                    </h1>
+            <div className="mt-2 bg-gray-50 px-5 pt-1 lg:mx-[100px] xl:mx-[150px] xl:mt-3 xl:py-5">
+                {/* Header */}
+
+                <div>
+                    <h1 className="text-xl font-bold text-gray-600 xl:text-2xl">{name}</h1>
                 </div>
-                <div className="mb-5 text-sm text-gray-400 xl:text-base">
-                    <a
-                        href="/"
-                        className="text-gray-500 hover:underline focus:outline-none"
-                    >
-                        Trang chủ
-                    </a>{" "}
-                    /{" "}
-                    <span className="text-sm text-gray-600 xl:text-base"> Sản phẩm</span>
-                </div>
+
             </div>
             <div className='lg:mx-[100px] xl:mx-[200px] '>
                 <div className='flex'>

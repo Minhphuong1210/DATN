@@ -8,13 +8,11 @@ interface ShippingFormProps {
         shippingMethod: string;
     };
     handleShippingChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleShippingMethodChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    error: string;
+    error: { [key: string]: string | null }; // Updated error prop to handle specific field errors
 }
 
 const ShippingForm: React.FC<ShippingFormProps> = ({
     shippingInfo,
-
     handleShippingChange,
     error
 }) => {
@@ -22,7 +20,6 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
 
     return (
         <div>
-            {error && <Alert className='my-4' severity="error">{error}</Alert>}
             <TextField
                 label="Họ và tên"
                 name="username"
@@ -30,6 +27,8 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
                 onChange={handleShippingChange}
                 fullWidth
                 margin="normal"
+                error={!!error.username} // Check if there's an error for this field
+                helperText={error.username} // Display the error message for this field
             />
             <TextField
                 label="Địa chỉ"
@@ -38,6 +37,8 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
                 onChange={handleShippingChange}
                 fullWidth
                 margin="normal"
+                error={!!error.address} // Check if there's an error for this field
+                helperText={error.address} // Display the error message for this field
             />
             <TextField
                 label="Email"
@@ -46,6 +47,8 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
                 onChange={handleShippingChange}
                 fullWidth
                 margin="normal"
+                error={!!error.email} // Check if there's an error for this field
+                helperText={error.email} // Display the error message for this field
             />
             <TextField
                 label="Số điện thoại"
@@ -54,6 +57,8 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
                 onChange={handleShippingChange}
                 fullWidth
                 margin="normal"
+                error={!!error.phone} // Check if there's an error for this field
+                helperText={error.phone} // Display the error message for this field
             />
             <TextField
                 label="Ghi chú"
@@ -75,10 +80,17 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
                     onChange={handleShippingChange}
                 >
                     {shippings.map((shipp) => (
-
-                        <FormControlLabel key={shipp.id} value={`${shipp.id}`} control={<Radio />} label={shipp.name} />
+                        <FormControlLabel
+                            key={shipp.id}
+                            value={`${shipp.id}`}
+                            control={<Radio />}
+                            label={shipp.name}
+                        />
                     ))}
                 </RadioGroup>
+                {error.shippingMethod && (
+                    <Alert severity="error">{error.shippingMethod}</Alert> // Display error for shipping method
+                )}
             </FormControl>
         </div>
     );

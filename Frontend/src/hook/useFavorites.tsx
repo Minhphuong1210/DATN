@@ -10,9 +10,9 @@ const useFavorites = () => {
     const navigate = useNavigate()
     const [message, setMessage] = useState('')
     // Lấy danh sách sản phẩm yêu thích từ API Laravel khi component được mount
-   
+
     const checkUser = localStorage.getItem('user');
-    
+
     useEffect(() => {
         if (checkUser) {
             try {
@@ -24,34 +24,40 @@ const useFavorites = () => {
                 console.error("Failed to parse the token:", error);
             }
         }
-    }, [checkUser]); 
-    useEffect(() => {
-        const fetchFavorites = async () => {
-            try {
-                const response = await axios.get('/api/wishlist');
-                setFavorites(response.data);
-            } catch (error) {
-                console.error('Lỗi khi lấy danh sách yêu thích:', error);
-            }
-        };
+    }, [checkUser]);
+    const fetchFavorites = async () => {
+        if (userId === null) {
+           
+            return;
+        }
 
-        fetchFavorites();
-    }, []);
-
-  
-    const addToFavorites = async (productId: string) => {
-        
-        
         try {
-          const responAdd=  await axios.post('/api/wishlist/add', { product_id: productId, user_id:userId});
-            const response = await axios.get('/api/wishlist');
+            const response = await axios.post('/api/wishlist', { user_id: userId });
             setFavorites(response.data);
-            // console.log(responAdd);
-            
-            if(responAdd.data.message){
-            toast.success(responAdd.data.message);
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+        }
+    };
 
-            }else{
+    
+    useEffect(() => {
+        if (userId !== null) {
+            fetchFavorites();
+        }
+    }, [userId]);  // Fetch favorites when userId is updated
+
+
+    const addToFavorites = async (productId: string) => {
+        try {
+            const responAdd = await axios.post('/api/wishlist/add', { product_id: productId, user_id: userId });
+            // const response = await axios.post('/api/wishlist', { user_id: userId });
+            // setFavorites(response.data);
+            // console.log(responAdd);
+
+            if (responAdd.data.message) {
+                toast.success(responAdd.data.message);
+
+            } else {
                 toast.warning(responAdd.data.error);
             }
             // navigate('/wishlist');
@@ -60,7 +66,7 @@ const useFavorites = () => {
                 toast.warning('Sản phẩm đã có trong danh sách yêu thích!');
             } else {
                 toast.error((error as AxiosError)?.message);
-        
+
             }
         }
     };

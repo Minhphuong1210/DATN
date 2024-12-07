@@ -6,12 +6,12 @@ import ContactsForm from '../../components/Form/ContactsForm'
 type Props = {}
 
 const Contact = (props: Props) => {
-    const {Contacts} = UseAuth()
+  const { Contacts } = UseAuth()
   return (
     <>
-        <div >
-            <ContactsForm onSubmit={Contacts}/>
-        </div>
+      <div className='bg-slate-100' >
+        <ContactsForm onSubmit={Contacts} />
+      </div>
     </>
   )
 }

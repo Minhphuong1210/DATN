@@ -11,10 +11,9 @@ import { useLoading } from "../context/Loading";
 import { toast } from "react-toastify";
 interface AvgComment {
     avgComment: number;
-    startComment: number
+    startComment: number;
 }
 export const useProduct = () => {
-
     const [products, setProducts] = useState<Product[]>([]);
     const [expiresTimeProducts, setExpiresTimeProducts] = useState();
     const [product, setProduct] = useState<Product>();
@@ -49,7 +48,6 @@ export const useProduct = () => {
     useEffect(() => {
         fetchProducts();
     }, []);
-
 
     // Lấy sản phẩm theo ID
     //   const getProductById = async (id: string, idd: string) => {
@@ -116,13 +114,14 @@ export const useProduct = () => {
     const getProductById = async (id: string, idd: string) => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/productDetai/${id}/subcate/${idd}`);
+            const response = await axios.get(
+                `/api/productDetai/${id}/subcate/${idd}`,
+            );
             setProduct(response.data.Product);
-            setImgsProduct(response.data.Product.images)
-            setAvgComments(response.data.avgComment)
-            setStartComments(response.data.startComment)
+            setImgsProduct(response.data.Product.images);
+            setAvgComments(response.data.avgComment);
+            setStartComments(response.data.startComment);
             // console.log(response.data.avgComment);
-
         } catch (error) {
             toast.error((error as AxiosError)?.message);
         } finally {
@@ -135,53 +134,69 @@ export const useProduct = () => {
         }
     }, [id, idd]);
 
-
     // thêm bình luận
 
-    const checkToken = localStorage.getItem('user')
+    const checkToken = localStorage.getItem("user");
+    const checkTokenn = localStorage.getItem("token");
     useEffect(() => {
-        const userID = JSON.parse(checkToken)
+        const userID = JSON.parse(checkToken);
         if (checkToken) {
-            setUserId(userID.id)
-
+            setUserId(userID.id);
         }
-    }, [])
+    }, []);
 
     // gửi sản phẩm đã xem
- 
+
     const addProductView = async (productId: string) => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
             if (!token) {
-                console.log('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
+                console.log("Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.");
                 return;
             }
-
-            const response = await axios.post('/api/products/viewed', { product_id: productId, user_id: userId });
-            console.log('Sản phẩm đã được thêm vào danh sách đã xem:', response.data);
-        } catch (error) {
-            toast.error((error as AxiosError)?.message);
-        }
+            await axios.post("/api/products/viewed", {
+                product_id: productId,
+                user_id: userId,
+            });
+        } catch { }
     };
     // lấy dữ liệu product view
-    
+
     const getProductView = async () => {
-       if(checkToken){
+        if (userId === null) {
+            return;
+        }
         try {
-            const response = await axios.get("/api/products/recently-viewed");
+            const response = await axios.post("/api/products/recently-viewed", {
+                user_id: userId,
+            });
             setproductViews(response.data); // Dữ liệu trả về đúng cấu trúc log
-            console.log(response.data);
         } catch (error) {
             toast.error((error as AxiosError)?.message);
         }
-       }
     };
 
     useEffect(() => {
-        if (checkToken) {
+        if (userId !== null) {
             getProductView();
-          }
-    }, [checkToken]);
-    return { products, product, loading, productsHots, productsSale, comments, getComment, ProductBycategorys, getProductBycategory, imgsProduct, expiresTimeProducts, productView, getProductView, avgComments, StartComments,addProductView };
-
+        }
+    }, [userId]);
+    return {
+        products,
+        product,
+        loading,
+        productsHots,
+        productsSale,
+        comments,
+        getComment,
+        ProductBycategorys,
+        getProductBycategory,
+        imgsProduct,
+        expiresTimeProducts,
+        productView,
+        getProductView,
+        avgComments,
+        StartComments,
+        addProductView,
+    };
 };

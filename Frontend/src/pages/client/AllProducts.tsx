@@ -246,21 +246,12 @@ const AllProducts = () => {
     return (
         <>
             <div className="mt-2 bg-gray-50 px-5 pt-1 lg:mx-[100px] xl:mx-[150px] xl:mt-3 xl:py-5">
-                <div className="mb-2">
-                    <h1 className="text-xl font-bold text-gray-600 xl:text-2xl">
-                        Sản phẩm
-                    </h1>
+                {/* Header */}
+
+                <div>
+                    <h1 className="text-xl font-bold text-gray-600 xl:text-2xl">Sản phẩm.</h1>
                 </div>
-                <div className="mb-5 text-sm text-gray-400 xl:text-base">
-                    <a
-                        href="/"
-                        className="text-gray-500 hover:underline focus:outline-none"
-                    >
-                        Trang chủ
-                    </a>{" "}
-                    /{" "}
-                    <span className="text-sm text-gray-600 xl:text-base"> Sản phẩm</span>
-                </div>
+
             </div>
             <div className="lg:mx-[100px] xl:mx-[150px]">
                 <div className="flex">
@@ -533,7 +524,7 @@ const AllProducts = () => {
                                     )}
                                 </div>
                                 <div>
-                                    <div className="flex w-40 gap-2 xl:block xl:w-full">
+                                    {/* <div className="flex w-40 gap-2 xl:block xl:w-full">
                                         <div
                                             onClick={handleFilterMobile}
                                             className="flex w-full cursor-pointer items-center rounded-lg border border-slate-300 p-1 text-black hover:bg-slate-100 xl:hidden xl:p-2"
@@ -548,7 +539,7 @@ const AllProducts = () => {
                                             <h2 className="text-[13px] xl:text-base">Sắp xếp </h2>{" "}
                                             <ChevronDown size={17} strokeWidth={1.5} />
                                         </div>
-                                    </div>
+                                    </div> */}
                                     {/* Nội dung Collapse */}
                                     <div
                                         className={`transition-max-height absolute right-1 mt-2 overflow-hidden duration-500 ease-in-out ${isOpenArrange ? "max-h-40" : "max-h-0"

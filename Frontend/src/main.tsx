@@ -14,6 +14,7 @@ import { configAxios } from "./config/aixos.ts";
 import { CartProvider } from "./context/Cart.tsx";
 import { SearchProvider } from "./context/SearchContext.tsx";
 import { ModalAddCartProvider } from "./context/MoDalAddToCart.tsx";
+import { ShipProvider } from "./context/Ship.tsx";
 const queryClient = new QueryClient()
 configAxios();
 createRoot(document.getElementById("root")!).render(
@@ -25,7 +26,9 @@ createRoot(document.getElementById("root")!).render(
           {/* bọc vào đây */}
           <SearchProvider>
             <ModalAddCartProvider>
-              <App />
+              <ShipProvider>
+                <App />
+              </ShipProvider>
             </ModalAddCartProvider>
           </SearchProvider>
         </CartProvider>

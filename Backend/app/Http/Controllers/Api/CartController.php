@@ -34,46 +34,22 @@ class CartController extends Controller
             'color_id' => 'required|integer',
             'quantity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
+            'user_id'=>'required'
         ]);
         $product_id = $request->id;
         $size_id = $request->size_id;
         $color_id = $request->color_id;
         $quantity = $request->quantity;
         $price = $request->price;
-
-        // if (!$product_id) {
-        //     return response()->json([
-        //         'error' => 'Không tìm thấy sản phẩm',
-        //     ], 404);
-        // }
-        // if (!$size_id) {
-        //     return response()->json([
-        //         'error' => 'Không tìm thấy kích cỡ sản phẩm',
-        //     ], 404);
-        // }
-        // if (!$color_id) {
-        //     return response()->json([
-        //         'error' => 'Không tìm thấy màu sắc sản phẩm',
-        //     ], 404);
-        // }
-        // if (!$quantity) {
-        //     return response()->json([
-        //         'error' => 'Không tìm thấy số lượng sản phẩm',
-        //     ], 404);
-        // }
-        // if (!$price) {
-        //     return response()->json([
-        //         'error' => 'Không tìm thấy giá sản phẩm',
-        //     ], 404);
-        // }
-        if (Auth::check()) {
-
+        $user_id = $request->user_id;
+        if ($user_id) {
             $productDetail = ProductDetail::where('product_id', $product_id)
                 ->where('size_id', $size_id)
                 ->where('color_id', $color_id)
                 ->first();
+
             if (!$productDetail) {
-                return response()->json(['error' => 'Không có sản phẩm'], 200);
+                return response()->json(['error' => 'Không có sản phẩm','sql'=>$sql], 200);
             }
             $stock = $productDetail->quantity;
             if ($stock == 0) {
@@ -84,7 +60,7 @@ class CartController extends Controller
             }
 
             $productDetail_id = $productDetail->id;
-            $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+            $cart = Cart::firstOrCreate(['user_id' => $user_id]);
             $cartDetail = CartDetail::where('cart_id', $cart->id)
                 ->where('product_detail_id', $productDetail_id)
                 ->first();

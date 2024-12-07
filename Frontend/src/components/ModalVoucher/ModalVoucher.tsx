@@ -48,12 +48,12 @@ const ModalVoucher = ({
                     onClick={handleCloseVoucher}
                     className={`fixed inset-0 top-0 lg:flex lg:items-center lg:justify-center z-50 h-screen w-screen bg-black bg-opacity-50 backdrop-blur-sm transition-all duration-700 ease-in-out ${isAnimation ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}`}
                 >
-                    <div className=" absolute top-1/3 lg:top-auto h-2/3 w-screen bg-white p-6 lg:h-auto max-h-[90%]  lg:w-auto ">
+                    <div className=" absolute top-1/3 lg:top-auto h-2/3 w-screen bg-white p-6 lg:h-auto max-h-[90%]  lg:w-auto rounded-lg">
                         <div
                             onClick={(e) => e.stopPropagation()}
-                            className="w-[500px] h-full lg:p-10 "
+                            className="w-[500px] h-full lg:p-5 "
                         >
-                            <h1 className="text-center">Voucher và khuyến mãi</h1>
+                            <h1 className="text-center text-2xl mb-3">Voucher và khuyến mãi</h1>
                             {promotions.map((item) => (
                                 <div
                                     key={item.id}

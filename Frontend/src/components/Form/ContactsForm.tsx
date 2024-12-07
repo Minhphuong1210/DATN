@@ -13,20 +13,20 @@ const ContactsForm = ({ onSubmit }: Props) => {
     } = useForm();
 
     return (
-        <div className='w-[90%] mx-auto'>
+        <div className='w-[90%] mx-auto pb-10 '>
             <h1 className='text-center text-2xl md:text-3xl font-semibold pt-6'>
                 Liên hệ với chúng tôi
             </h1>
-            <div className='flex flex-col lg:flex-row justify-center gap-8 pt-6 px-4 lg:px-16'>
+            <div className='flex flex-col lg:flex-row justify-center gap-8 pt-6 px-4 lg:px-16 '>
                 {/* Form Section */}
-                <form 
-                    onSubmit={handleSubmit(onSubmit)} 
-                    className="w-full lg:w-2/3 max-w-4xl"
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="w-full lg:w-2/3 max-w-4xl bg-white"
                 >
-                    <div className='border-2 border-slate-200 p-6 rounded-xl shadow-xl'>
+                    <div className='border-2 border-slate-200 p-6 rounded-xl '>
                         <h2 className='text-lg md:text-xl font-semibold'>Viết cho chúng tôi</h2>
                         <p className='text-sm md:text-base'>Chúng tôi sẽ trả lời bạn nhanh nhất có thể.</p>
-                        
+
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-6 pt-6'>
                             {/* Name Input */}
                             <div className="w-full">
@@ -127,7 +127,7 @@ const ContactsForm = ({ onSubmit }: Props) => {
                         </div>
                         {/* Submit Button */}
                         <div className='pt-8 flex justify-center'>
-                            <button 
+                            <button
                                 className='w-full md:w-1/2 h-[45px] bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded'
                             >
                                 Gửi
@@ -136,7 +136,7 @@ const ContactsForm = ({ onSubmit }: Props) => {
                     </div>
                 </form>
                 {/* Office Info Section */}
-                <div className='border-2 border-slate-200 p-6 w-full lg:w-1/3 rounded-xl shadow-xl'>
+                <div className='border-2 border-slate-200 p-6 w-full lg:w-1/3 rounded-xl  bg-white'>
                     <h2 className='text-lg md:text-xl font-semibold'>Văn phòng</h2>
                     <p className='pt-4 text-sm md:text-base'><strong>Hotline:</strong> 1900.8079</p>
                     <p className='pt-2 text-sm md:text-base'><strong>Thời gian mở cửa:</strong> 8:00 - 19:00 Thứ 2 - Thứ 7</p>

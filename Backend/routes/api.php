@@ -24,15 +24,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // API để lấy giỏ hàng
     Route::get('/cart', [CartController::class, 'cart_detail']);
     // API thêm sản phẩm vào giỏ hàng
-    Route::post('/cart/add', [CartController::class, 'store']);
 
 
-    // API thêm sản phẩm vào giỏ hàng
-    Route::post('/cart/add', [CartController::class, 'store']);
+
+    // // API thêm sản phẩm vào giỏ hàng
+    // Route::post('/cart/add', [CartController::class, 'store']);
 
 
-    // API cập nhật số lượng sản phẩm trong giỏ hàng
-    Route::put('/cart/{id}/update', [CartController::class, 'update']);
+    // // API cập nhật số lượng sản phẩm trong giỏ hàng
+    // Route::put('/cart/{id}/update', [CartController::class, 'update']);
 
 
 
@@ -43,11 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // API xóa sản phẩm khỏi giỏ hàng
     Route::delete('/cart/{id}/delete', [CartController::class, 'destroy']);
     //Sản phẩm gần đây
-;
- Route::get('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed'])->middleware('auth:sanctum');
-
 
 });
+Route::post('/cart/add', [CartController::class, 'store']);
+Route::post('/products/recently-viewed', [ProductController::class, 'getRecentlyViewed']);
 Route::post('/products/viewed', [ProductController::class, 'addRecentlyViewed']);
 // lấy sản phẩm product
 Route::resource('/products', ProductController::class);
@@ -103,8 +102,9 @@ Route::post('/search', [ProductController::class, 'search']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('wishlist/add', [ApiWishlistController::class, 'addProductToWishlist']);
     Route::delete('wishlist/remove/{productId}', [ApiWishlistController::class, 'removeProductFromWishlist']);
-    Route::get('wishlist', [ApiWishlistController::class, 'getWishlist']);
+
 });
+Route::post('wishlist', [ApiWishlistController::class, 'getWishlist']);
 Route::post('/comment/{id}',[CommentController::class,'store'])->middleware('auth:sanctum');
 
 Route::put('/userEdit/{id}',[ApiAuthController::class,'update'])->middleware('auth:sanctum');

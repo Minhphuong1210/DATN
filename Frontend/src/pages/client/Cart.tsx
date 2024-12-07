@@ -4,10 +4,13 @@ import { ChevronLeft, ChevronRight, PackageX } from "lucide-react";
 import { useCart } from "../../context/Cart";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import momo from "../../public/images/Logo-MoMo-Square.webp"
+import vnpay from "../../public/images/logovnpay.png"
 const Cart = () => {
     const { cart, removeFromCart, increaseQuantity, decreaseQuantity } =
         useCart();
+    console.log(cart);
+
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const productsPerPage = 3;
@@ -51,10 +54,10 @@ const Cart = () => {
     //   const soluongcart = Number(cart.map(item => item.quantity));
     // console.log(soluongcart);
 
-      
-   
+
+
     // console.log(item);
-    
+
     const handleButtonClick = () => {
         console.log("Selected ID:", selectedIds);
 
@@ -72,24 +75,16 @@ const Cart = () => {
 
     return (
         <>
-            <div className="mt-2 bg-gray-50 px-5 pt-1 xl:mx-[150px] xl:mt-3 xl:py-5">
-                <div className="mb-2">
-                    <h1 className="text-xl font-bold text-gray-600  xl:text-2xl">
-                        Giỏ hàng.
-                    </h1>
-                </div>
-                <div className="mb-5 text-sm text-gray-400 xl:text-base">
-                    <a
-                        href="/"
-                        className="text-gray-500 hover:underline focus:outline-none"
-                    >
-                        Trang chủ
-                    </a>{" "}
-                    / <span className="text-sm text-gray-600 xl:text-base">Giỏ hàng</span>
-                </div>
-            </div>
-            <section className="xl:h-[650px] bg-white">
+
+            <section className="xl:h-[650px] bg-slate-100 pt-2 ">
                 <div className="mx-auto max-w-screen-xl px-4 xl:min-h-[620px]  min-h-[720px]  2xl:px-0">
+                    <div className=" px-5 py-1 pt-1 xl:mt-3 bg-white xl:py-5">
+                        <div className="">
+                            <h1 className="text-xl font-bold text-gray-600  xl:text-2xl">
+                                Giỏ hàng.
+                            </h1>
+                        </div>
+                    </div>
                     {currentProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center">
                             <div className="mt-6 flex flex-col items-center">
@@ -103,7 +98,7 @@ const Cart = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="mb-7 mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+                        <div className="mb-7 xl:mt-4 mt-2 md:gap-6 lg:flex lg:items-start xl:gap-4">
                             <div className="relative mx-auto w-full flex-none overflow-hidden lg:max-w-2xl xl:min-h-[620px] xl:max-w-4xl min-h-[620px] ">
                                 <div className="mb-20 space-y-6">
                                     {currentProducts.map((item) => {
@@ -115,11 +110,11 @@ const Cart = () => {
                                             >
                                                 <div className="space-y-1 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0 xl:space-y-4">
                                                     <div className="flex gap-2">
-                                                        <input
+                                                        {/* <input
                                                             type="checkbox"
                                                             value={item.id}
                                                             onChange={() => handleCheckboxChange(item.id)}
-                                                        />
+                                                        /> */}
                                                         <a href="#" className="shrink-0 md:order-1">
                                                             <img
                                                                 className="h-20 w-16 xl:h-28 xl:w-20 dark:hidden"
@@ -195,7 +190,7 @@ const Cart = () => {
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center justify-between md:order-3 md:justify-end">
-                                                        <div className="hidden items-center xl:flex">
+                                                        <div className="hidden items-center md:flex">
                                                             <button
                                                                 onClick={() => decreaseQuantity(item.id)}
                                                                 type="button"
@@ -246,14 +241,19 @@ const Cart = () => {
                                                             </button>
 
                                                         </div>
-                                                        <div className="hidden text-end md:order-4 md:w-32 xl:block">
-                                                            <p className="dark:text-dark text-base font-bold text-gray-900">
-                                                                {" "}
-                                                                {formatPrice(item.PriceProduct)}
-                                                            </p>
-                                                            <p className="dark:text-dark text-base font-bold text-red-500">
+                                                        <div className="hidden text-end md:order-4 md:w-48 lg:block ">
+                                                            <div className=" ">
+                                                                <p className="dark:text-dark text-base  text-gray-900 line-through opacity-50">
+                                                                    {formatPrice(item.product_detail.product.price)}
+                                                                </p>
+                                                                <p className="dark:text-dark text-base font-bold text-red-500">
+                                                                    {formatPrice(item.product_detail.product.price_sale)}
+                                                                </p>
+                                                            </div>
+                                                            {/* <p className="dark:text-dark text-base font-bold text-red-500">
                                                                 {formatPrice(totalPrice)}
-                                                            </p>
+                                                            </p> */}
+
                                                         </div>
                                                     </div>
                                                     <div className="w-full min-w-0 flex-1 md:order-2 md:max-w-md xl:space-y-4">
@@ -263,7 +263,7 @@ const Cart = () => {
                                                         >
                                                             {item.NameProduct}
                                                         </a>
-                                                        <div className="hidden lg:block">
+                                                        <div className="hidden md:block  text-[14px] opacity-50">
                                                             Size: {item.sizeName}, Màu: {item.colorName}
                                                         </div>
                                                         <div className="flex items-center justify-between lg:justify-start gap-10 xl:gap-4">
@@ -314,14 +314,16 @@ const Cart = () => {
                                                                 </svg>
                                                                 Xóa
                                                             </button>
-                                                            <div className="text-end md:order-4 md:w-32 xl:hidden">
+                                                            <div className="text-end md:order-4 md:w-32 lg:hidden ">
+                                                                <p className="dark:text-dark text-base  text-gray-900 line-through opacity-50">
+                                                                    {formatPrice(item.product_detail.product.price)}
+                                                                </p>
                                                                 <p className="dark:text-dark text-base font-bold text-gray-900">
-                                                                    {" "}
-                                                                    {formatPrice(item.PriceProduct)}
+                                                                    {formatPrice(item.product_detail.product.price_sale)}
                                                                 </p>
-                                                                <p className="dark:text-dark text-base font-bold text-red-500">
+                                                                {/* <p className="dark:text-dark text-base font-bold text-red-500">
                                                                     {formatPrice(totalPrice)}
-                                                                </p>
+                                                                </p> */}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -361,7 +363,7 @@ const Cart = () => {
                                 <div className="xl:space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
                                     <div className="flex justify-between">
                                         <p className=" text-base xl:text-xl font-semibold text-gray-900">
-                                            Tổng đơn hàng:
+                                            Tổng giá trị đơn hàng:
                                         </p>
                                         <div className="flex justify-end xl:hidden ">
                                             <Link
@@ -374,14 +376,14 @@ const Cart = () => {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4  ">
-                                        <dl className="flex items-center xl:justify-between gap-4">
+                                    <div className="  ">
+                                        <dl className="flex items-center xl:justify-between gap-4 ">
                                             <dt className="text-[15px] opacity-70 xl:text-base font-bold text-gray-900">Giá:</dt>
                                             <dd className="text-base font-bold text-red-500">
                                                 {formatPrice(totalCartPrice)}
                                             </dd>
                                         </dl>
-                                        <div className=" justify-center hidden xl:flex">
+                                        <div className=" justify-center hidden xl:flex mt-5">
                                             <Link
                                                 to={"/checkout"}
                                                 onClick={handlecheckNav}
@@ -389,6 +391,13 @@ const Cart = () => {
                                             >
                                                 Đặt hàng
                                             </Link>
+                                        </div>
+                                        <div className="hidden lg:block">
+                                            <div className="flex gap-4 justify-center mt-10 mb-2 ">
+                                                <img src={momo} alt="" className="w-8" />
+                                                <img src={vnpay} alt="" className="w-24" />
+                                            </div>
+                                            <p className="text-[14px] opacity-60 text-center">Đảm bảo thanh toán an toàn và bảo mật</p>
                                         </div>
                                         {/* <div className="flex justify-center">
                                             <button

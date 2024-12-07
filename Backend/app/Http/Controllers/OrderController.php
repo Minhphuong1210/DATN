@@ -16,27 +16,26 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-        $q=Order::query();
+        $q = Order::query();
 
-       
-        
+
+
         // dd($listDonHang);
-        if($request->key){
-            $listDonHang=$q->where('code_order',$request->key)
-            ->orWhere('username',$request->key)
-            ->orWhere('address',$request->key)
-            ->orWhere('email',$request->key)
-            ->get();
-        }else if($request->order_status){
-            $listDonHang=$q->where('order_status',$request->order_status)->get();
-        }else if($request->order_payment){
-            $listDonHang=$q->where('order_payment',$request->order_payment)->get();
-        }
-        else{
+        if ($request->key) {
+            $listDonHang = $q->where('code_order', $request->key)
+                ->orWhere('username', $request->key)
+                ->orWhere('address', $request->key)
+                ->orWhere('email', $request->key)
+                ->get();
+        } else if ($request->order_status) {
+            $listDonHang = $q->where('order_status', $request->order_status)->get();
+        } else if ($request->order_payment) {
+            $listDonHang = $q->where('order_payment', $request->order_payment)->get();
+        } else {
             $listDonHang = $q->orderByDesc('id')->get();
         }
         $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
-        $trangThaiThanhToan=Order::TRANG_THAI_THANH_TOAN;
+        $trangThaiThanhToan = Order::TRANG_THAI_THANH_TOAN;
         // dd($trangThaiThanhToan);
         // dd($trangThaiDonHang);
         foreach ($trangThaiDonHang as $key => $value) {
@@ -73,30 +72,17 @@ class OrderController extends Controller
     //     'data' => $orderDetails,
     //     ]);
     // }
-    public function show(Request $request)
+    public function show(string $id)
     {
-        $orderDetails = Order::with(['user', 'shipping'])->find($request->id);
-        if (!$orderDetails) {
-            return response()->json([
-                'error' => 'Đơn hàng không tồn tại.'
-            ], 404);
-        }
-        return response()->json([
-            'data' => [
-                'code_order' => $orderDetails->code_order,
-                'commodity_money' => $orderDetails->commodity_money,
-                'total_amount' => $orderDetails->total_amount,
-                'order_status' => $orderDetails->order_status,
-                'order_payment' => $orderDetails->order_payment,
-                'user_id' => $orderDetails->user->id ?? null,
-                'username' => $orderDetails->user->name ?? 'Không rõ',
-                'phone' => $orderDetails->user->phone,
-                'email' => $orderDetails->user->email,
-                'address' => $orderDetails->user->address,
-                'cost' => $orderDetails->shipping->cost,
-                'price' =>$orderDetails->price,
-            ]
-        ]);
+        $donHang = Order::query()->findOrFail($id);
+        $user_id  = $donHang->user_id ;
+
+        $trangThaiDonHang = Order::TRANG_THAI_DON_HANG;
+        $trangThaiThanhToan = Order::TRANG_THAI_THANH_TOAN;
+        $productDetails_id = $donHang->OrderDetail->pluck('product_detail_id')->toArray();
+            $productDetails = ProductDetail::whereIn('id', values: $productDetails_id)->get();
+            $orderDetails = $donHang->OrderDetail;
+        return view('Admin.Orders.show', compact('donHang', 'trangThaiDonHang', 'trangThaiThanhToan','productDetails'));
     }
 
     /**

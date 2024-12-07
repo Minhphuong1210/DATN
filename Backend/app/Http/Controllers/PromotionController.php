@@ -14,7 +14,7 @@ class PromotionController extends Controller
     public function index()
     {
         $promotion = Promotion::all();
-    
+
         return view('Admin.Promotion.index',compact('promotion'));
     }
 
@@ -31,6 +31,9 @@ class PromotionController extends Controller
      */
     public function store(PromotionRequest $request)
     {
+        // if($request->discount_type['percentage']>100){
+
+        // }
         Promotion::create($request->all());
 
         return redirect()->route('admins.promotion.index')->with('success', 'Thêm khuyễn mãi thành công');

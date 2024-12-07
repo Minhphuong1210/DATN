@@ -63,6 +63,7 @@ class ApiOrderController extends Controller
                     'orderStatus' => $trangThaiDonHang[$donHang->order_status],
                     'imageUrl' => 'http://127.0.0.1:8000/storage/' . $detail->productDetail->product->image,
                     'id' => $donHang->id,
+                    'code_order' => $donHang->code_order,
                     'id_product' => $detail->productDetail->product->id,
                 ];
             });
@@ -315,6 +316,14 @@ class ApiOrderController extends Controller
         try {
             if ($request->has('huy_don_hang')) {
                 if ($donHang->order_status == 'dang_van_chuyen') {
+                    return response()->json([
+                        'error' => 'Cập nhật không thành công'
+                    ]);
+                }else if($donHang->order_status == 'dang_chuan_bi'){
+                    return response()->json([
+                        'error' => 'Cập nhật không thành công'
+                    ]);
+                }else if($donHang->order_status == 'da_nhan_hang'){
                     return response()->json([
                         'error' => 'Cập nhật không thành công'
                     ]);

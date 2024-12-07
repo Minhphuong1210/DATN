@@ -14,7 +14,7 @@ const ThankPayMent: React.FC<ConfirmModalProps> = ({ isVisible, onCancel }) => {
     useEffect(() => {
         if (isVisible) {
             // Simulate loading process
-            const timer = setTimeout(() => setIsLoading(false), 3000);
+            const timer = setTimeout(() => setIsLoading(false), 4000);
             return () => clearTimeout(timer); // Cleanup on unmount
         }
     }, [isVisible]);

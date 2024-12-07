@@ -160,8 +160,8 @@
                             </div><!-- end card -->
                         </div><!-- end col -->
 
-                        <div class="col-xl-4">
-                            <!-- card -->
+                        <!-- <div class="col-xl-4">
+
                             <div class="card card-height-100">
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Sales by Locations</h4>
@@ -170,9 +170,9 @@
                                             Export Report
                                         </button>
                                     </div>
-                                </div><!-- end card header -->
+                                </div>
 
-                                <!-- card body -->
+
                                 <div class="card-body">
 
                                     <div id="sales-by-locations"
@@ -184,16 +184,16 @@
                                         <p class="mb-1">Canada <span class="float-end">75%</span></p>
                                         <div class="progress mt-2" style="height: 6px;">
                                             <div class="progress-bar progress-bar-striped bg-primary" role="progressbar"
-                                                style="width: 75%" aria-valuenow="75" aria-valuemin="0"
-                                                aria-valuemax="75"></div>
+                                                style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="75">
+                                            </div>
                                         </div>
 
                                         <p class="mt-3 mb-1">Greenland <span class="float-end">47%</span>
                                         </p>
                                         <div class="progress mt-2" style="height: 6px;">
                                             <div class="progress-bar progress-bar-striped bg-primary" role="progressbar"
-                                                style="width: 47%" aria-valuenow="47" aria-valuemin="0"
-                                                aria-valuemax="47"></div>
+                                                style="width: 47%" aria-valuenow="47" aria-valuemin="0" aria-valuemax="47">
+                                            </div>
                                         </div>
 
                                         <p class="mt-3 mb-1">Russia <span class="float-end">82%</span>
@@ -205,10 +205,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- end card body -->
+
                             </div>
-                            <!-- end card -->
-                        </div>
+
+                        </div> -->
                         <!-- end col -->
                     </div>
 
@@ -217,24 +217,6 @@
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Top 10 sản phẩm được mua nhiều nhất</h4>
-                                    <div class="flex-shrink-0">
-                                        <div class="dropdown card-header-dropdown">
-                                            <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="false">
-                                                <span class="fw-semibold text-uppercase fs-12">Sort by:
-                                                </span><span class="text-muted">Today<i
-                                                        class="mdi mdi-chevron-down ms-1"></i></span>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="#">Today</a>
-                                                <a class="dropdown-item" href="#">Yesterday</a>
-                                                <a class="dropdown-item" href="#">Last 7 Days</a>
-                                                <a class="dropdown-item" href="#">Last 30 Days</a>
-                                                <a class="dropdown-item" href="#">This Month</a>
-                                                <a class="dropdown-item" href="#">Last Month</a>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div class="card-body">
@@ -251,11 +233,10 @@
                                                                 </div>
                                                                 <div>
                                                                     <h5 class="fs-14 my-1"><a
-                                                                            href="apps-ecommerce-product-details.html"
+                                                                            href="{{ route('admins.product.edit', $top10productboughts['id']) }}"
                                                                             class="text-reset">{{ $top10productboughts['name'] }}</a>
                                                                     </h5>
-                                                                    <span class="text-muted">24 Apr
-                                                                        2021</span>
+                                                                    <span class="text-muted"></span>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -293,21 +274,8 @@
                         <div class="col-xl-6">
                             <div class="card card-height-100">
                                 <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Top Sellers</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Sản phẩm sắp hết hàng</h4>
                                     <div class="flex-shrink-0">
-                                        <div class="dropdown card-header-dropdown">
-                                            <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="false">
-                                                <span class="text-muted">Report<i
-                                                        class="mdi mdi-chevron-down ms-1"></i></span>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="#">Download
-                                                    Report</a>
-                                                <a class="dropdown-item" href="#">Export</a>
-                                                <a class="dropdown-item" href="#">Import</a>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div><!-- end card header -->
 
@@ -315,171 +283,44 @@
                                     <div class="table-responsive table-card">
                                         <table class="table table-centered table-hover align-middle table-nowrap mb-0">
                                             <tbody>
+                                                @foreach ($sanphamhethan as $key => $sanphamhethans)
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-2">
-                                                                <img src="assets/images/companies/img-1.png"
-                                                                    alt="" class="avatar-sm p-2" />
+                                                            <div class="avatar-sm bg-light rounded p-1 me-2">
+                                                                <img src="{{ Storage::url($sanphamhethans->product->image)}}"
+                                                                    alt="" class="img-fluid d-block" />
                                                             </div>
                                                             <div>
-                                                                <h5 class="fs-14 my-1 fw-medium">
-                                                                    <a href="apps-ecommerce-seller-details.html"
-                                                                        class="text-reset">iTest
-                                                                        Factory</a>
+                                                                <h5 class="fs-14 my-1"><a
+                                                                        href="{{ route('admins.product.edit', $sanphamhethans->product->id) }}"
+                                                                        class="text-reset">{{ $sanphamhethans->product->name }}</a>
                                                                 </h5>
-                                                                <span class="text-muted">Oliver
-                                                                    Tyler</span>
+                                                                <span class="text-muted"> Màu: {{$sanphamhethans->productColor->name}} , Size: {{$sanphamhethans->productSize->name}}
+                                                                    </span>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <span class="text-muted">Bags and Wallets</span>
-                                                    </td>
-                                                    <td>
-                                                        <p class="mb-0">8547</p>
-                                                        <span class="text-muted">Stock</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">$541200</span>
-                                                    </td>
-                                                    <td>
-                                                        <h5 class="fs-14 mb-0">32%<i
-                                                                class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
+                                                        <h5 class="fs-14 my-1 fw-normal">
+                                                            @if ($top10productboughts['price_sale'] == null)
+                                                                {{ number_format($sanphamhethans->product->price, 0, ',', '.') }}
+                                                                <span class="text-muted">Price</span>
+                                                            @else
+                                                                {{ number_format($sanphamhethans->product->price_sale, 0, ',', '.') }}
+                                                                <span class="text-muted">Price sale</span>
+                                                            @endif
                                                         </h5>
                                                     </td>
-                                                </tr><!-- end -->
-                                                <tr>
                                                     <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-2">
-                                                                <img src="assets/images/companies/img-2.png"
-                                                                    alt="" class="avatar-sm p-2" />
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="fs-14 my-1 fw-medium"><a
-                                                                        href="apps-ecommerce-seller-details.html"
-                                                                        class="text-reset">Digitech
-                                                                        Galaxy</a></h5>
-                                                                <span class="text-muted">John
-                                                                    Roberts</span>
-                                                            </div>
-                                                        </div>
+                                                        <h5 class="fs-14 my-1 fw-normal">
+                                                            {{ $sanphamhethans->quantity }}</h5>
+                                                        <span class="text-muted">Số lượng</span>
                                                     </td>
-                                                    <td>
-                                                        <span class="text-muted">Watches</span>
-                                                    </td>
-                                                    <td>
-                                                        <p class="mb-0">895</p>
-                                                        <span class="text-muted">Stock</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">$75030</span>
-                                                    </td>
-                                                    <td>
-                                                        <h5 class="fs-14 mb-0">79%<i
-                                                                class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
-                                                        </h5>
-                                                    </td>
-                                                </tr><!-- end -->
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-2">
-                                                                <img src="assets/images/companies/img-3.png"
-                                                                    alt="" class="avatar-sm p-2" />
-                                                            </div>
-                                                            <div class="flex-gow-1">
-                                                                <h5 class="fs-14 my-1 fw-medium"><a
-                                                                        href="apps-ecommerce-seller-details.html"
-                                                                        class="text-reset">Nesta
-                                                                        Technologies</a></h5>
-                                                                <span class="text-muted">Harley
-                                                                    Fuller</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">Bike Accessories</span>
-                                                    </td>
-                                                    <td>
-                                                        <p class="mb-0">3470</p>
-                                                        <span class="text-muted">Stock</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">$45600</span>
-                                                    </td>
-                                                    <td>
-                                                        <h5 class="fs-14 mb-0">90%<i
-                                                                class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
-                                                        </h5>
-                                                    </td>
-                                                </tr><!-- end -->
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-2">
-                                                                <img src="assets/images/companies/img-8.png"
-                                                                    alt="" class="avatar-sm p-2" />
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="fs-14 my-1 fw-medium"><a
-                                                                        href="apps-ecommerce-seller-details.html"
-                                                                        class="text-reset">Zoetic
-                                                                        Fashion</a></h5>
-                                                                <span class="text-muted">James
-                                                                    Bowen</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">Clothes</span>
-                                                    </td>
-                                                    <td>
-                                                        <p class="mb-0">5488</p>
-                                                        <span class="text-muted">Stock</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">$29456</span>
-                                                    </td>
-                                                    <td>
-                                                        <h5 class="fs-14 mb-0">40%<i
-                                                                class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
-                                                        </h5>
-                                                    </td>
-                                                </tr><!-- end -->
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-2">
-                                                                <img src="assets/images/companies/img-5.png"
-                                                                    alt="" class="avatar-sm p-2" />
-                                                            </div>
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="fs-14 my-1 fw-medium">
-                                                                    <a href="apps-ecommerce-seller-details.html"
-                                                                        class="text-reset">Meta4Systems</a>
-                                                                </h5>
-                                                                <span class="text-muted">Zoe Dennis</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">Furniture</span>
-                                                    </td>
-                                                    <td>
-                                                        <p class="mb-0">4100</p>
-                                                        <span class="text-muted">Stock</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-muted">$11260</span>
-                                                    </td>
-                                                    <td>
-                                                        <h5 class="fs-14 mb-0">57%<i
-                                                                class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
-                                                        </h5>
-                                                    </td>
-                                                </tr><!-- end -->
+                                                </tr>
+                                            @endforeach
+
+
                                             </tbody>
                                         </table><!-- end table -->
                                     </div>
@@ -662,71 +503,71 @@
         $(document).ready(function() {
             // Dữ liệu mẫu cho biểu đồ tròn
             const labels = @json(array_column($percentages, 'name')); // Lấy tên từ mảng phần trăm
-const series = @json($totalSales); // Lấy tổng sản phẩm
+            const series = @json($totalSales); // Lấy tổng sản phẩm
 
-// Khởi tạo biểu đồ donut
-const donutOptions = {
-    chart: {
-        type: 'donut',
-        height: 350
-    },
-    colors: ['#FF4560', '#008FFB', '#00E396', '#775DD0', '#FEB019'], // Màu cố định
-    series: series,
-    labels: labels,
-    responsive: [{
-        breakpoint: 480,
-        options: {
-            chart: {
-                width: 200
-            },
-            legend: {
-                position: 'bottom'
-            }
-        }
-    }]
-};
+            // Khởi tạo biểu đồ donut
+            const donutOptions = {
+                chart: {
+                    type: 'donut',
+                    height: 350
+                },
+                colors: ['#FF4560', '#008FFB', '#00E396', '#775DD0', '#FEB019'], // Màu cố định
+                series: series,
+                labels: labels,
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
 
-// Tạo biểu đồ
-const donutChart = new ApexCharts(document.querySelector("#store-visits-source"), donutOptions);
-donutChart.render();
+            // Tạo biểu đồ
+            const donutChart = new ApexCharts(document.querySelector("#store-visits-source"), donutOptions);
+            donutChart.render();
 
             // Dữ liệu cho biểu đồ cột
             // Dữ liệu mẫu cho biểu đồ cột với 12 phần
             const columnLabels = [
-            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
-        ];
+                'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+            ];
 
-        const columnOptions = {
-            chart: {
-                type: 'bar',
-                height: 350,
-            },
-            colors: ['#FF4560', '#008FFB', '#00E396', '#775DD0', '#FEB019',
-                     '#FFB547', '#B1B1B1', '#FF67A3', '#6A80FF',
-                     '#A45E00', '#FFA07A', '#77D7A1'
-            ],
-            series: [{
-                name: 'Doanh Số',
-                data: @json($monthlySales) 
-            }],
-            xaxis: {
-                categories: columnLabels,
-            },
-            yaxis: {
-                title: {
-                    text: 'Doanh Số',
+            const columnOptions = {
+                chart: {
+                    type: 'bar',
+                    height: 350,
                 },
-            },
-            tooltip: {
-                y: {
-                    formatter: (val) => val + ' sản phẩm'
-                }
-            },
-        };
+                colors: ['#FF4560', '#008FFB', '#00E396', '#775DD0', '#FEB019',
+                    '#FFB547', '#B1B1B1', '#FF67A3', '#6A80FF',
+                    '#A45E00', '#FFA07A', '#77D7A1'
+                ],
+                series: [{
+                    name: 'Doanh Số',
+                    data: @json($monthlySales)
+                }],
+                xaxis: {
+                    categories: columnLabels,
+                },
+                yaxis: {
+                    title: {
+                        text: 'Doanh Số',
+                    },
+                },
+                tooltip: {
+                    y: {
+                        formatter: (val) => val + ' sản phẩm'
+                    }
+                },
+            };
 
-        const columnChart = new ApexCharts(document.querySelector("#store-visits-column"), columnOptions);
-        columnChart.render();
+            const columnChart = new ApexCharts(document.querySelector("#store-visits-column"), columnOptions);
+            columnChart.render();
         });
     </script>
 @endsection

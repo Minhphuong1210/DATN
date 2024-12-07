@@ -22,23 +22,23 @@ class DashboardController extends Controller
       // dd($totalBoughtProduct);
       // c1:
       $top10Category = SubCategory::select('sub_categories.name', 'sub_categories.id', DB::raw('SUM(Order_details.quantity) as total'))
-         // từ bảng subcategory lấy name và id và thực hiện tổng sản phẩm gọi thành total 
+         // từ bảng subcategory lấy name và id và thực hiện tổng sản phẩm gọi thành total
          ->join('products', 'sub_categories.id', '=', 'products.sub_category_id')
-         // ở đây là nối các bảng 
+         // ở đây là nối các bảng
          ->join('product_details', 'products.id', '=', 'product_details.product_id')
-         // ở đây là nối các bảng 
+         // ở đây là nối các bảng
          ->join('order_details', 'product_details.id', '=', 'order_details.product_detail_id')
-         // ở đây là nối các bảng 
+         // ở đây là nối các bảng
          ->groupBy('sub_categories.name', 'sub_categories.id')
-         // nhóm nó theo name và id  
+         // nhóm nó theo name và id
          ->orderBy('total', 'desc')
          // sắn xếp theo tổng nhiều nhất
          ->limit(10)
-         // giời hạn là 10 
-         // ->toRawSql(); 
-         // để hiện sql ra check 
+         // giời hạn là 10
+         // ->toRawSql();
+         // để hiện sql ra check
          ->get();
-      // đây là nối 4 bảng vào với nhau để có thể lấy được top 10 danh mục sản phẩm bán được nhiều nhất 
+      // đây là nối 4 bảng vào với nhau để có thể lấy được top 10 danh mục sản phẩm bán được nhiều nhất
 
       $top5LastestComment = Comment::query()
          ->whereNull('parent_id')
@@ -74,7 +74,10 @@ class DashboardController extends Controller
             ];
          })
          ->sortByDesc('total')
-         ->take(10); // Lấy 10 sản phẩm hàng đầu
+         ->take(5); // Lấy 10 sản phẩm hàng đầu
+// dd($top10productbought);
+         $sanphamhethan=ProductDetail::query()->where('quantity','<','30')->get();
+
 
       $top5Users = Order::select('orders.user_id', 'users.name', 'users.phone', 'users.address', 'users.email')
          ->selectRaw('SUM(order_details.quantity) as total')
@@ -86,7 +89,7 @@ class DashboardController extends Controller
          ->take(5)
          ->get();
 
-      // thống kê theo năm 
+      // thống kê theo năm
       $currentYear = Carbon::now()->year;
       $data = OrderDetail::selectRaw('MONTH(created_at) as month, SUM(quantity) as total_sales')
          ->whereYear('created_at', $currentYear)
@@ -100,7 +103,7 @@ class DashboardController extends Controller
          $monthlySales[$item->month - 1] = $item->total_sales;
       }
       $percentages = [];
-// Thống kê biểu đồ tròn theo danh mục sản phẩm đã bán 
+// Thống kê biểu đồ tròn theo danh mục sản phẩm đã bán
 // lấy dữ liệu từ cái trên xuống nhưng bỏ cái limit đi để không bị giowia hạn
 $PieChart = SubCategory::select('sub_categories.name', 'sub_categories.id', DB::raw('SUM(order_details.quantity) as total'))
     ->join('products', 'sub_categories.id', '=', 'products.sub_category_id')
@@ -121,7 +124,8 @@ foreach ($PieChart as $PieCharts) {
 
 // Lưu mảng tổng sản phẩm vào biến cho JavaScript
 $totalSales = array_column($percentages, 'total'); // Lấy ra mảng tổng sản phẩm
+$sanphamhethan=ProductDetail::query()->where('quantity','<','30')->orderBy('quantity','asc')->limit('5')->get();
       // dd($percen);
-      return view('dashboard', compact('totalmoney', 'totalBoughtProduct', 'totalProduct', 'top10Category', 'top5LastestComment', 'top10productbought', 'top5Users', 'monthlySales', 'percentages','totalSales'));
+      return view('dashboard', compact('totalmoney', 'totalBoughtProduct', 'totalProduct', 'top10Category', 'top5LastestComment', 'top10productbought', 'top5Users', 'monthlySales', 'percentages','totalSales','sanphamhethan'));
    }
 }

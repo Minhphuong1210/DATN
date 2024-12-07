@@ -249,7 +249,10 @@ class ProductController extends Controller
     // Hàm để lấy danh sách sản phẩm đã xem gần đây
     public function getRecentlyViewed(Request $request)
     {
-        $user_id = Auth::id();
+         $request->validate([
+            'user_id' => 'required'
+        ]);
+        $user_id = $request->user_id;
         // Lấy người dùng hiện tại
         // return response()->json([
         //     'user_id' => $user_id
@@ -317,7 +320,18 @@ class ProductController extends Controller
         if ($request->filled('min_price') || $request->filled('max_price')) {
             $min_price = $request->min_price ?? 0;
             $max_price = $request->max_price ?? 9999999;
-            $query->whereBetween('products.price', [$min_price, $max_price]);
+            $query->where(function ($q) use ($min_price, $max_price) {
+                // Nếu có giá sale, lọc theo giá sale
+                $q->where(function ($q2) use ($min_price, $max_price) {
+                    $q2->whereNotNull('products.price_sale')  // Kiểm tra nếu có giá sale
+                        ->whereBetween('products.price_sale', [$min_price, $max_price]); // Lọc theo giá sale
+                })
+                ->orWhere(function ($q3) use ($min_price, $max_price) {
+                    // Nếu không có giá sale, lọc theo giá gốc
+                    $q3->whereNull('products.price_sale')  // Kiểm tra nếu không có giá sale
+                        ->whereBetween('products.price', [$min_price, $max_price]); // Lọc theo giá gốc
+                });
+            });
         }
 
         $products = $query->select('products.*')

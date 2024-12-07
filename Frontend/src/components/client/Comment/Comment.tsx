@@ -66,7 +66,7 @@ const Comment: React.FC<ConfirmModalProps> = ({ isVisible, onConfirm, onCancel, 
                             <div className="flex justify-end items-center mb-2">
                             </div>
                             <hr className="mb-2" />
-                            <div className="">
+                            {/* <div className="">
                                 <div className="flex">
                                     <img src="https://m.yodycdn.com/fit-in/filters:format(webp)/products/ao-the-thao-nam-SUM7006-DEN%20(10).JPG" alt="Product Image" className="w-20 h-20 object-cover mr-4" />
                                     <div className="flex-1">
@@ -75,7 +75,7 @@ const Comment: React.FC<ConfirmModalProps> = ({ isVisible, onConfirm, onCancel, 
                                         <div className="text-sm text-gray-500">x1</div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
@@ -95,11 +95,11 @@ const Comment: React.FC<ConfirmModalProps> = ({ isVisible, onConfirm, onCancel, 
                     </div>
 
                     <div>
-                        <div className='flex gap-3 justify-center text-[15px]'>
+                        {/* <div className='flex gap-3 justify-center text-[15px]'>
                             <div className='border-2 border-red-300 w-60  h-32 flex flex-col justify-center items-center text-red-500'> <Camera strokeWidth='1' size={40} /> Thêm hình ảnh</div>
 
-                            {/* <div className='border-2 border-red-300 w-60 h-32 flex flex-col justify-center items-center text-red-500'>  <Video strokeWidth='1' size={40} />Thêm video</div> */}
-                        </div>
+                            <div className='border-2 border-red-300 w-60 h-32 flex flex-col justify-center items-center text-red-500'>  <Video strokeWidth='1' size={40} />Thêm video</div>
+                        </div> */}
                     </div>
                     <div className=' flex justify-center'>
                         <textarea

@@ -37,8 +37,22 @@ interface CartProviderProps {
 // CartProvider để quản lý trạng thái giỏ hàng
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<Cart_detail[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
   const [Message, setMessage] = useState('');
   const { setLoading } = useLoading()
+  const checkUser = localStorage.getItem('user');
+  useEffect(() => {
+    if (checkUser) {
+      try {
+        const userID = JSON.parse(checkUser);
+        if (userID && userID.id) {
+          setUserId(userID.id);
+        }
+      } catch (error) {
+        console.error("Failed to parse the token:", error);
+      }
+    }
+  }, [checkUser]);
   // Hàm để thêm sản phẩm vào giỏ hàng
   const addToCart = async (product: Product, color_id: string, size_id: string, quantity: number) => {
     try {
@@ -58,6 +72,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         size_id,
         quantity,
         price: product.price,
+        user_id: userId
       });
 
       // Thêm sản phẩm vào giỏ hàng trong state của context
@@ -129,7 +144,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       //  console.log(response.data.message);
 
       if (response.data.message) {
-        toast.success(response.data.message);
+        // toast.success(response.data.message);
       } else {
         toast.error(response.data.error);
         return;
@@ -152,7 +167,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setCart(updatedCart); // Cập nhật giỏ hàng tạm thời
       await axios.put(`/api/cart/${id}/update`, { quantity: updatedCart.find(item => item.id === id)?.quantity });
     } catch (error) {
-      console.error("Lỗi khi giảm số lượng sản phẩm:", error);
+      // console.error("Lỗi khi giảm số lượng sản phẩm:", error);
     } finally {
       setLoading(false)
     }

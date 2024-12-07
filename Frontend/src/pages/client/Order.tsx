@@ -5,6 +5,7 @@ import CancelMyOrder from "../../modalConfirm/CancelMyoOrder";
 import Comment from "../../components/client/Comment/Comment";
 import { toast } from "react-toastify";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import useFormatPrice from "../../hook/useFormatPrice";
 
 interface OrderItem {
     id: string;
@@ -13,7 +14,7 @@ interface OrderItem {
     price: number;
     product_name: string;
     quantity: number;
-    codeOder: string
+    code_order: string
 }
 
 const Order: React.FC = () => {
@@ -22,7 +23,7 @@ const Order: React.FC = () => {
     const [isModalComment, setModalComment] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
     const [selectedProductId, setSelectedProductId] = useState(null);
-
+    const { formatPrice } = useFormatPrice();
     // Thêm state cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage] = useState(2);
@@ -134,24 +135,26 @@ const Order: React.FC = () => {
         acc[item.id].push(item);
         return acc;
     }, {});
+
+
     return (
-        <div className="col-span-4">
+        <div className="col-span-4 ">
             <div className="overflow-hidden">
-                <div className=" mx-auto px-4 relative h-[650px]">
+                <div className=" mx-auto px-4 relative h-[550px] ">
                     {/* Search Bar */}
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                         <input
                             type="text"
                             placeholder="Bạn có thể tìm kiếm theo ID đơn hàng hoặc Tên Sản phẩm"
                             className=" text-[15px] w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
-                    </div>
+                    </div> */}
                     {Object.keys(groupedOrders).map((id) => (
-                        <div key={id} className="border border-gray-300 rounded-md p-4 mb-4">
+                        <div key={id} className="border  rounded-md p-4 mb-4 bg-white">
                             <div className="flex justify-between items-center mb-2">
                                 <div className=" space-x-2 text-stone-500">
                                     <span>Mã đơn hàng:</span>
-                                    <span>{groupedOrders[id][0]?.codeOder || "Không có mã"}</span>
+                                    <span>{groupedOrders[id][0]?.code_order || "Không có mã"}</span>
                                 </div>
                                 <div className="flex space-x-2">
                                     <span
@@ -167,18 +170,20 @@ const Order: React.FC = () => {
                             {/* Hiển thị sản phẩm theo từng nhóm id */}
                             {groupedOrders[Number(id)].map((item, index) => (
                                 <div key={index} className="flex mb-2">
-                                    <img src={item.image} alt="Product Image" className="w-20 h-20 object-cover mr-4" />
+                                    <img src={item.imageUrl} alt="Product Image" className="w-20 h-20 object-cover mr-4" />
                                     <div className="flex-1">
                                         <p className="text-gray-800">{item.product_name}</p>
                                         <div className="text-sm text-gray-500">Phân loại hàng: Dài 33cm</div>
                                         <div className="text-sm text-gray-500">Sl:x{item.quantity}</div>
                                     </div>
-                                    <button
-                                        onClick={() => openComment(item.id_product)}
-                                        className="px-4 py-2 text-gray-700 rounded border-2 hover:bg-gray-100"
-                                    >
-                                        Đánh Giá Sản Phẩm
-                                    </button>
+                                    {groupedOrders[Number(id)][0].orderStatus === "Đã nhận hàng" && (
+                                        <button
+                                            onClick={() => openComment(item.id_product)}
+                                            className="px-4 py-2 text-gray-700 rounded border-2 hover:bg-gray-100"
+                                        >
+                                            Đánh Giá Sản Phẩm
+                                        </button>
+                                    )}
                                 </div>
                             ))}
 
@@ -187,14 +192,14 @@ const Order: React.FC = () => {
                                 <div className="flex justify-end">
                                     <p className="mr-2">Thành tiền:</p>
                                     <p className="text-xl text-red-600">
-                                        {groupedOrders[Number(id)].reduce((total, item) => total + item.price, 0)}đ
+                                        {formatPrice(groupedOrders[Number(id)].reduce((total, item) => total + item.price, 0))}
                                     </p>
                                 </div>
                                 <div className="flex space-x-2 mt-2 justify-end text-[15px]">
                                     {getStatusButton(groupedOrders[Number(id)][0].orderStatus, id)}
-                                    <button className="px-4 py-2 text-gray-700 rounded border-2 hover:bg-gray-100">
+                                    {/* <button className="px-4 py-2 text-gray-700 rounded border-2 hover:bg-gray-100">
                                         Liên Hệ Shop
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
                         </div>

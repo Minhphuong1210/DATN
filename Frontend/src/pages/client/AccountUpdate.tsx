@@ -24,7 +24,7 @@ const AccountUpdate = () => {
     return (
 
         <div className='col-span-4'>
-            <div className=' bg-white ml-3 rounded-sm border-2 p-6 flex flex-col items-center'>
+            <div className=' bg-white ml-3 rounded-lg border-2 p-6 flex flex-col items-center'>
                 <h2 className='text-2xl font-semibold text-center'>Cập nhật tài khoản</h2>
                 <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-1/2 mx-auto mt-4 p-4'>
                     <div>
@@ -32,7 +32,7 @@ const AccountUpdate = () => {
                         <input
                             type="text"
                             name="name"
-                            placeholder='Nhập tên'
+
                             className='w-full p-2 border border-gray-300 rounded-md'
                             value={user.name ?? ""}
                             onChange={handleChange}
@@ -43,7 +43,7 @@ const AccountUpdate = () => {
                         <input
                             type="email"
                             name="email"
-                            placeholder='Nhập email'
+
                             className='w-full p-2 border border-gray-300 rounded-md'
                             value={user.email ?? ""}
                             onChange={handleChange}
@@ -54,7 +54,7 @@ const AccountUpdate = () => {
                         <input
                             type="text"
                             name="phone"
-                            placeholder='Nhập số điện thoại'
+
                             className='w-full p-2 border border-gray-300 rounded-md'
                             value={user.phone ?? ""}
                             onChange={handleChange}
@@ -65,7 +65,7 @@ const AccountUpdate = () => {
                         <input
                             type="text"
                             name="address"
-                            placeholder='Nhập địa chỉ'
+
                             className='w-full p-2 border border-gray-300 rounded-md'
                             value={user.address ?? ""}
                             onChange={handleChange}

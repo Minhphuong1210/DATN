@@ -32,6 +32,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($comment as $item)
+                              
                                     <tr>
                                         <th scope="row">{{ $item->id }}</th>
                                         <!-- Display user email -->

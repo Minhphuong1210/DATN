@@ -255,45 +255,46 @@
     </script>
 
     <script>
-        document.getElementById('add-variant').addEventListener('click', function() {
-            var rowCount = 1;
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
+          var rowCountDem = 1;
+      document.getElementById('add-variant').addEventListener('click', function () {
+
+        var variantTableBody = document.getElementById('variant-table-body');
+        var newVariantRow = document.createElement('tr');
+        newVariantRow.innerHTML = `
             <td class="d-flex align-items-center">
                 <div class="mb-3 mx-3">
-                    <label for="simpleinput" class="form-label">Màu sắc</label>
-                    <select class="form-select" aria-label="Default select example" name="products[${rowCount}][color_id]">
+                    <label for="simpleinput" class="form-label">Color</label>
+                    <select class="form-select" name="products[${rowCountDem}][color_id]">
                         @foreach ($color as $colors)
                             <option value="{{ $colors->id }}">{{ $colors->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="mb-3 mx-3">
-                    <label for="simpleinput" class="form-label">Kích thước</label>
-                    <select class="form-select" aria-label="Default select example" name="products[${rowCount}][size_id]">
+                    <label for="simpleinput" class="form-label">Size</label>
+                    <select class="form-select" name="products[${rowCountDem}][size_id]">
                         @foreach ($size as $sizes)
                             <option value="{{ $sizes->id }}">{{ $sizes->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="simpleinput" class="form-label">Số lượng</label>
-                    <input type="text" name="products[${rowCount}][quantity]" class="form-control">
+                    <label for="simpleinput" class="form-label">Quantity</label>
+                    <input type="text" class="form-control" name="products[${rowCountDem}][quantity]">
                 </div>
             </td>
             <td>
                 <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1 remove-variant" style="cursor: pointer"></i>
             </td>
         `;
-            document.getElementById('variant-table-body').appendChild(newRow);
+        variantTableBody.appendChild(newVariantRow);
+
+        // Add event listener to the delete button
+        newVariantRow.querySelector('.remove-variant').addEventListener('click', function () {
+            newVariantRow.remove();
         });
 
-
-        document.getElementById('variant-table-body').addEventListener('click', function(event) {
-            if (event.target.classList.contains('remove-variant')) {
-
-                event.target.closest('tr').remove();
-            }
-        });
+        rowCountDem++;
+    });
     </script>
 @endsection

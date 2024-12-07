@@ -20,8 +20,8 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     @error('products')
-                                    <div class="alert alert-danger">{{ $message }}</div>
-                                @enderror
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                     <label for="product_name" class="form-label">Name</label>
                                     <input type="text" id="product_name"
                                         class="form-control @error('name') is-invalid @enderror" name="name"
@@ -55,7 +55,7 @@
                                     <input type="file" id="simpleinput"
                                         class="form-control  @error('image') is-invalid @enderror" name="image"
                                         value="{{ $product->image }}" placeholder="image ">
-                                        <img src="{{Storage::url( $product->image)}}" alt="" width="100px">
+                                    <img src="{{ Storage::url($product->image) }}" alt="" width="100px">
                                     @error('image')
                                         <p class="text-danger">{{ $message }}</p>
                                     @enderror
@@ -78,18 +78,35 @@
                                         // Kích hoạt CKEditor
                                         CKEDITOR.replace('content', {
                                             language: 'vi', // Ngôn ngữ Tiếng Việt
-                                            toolbar: [
-                                                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
-                                                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'] },
-                                                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] },
-                                                { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
-                                                { name: 'colors', items: ['TextColor', 'BGColor'] },
-                                                { name: 'tools', items: ['Maximize'] },
+                                            toolbar: [{
+                                                    name: 'basicstyles',
+                                                    items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat']
+                                                },
+                                                {
+                                                    name: 'paragraph',
+                                                    items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
+                                                },
+                                                {
+                                                    name: 'insert',
+                                                    items: ['Image', 'Table', 'HorizontalRule']
+                                                },
+                                                {
+                                                    name: 'styles',
+                                                    items: ['Format', 'Font', 'FontSize']
+                                                },
+                                                {
+                                                    name: 'colors',
+                                                    items: ['TextColor', 'BGColor']
+                                                },
+                                                {
+                                                    name: 'tools',
+                                                    items: ['Maximize']
+                                                },
                                             ],
                                             height: 300, // Chiều cao của editor
                                         });
                                     </script>
-                                    
+
                                 </div>
 
 
@@ -141,10 +158,11 @@
                                                     <td class="d-flex align-items-center">
                                                         <input type="file" class="form-control"
                                                             name="list_hinh_anh[{{ $image->id }}]"
-                                                            onchange="previewImage(this, {{ $image->id }})"> 
+                                                            onchange="previewImage(this, {{ $image->id }})">
                                                         <img src="{{ Storage::url($image->image) }}" alt=""
                                                             width="100px" id="preview_{{ $image->id }}">
-                                                            <input type="hidden" name="list_hinh_anh[{{ $image->id }}]" value="{{$image->id}}">
+                                                        <input type="hidden" name="list_hinh_anh[{{ $image->id }}]"
+                                                            value="{{ $image->id }}">
                                                     </td>
                                                     <td>
                                                         <i class="mdi mdi-delete text-muted fs-18 rounded-2 border remove-image p-1"
@@ -245,7 +263,7 @@
                     <td class="d-flex align-items-center">
                         <div class="mb-3 mx-3">
                             <label class="form-label">Màu sắc</label>
-                            <select class="form-select" name="products[new_${variantRowCount}][color_id]">
+                            <select class="form-select" name="products[${variantRowCount}][color_id]">
                                 @foreach ($color as $colors)
                                     <option value="{{ $colors->id }}">{{ $colors->name }}</option>
                                 @endforeach
@@ -253,7 +271,7 @@
                         </div>
                         <div class="mb-3 mx-3">
                             <label class="form-label">Kích thước</label>
-                            <select class="form-select" name="products[new_${variantRowCount}][size_id]">
+                            <select class="form-select" name="products[${variantRowCount}][size_id]">
                                 @foreach ($size as $sizes)
                                     <option value="{{ $sizes->id }}">{{ $sizes->name }}</option>
                                 @endforeach
@@ -261,7 +279,7 @@
                         </div>
                         <div class="mb-3 mx-3">
                             <label class="form-label">Số lượng</label>
-                            <input type="number" class="form-control" name="products[new_${variantRowCount}][quantity]" value="1">
+                            <input type="number" class="form-control" name="products[${variantRowCount}][quantity]" value="1">
                         </div>
                     </td>
                     <td>
@@ -280,16 +298,29 @@
             });
 
 
-            document.querySelectorAll('.remove-variant').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var variantId = this.closest('tr').getAttribute('data-variant-id');
+            // document.querySelectorAll('.remove-variant').forEach(function(button) {
+            //     button.addEventListener('click', function() {
+            //         var variantId = this.closest('tr').getAttribute('data-variant-id');
+            //         if (variantId) {
+            //             var deletedVariants = document.getElementById('deleted_variants').value;
+            //             deletedVariants += (deletedVariants ? ',' : '') + variantId;
+            //             document.getElementById('deleted_variants').value = deletedVariants;
+            //         }
+            //         this.closest('tr').remove();
+            //     });
+            // });
+
+            document.getElementById('variant-table-body').addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-variant')) {
+                    const row = event.target.closest('tr');
+                    const variantId = row.getAttribute('data-variant-id');
                     if (variantId) {
-                        var deletedVariants = document.getElementById('deleted_variants').value;
+                        let deletedVariants = document.getElementById('deleted_variants').value;
                         deletedVariants += (deletedVariants ? ',' : '') + variantId;
                         document.getElementById('deleted_variants').value = deletedVariants;
                     }
-                    this.closest('tr').remove();
-                });
+                    row.remove();
+                }
             });
 
         });

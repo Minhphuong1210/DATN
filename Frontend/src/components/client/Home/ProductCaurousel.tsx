@@ -135,7 +135,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ productsHot = [] }) =
                                                 <span className="mr-1 text-xs md:text-sm lg:text-base xl:text-base text-gray-500 line-through hover:text-yellow-500">
                                                     {formatPrice(product.price)}
                                                 </span>
-                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl hover:text-yellow-500">
+                                                <span className="text-sm md:text-base lg:text-lg xl:text-xl text-red-500 hover:text-yellow-500">
                                                     {formatPrice(product.price_sale)}
                                                 </span>
                                             </>

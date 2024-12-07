@@ -1,29 +1,41 @@
-
 export const validateShippingInfo = (shippingInfo: {
     username: string;
     address: string;
     email: string;
     phone: string;
     shippingMethod: string;
-}): string | null => {
+}): { [key: string]: string | null } => {
     const { username, address, email, phone, shippingMethod } = shippingInfo;
+    const errors: { [key: string]: string | null } = {};
 
     // Kiểm tra các trường thông tin bắt buộc
-    if (!username || !address || !email || !phone || !shippingMethod) {
-        return "Vui lòng điền tất cả thông tin bắt buộc.";
+    if (!username) {
+        errors.username = "Vui lòng điền họ và tên.";
+    }
+    if (!address) {
+        errors.address = "Vui lòng điền địa chỉ.";
+    }
+    if (!email) {
+        errors.email = "Vui lòng điền email.";
+    }
+    if (!phone) {
+        errors.phone = "Vui lòng điền số điện thoại.";
+    }
+    if (!shippingMethod) {
+        errors.shippingMethod = "Vui lòng chọn phương thức vận chuyển.";
     }
 
-    // Kiểm tra định dạng email
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return "Email không hợp lệ.";
+    if (email && !emailRegex.test(email)) {
+        errors.email = "Email không hợp lệ.";
     }
 
-    // Kiểm tra định dạng số điện thoại
-    const phoneRegex = /^[0-9]{10,15}$/; // Định dạng số điện thoại từ 10 đến 15 chữ số
-    if (!phoneRegex.test(phone)) {
-        return "Số điện thoại không hợp lệ.";
+
+    const phoneRegex = /^[0-9]{10,15}$/;
+    if (phone && !phoneRegex.test(phone)) {
+        errors.phone = "Số điện thoại không hợp lệ.";
     }
 
-    return null; // Không có lỗi
+    return errors; // Trả về lỗi cho từng trường
 };
